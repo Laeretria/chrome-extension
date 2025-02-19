@@ -68,7 +68,7 @@ async function loadTabData(tabName) {
     document.getElementById('loading').classList.add('hidden')
 
     if (tabName === 'images' && response && response.images) {
-      updateImagesUI(response.images)
+      updateImagesUI(response) // Update images and summary
     } else if (tabName === 'links' && response) {
       updateLinksUI(response)
     }
@@ -79,27 +79,32 @@ async function loadTabData(tabName) {
   }
 }
 
-function updateImagesUI(images) {
-  const totalImages = images.length
-  const missingAlt = images.filter((img) => !img.alt).length
+// Function to update the UI with images and summary data
+function updateImagesUI({ images, summary }) {
+  const { total, missingAlt, missingTitle } = summary
 
-  document.getElementById('totalImages').textContent = totalImages
+  // Update the counts in the UI
+  document.getElementById('totalImages').textContent = total
   document.getElementById('missingAlt').textContent = missingAlt
+  document.getElementById('missingTitle').textContent = missingTitle
 
+  // Clear any existing image details in the UI
   const imageDetails = document.getElementById('imageDetails')
   imageDetails.innerHTML = ''
 
+  // Loop through each image to display the details
   images.forEach((img, index) => {
     const imageInfo = document.createElement('div')
     imageInfo.className = 'image-info'
     imageInfo.innerHTML = `
-            <h3>Afbeelding ${index + 1}</h3>
-            <p>Source: ${img.src}</p>
-            <p>Alt Text: ${
-              img.alt || '<span class="warning">Ontbreekt!</span>'
-            }</p>
-            <p>Afmetingen: ${img.width}x${img.height}</p>
-        `
+        <h3>Afbeelding ${index + 1}</h3>
+        <p>Source: ${img.src}</p>
+        <p>Alt Text: ${img.alt || '<span class="warning">Ontbreekt!</span>'}</p>
+        <p>Title Text: ${
+          img.title || '<span class="warning">Ontbreekt!</span>'
+        }</p>
+        <p>Afmetingen: ${img.width}x${img.height}</p>
+      `
     imageDetails.appendChild(imageInfo)
   })
 }
@@ -144,17 +149,17 @@ function createLinkElement(link) {
   // Handle undefined href
   if (link.href === 'Undefined (No href attribute)') {
     div.innerHTML = `
-            <div class="undefined-link">Undefined (No href attribute)</div>
-            <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
-        `
+              <div class="undefined-link">Undefined (No href attribute)</div>
+              <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+          `
   } else {
     div.innerHTML = `
-            <a href="${link.href}" class="link-url" target="_blank">${
+              <a href="${link.href}" class="link-url" target="_blank">${
       link.href
     }</a>
-            <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
-            ${link.rel ? `<span class="link-rel">${link.rel}</span>` : ''}
-        `
+              <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+              ${link.rel ? `<span class="link-rel">${link.rel}</span>` : ''}
+          `
   }
 
   return div

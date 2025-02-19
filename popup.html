@@ -102,7 +102,7 @@
         </button>
       </div>
 
-      <div id="loading">Analyzing page...</div>
+      <div id="loading">Analyseren van pagina</div>
 
       <!-- Links Tab -->
       <div id="links-tab" class="tab-content">
@@ -189,19 +189,28 @@
         </div>
       </div>
 
-      <!-- Images Tab -->
-      <div id="images-tab" class="tab-content active">
-        <div class="summary">
-          <h2>Afbeeldingen Samenvatting</h2>
-          <p>Totaal aantal afbeeldingen: <span id="totalImages">0</span></p>
-          <p>Afbeeldingen zonder alt text: <span id="missingAlt">0</span></p>
-        </div>
-        <div class="image-list">
-          <h2>Gevonden Afbeeldingen</h2>
-          <div id="imageDetails"></div>
-        </div>
+<!-- Images Tab -->
+<div id="images-tab" class="tab-content active">
+  <div class="metrics">
+      <div class="metric">
+          <span class="metric-label">Total Images</span>
+          <span class="metric-value" id="totalImages">0</span>
       </div>
-    </div>
+      <div class="metric">
+          <span class="metric-label">Missing Alt</span>
+          <span class="metric-value" id="missingAlt">0</span>
+      </div>
+      <div class="metric">
+          <span class="metric-label">Missing Title</span>
+          <span class="metric-value" id="missingTitle">0</span>
+      </div>
+  </div>
+
+  <div class="image-list">
+      <h2>Images Found</h2>
+      <div id="imageDetails" class="image-grid"></div>
+  </div>
+</div>
     <script src="popup.js"></script>
   </body>
 </html>
