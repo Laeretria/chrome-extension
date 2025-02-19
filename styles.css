@@ -80,11 +80,14 @@ h2 {
   justify-content: center;
   align-items: center;
   border-radius: 4px;
-  margin: 3px;
   font-family: 'Regola-Medium';
   color: var(--black);
 
   transition: 0.3s;
+}
+
+.tab-button:not(:last-child) {
+  margin-right: 3px;
 }
 
 .tab-button:hover {
@@ -141,7 +144,7 @@ h2 {
   background-color: #f5f5f5;
   padding: 15px;
   border-radius: 5px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .metric {
@@ -153,6 +156,7 @@ h2 {
   color: var(--body);
   font-size: 14px;
   margin-bottom: 5px;
+  font-family: 'Regola-Bold';
 }
 
 .metric-value {
@@ -166,26 +170,28 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-top: 15px;
+  gap: 15px;
+  margin-top: 20px;
 }
 
 .export-btn {
   display: flex;
   align-items: center;
   gap: 5px;
-  padding: 8px 12px;
-  background-color: #e9ecef;
-  border: none;
+  padding: 10px 20px;
+  background-color: var(--white);
   border-radius: 4px;
   cursor: pointer;
+  border: 1px solid #e7e9f1;
+  font-family: 'Regola-Medium';
   font-size: 13px;
   color: var(--body);
   transition: background-color 0.3s;
 }
 
 .export-btn:hover {
-  background-color: #dee2e6;
+  background-color: var(--primary-color);
+  color: var(--white);
 }
 
 /* Links List Styling */
@@ -194,7 +200,8 @@ h2 {
 }
 
 .link-item {
-  padding: 12px;
+  padding-left: 0px !important;
+  padding: 15px;
   border-bottom: 1px solid #eee;
 }
 
