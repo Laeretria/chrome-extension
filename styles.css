@@ -8,20 +8,33 @@
   --black: #000;
   --background-color: #eff5ff;
 }
+
 @font-face {
   font-family: 'Regola-Bold';
   src: url('assets/fonts/RegolaPro-Bold.ttf');
 }
+
 @font-face {
   font-family: 'Regola-Medium';
   src: url('assets/fonts/RegolaPro-Medium.ttf');
 }
+
 @font-face {
   font-family: 'Regola-Regular';
   src: url('assets/fonts/RegolaPro-Regular.ttf');
 }
+
 body {
   font-family: 'Regola-Regular';
+}
+/* .header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+} */
+
+.titel {
+  font-size: medium;
 }
 
 .container {
