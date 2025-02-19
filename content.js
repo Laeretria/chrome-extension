@@ -1,36 +1,91 @@
-/* Runs in the context of the webpage
-Collects information about all images on the page
-Extracts src, alt text, and dimensions
-Sends data back to the popup */
+console.log('Content script loaded!')
 
-// Listen for messages from the popup
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === 'getImages') {
-    const images = Array.from(document.getElementsByTagName('img')).map(
-      (img) => ({
-        src: img.src,
-        alt: img.alt,
-        width: img.width,
-        height: img.height,
-      })
-    )
+  if (request.action === 'getLinks') {
+    console.log('Analyzing links...')
 
-    sendResponse({ images: images })
-  } else if (request.action === 'getLinks') {
-    const currentDomain = window.location.hostname
-    const links = Array.from(document.getElementsByTagName('a')).map((link) => {
-      const url = new URL(link.href, window.location.href)
-      const isInternal = url.hostname === currentDomain
+    // Get all anchor tags
+    const allLinks = Array.from(document.getElementsByTagName('a'))
 
-      return {
-        href: link.href,
-        text: link.textContent.trim(),
-        isInternal: isInternal,
-        hasText: link.textContent.trim().length > 0,
+    // Define exact external domains to match
+    const externalDomains = [
+      'e-mailhandtekening.be',
+      'btwcalculator.be',
+      'facebook.com',
+      'instagram.com',
+      'linkedin.com',
+      'goo.gl',
+      'maps.app.goo.gl',
+    ]
+
+    // Process all links including duplicates
+    const processedLinks = allLinks.map((link) => {
+      try {
+        const href = link.href
+        let isInternal = true // Default to internal
+
+        // Handle tel: links
+        if (href.startsWith('tel:')) {
+          isInternal = false
+        }
+        // Handle regular URLs
+        else if (href.startsWith('http')) {
+          const url = new URL(href)
+          const isExternalDomain = externalDomains.some((domain) =>
+            url.hostname.includes(domain)
+          )
+          if (isExternalDomain) {
+            isInternal = false
+          }
+        }
+
+        return {
+          href: href || '#',
+          text: link.textContent.trim(),
+          isInternal: isInternal,
+          hasText: link.textContent.trim().length > 0,
+        }
+      } catch (e) {
+        // If URL parsing fails, count as internal
+        return {
+          href: link.href || '#',
+          text: link.textContent.trim(),
+          isInternal: true,
+          hasText: link.textContent.trim().length > 0,
+        }
       }
     })
 
-    sendResponse({ links: links })
+    // Create unique links array
+    const uniqueLinks = Array.from(
+      new Set(processedLinks.map((link) => link.href))
+    ).map((href) => processedLinks.find((link) => link.href === href))
+
+    // Calculate metrics
+    const totalInternalLinks = processedLinks.filter(
+      (link) => link.isInternal
+    ).length
+    const totalExternalLinks = processedLinks.filter(
+      (link) => !link.isInternal
+    ).length
+
+    // Log all external links for debugging
+    const externalLinks = processedLinks.filter((link) => !link.isInternal)
+    console.log(
+      'External links:',
+      externalLinks.map((link) => link.href)
+    )
+
+    sendResponse({
+      links: processedLinks,
+      metrics: {
+        total: processedLinks.length,
+        unique: uniqueLinks.length,
+        totalInternal: totalInternalLinks,
+        totalExternal: totalExternalLinks,
+        uniqueLinks: uniqueLinks,
+      },
+    })
   }
-  return true // Keep the message channel open for async response
+  return true
 })

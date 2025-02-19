@@ -1,28 +1,18 @@
-/* Runs when the popup is opened
-Communicates with content.js to get image data
-Updates the UI with the image analysis results
-Shows total images and missing alt text counts */
-
 document.addEventListener('DOMContentLoaded', function () {
   // Tab switching functionality
   const tabs = document.querySelectorAll('.tab-button')
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      // Remove active class from all tabs
       tabs.forEach((t) => t.classList.remove('active'))
-      // Add active class to clicked tab
       tab.classList.add('active')
 
-      // Hide all tab content
       document.querySelectorAll('.tab-content').forEach((content) => {
         content.classList.remove('active')
       })
 
-      // Show selected tab content
       const tabId = `${tab.dataset.tab}-tab`
       document.getElementById(tabId).classList.add('active')
 
-      // Load data for the selected tab
       loadTabData(tab.dataset.tab)
     })
   })
@@ -31,24 +21,62 @@ document.addEventListener('DOMContentLoaded', function () {
   loadTabData('images')
 })
 
-function loadTabData(tabName) {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+async function ensureContentScriptInjected(tabId) {
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['content.js'],
+    })
+    console.log('Content script injected successfully')
+  } catch (err) {
+    console.log(
+      'Content script injection error (might already be injected):',
+      err
+    )
+  }
+}
+
+async function loadTabData(tabName) {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    const currentTab = tabs[0]
+
+    if (!currentTab) {
+      throw new Error('No active tab found')
+    }
+
+    // Ensure content script is injected
+    await ensureContentScriptInjected(currentTab.id)
+
+    // Wait a short moment to ensure content script is ready
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
     const action = tabName === 'images' ? 'getImages' : 'getLinks'
 
-    chrome.tabs.sendMessage(
-      tabs[0].id,
-      { action: action },
-      function (response) {
-        document.getElementById('loading').classList.add('hidden')
-
-        if (tabName === 'images' && response && response.images) {
-          updateImagesUI(response.images)
-        } else if (tabName === 'links' && response && response.links) {
-          updateLinksUI(response.links)
+    // Send message with timeout
+    const response = await new Promise((resolve, reject) => {
+      chrome.tabs.sendMessage(currentTab.id, { action: action }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error('Message sending error:', chrome.runtime.lastError)
+          reject(chrome.runtime.lastError)
+        } else {
+          resolve(response)
         }
-      }
-    )
-  })
+      })
+    })
+
+    document.getElementById('loading').classList.add('hidden')
+
+    if (tabName === 'images' && response && response.images) {
+      updateImagesUI(response.images)
+    } else if (tabName === 'links' && response) {
+      updateLinksUI(response)
+    }
+  } catch (error) {
+    console.error('Error in loadTabData:', error)
+    document.getElementById('loading').textContent =
+      'Error loading data. Please refresh the page and try again.'
+  }
 }
 
 function updateImagesUI(images) {
@@ -65,40 +93,47 @@ function updateImagesUI(images) {
     const imageInfo = document.createElement('div')
     imageInfo.className = 'image-info'
     imageInfo.innerHTML = `
-              <h3>Afbeelding ${index + 1}</h3>
-              <p>Source: ${img.src}</p>
-              <p>Alt Text: ${
-                img.alt || '<span class="warning">Ontbreekt!</span>'
-              }</p>
-              <p>Afmetingen: ${img.width}x${img.height}</p>
-          `
+            <h3>Afbeelding ${index + 1}</h3>
+            <p>Source: ${img.src}</p>
+            <p>Alt Text: ${
+              img.alt || '<span class="warning">Ontbreekt!</span>'
+            }</p>
+            <p>Afmetingen: ${img.width}x${img.height}</p>
+        `
     imageDetails.appendChild(imageInfo)
   })
 }
 
-function updateLinksUI(links) {
-  const totalLinks = links.length
-  const internalLinks = links.filter((link) => link.isInternal).length
-  const externalLinks = totalLinks - internalLinks
+function updateLinksUI(response) {
+  if (!response || !response.metrics) {
+    console.error('Invalid response format:', response)
+    return
+  }
 
-  document.getElementById('totalLinks').textContent = totalLinks
-  document.getElementById('internalLinks').textContent = internalLinks
-  document.getElementById('externalLinks').textContent = externalLinks
+  const { metrics } = response
 
+  // Update metrics in UI
+  document.getElementById('totalLinks').textContent = metrics.total
+  document.getElementById('uniqueLinks').textContent = metrics.unique
+  document.getElementById('internalLinks').textContent = metrics.totalInternal
+  document.getElementById('externalLinks').textContent = metrics.totalExternal
+
+  // Update link details
   const linkDetails = document.getElementById('linkDetails')
   linkDetails.innerHTML = ''
 
-  links.forEach((link, index) => {
+  // Use uniqueLinks for display to avoid duplicates in the list
+  metrics.uniqueLinks.forEach((link, index) => {
     const linkInfo = document.createElement('div')
     linkInfo.className = 'link-info'
     linkInfo.innerHTML = `
-              <h3>Link ${index + 1}</h3>
-              <p>URL: ${link.href}</p>
-              <p>Text: ${
-                link.text || '<span class="warning">Geen tekst!</span>'
-              }</p>
-              <p>Type: ${link.isInternal ? 'Intern' : 'Extern'}</p>
-          `
+            <h3>Link ${index + 1}</h3>
+            <p>URL: ${link.href}</p>
+            <p>Text: ${
+              link.text || '<span class="warning">Geen tekst!</span>'
+            }</p>
+            <p>Type: ${link.isInternal ? 'Intern' : 'Extern'}</p>
+        `
     linkDetails.appendChild(linkInfo)
   })
 }
