@@ -3,10 +3,7 @@
   "name": "Kreatix SEO Analyse",
   "version": "1.0.0",
   "description": "Een uitgebreide SEO analyse tool voor uw webpagina's",
-  "permissions": [
-    "activeTab",
-    "scripting"
-  ],
+  "permissions": ["activeTab", "scripting"],
   "action": {
     "default_popup": "popup.html"
   },
