@@ -4,11 +4,24 @@
   --acent-color: #37dbdb;
   --headline: #172653;
   --body: #424861;
+  --white: #fff;
+  --black: #000;
   --background-color: #eff5ff;
 }
-
+@font-face {
+  font-family: 'Regola-Bold';
+  src: url('assets/fonts/RegolaPro-Bold.ttf');
+}
+@font-face {
+  font-family: 'Regola-Medium';
+  src: url('assets/fonts/RegolaPro-Medium.ttf');
+}
+@font-face {
+  font-family: 'Regola-Regular';
+  src: url('assets/fonts/RegolaPro-Regular.ttf');
+}
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Regola-Regular';
 }
 
 .container {
@@ -31,37 +44,41 @@ h2 {
 }
 
 /* Tab Styling */
+.navbar {
+  margin-right: 5px;
+}
+
 .tabs {
   display: flex;
-  background-color: var(--background-color);
   margin-bottom: 20px;
 }
 
 .tab-button {
   padding: 10px 20px;
-  border: none;
-  background: none;
+  background: var(--white);
   cursor: pointer;
   font-size: 14px;
-  border-bottom: 2px solid transparent;
-  border-radius: 5px;
-  margin: 5px;
+  border: 1px solid #e7e9f1;
+  text-align: center;
   display: flex;
+  justify-content: center;
   align-items: center;
-}
+  border-radius: 4px;
+  margin: 3px;
+  font-family: 'Regola-Medium';
+  color: var(--black);
 
-.svg-icon {
-  margin-right: 5px;
+  transition: 0.3s;
 }
 
 .tab-button:hover {
-  background-color: #dee8ff;
-  color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--white);
 }
 
 .tab-button.active {
-  background-color: #dee8ff;
-  color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--white);
 }
 
 .tab-content {

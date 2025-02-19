@@ -12,36 +12,84 @@
       <!-- Tab Navigation -->
       <div class="tabs">
         <button class="tab-button active" data-tab="images">
-          <img
-            src="assets/book-open-svgrepo-com.svg"
+          <svg
+            class="w-6 h-6 text-gray-800 dark:text-white navbar"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
             width="15"
             height="15"
-            class="svg-icon"
-          />
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M11 4.717c-2.286-.58-4.16-.756-7.045-.71A1.99 1.99 0 0 0 2 6v11c0 1.133.934 2.022 2.044 2.007 2.759-.038 4.5.16 6.956.791V4.717Zm2 15.081c2.456-.631 4.198-.829 6.956-.791A2.013 2.013 0 0 0 22 16.999V6a1.99 1.99 0 0 0-1.955-1.993c-2.885-.046-4.76.13-7.045.71v15.081Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+
           Overzicht
         </button>
         <button class="tab-button" data-tab="images">
-          <img
-            src="assets/paper-file-text-svgrepo-com.svg"
+          <svg
+            class="w-6 h-6 text-gray-800 dark:text-white navbar"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
             width="15"
             height="15"
-            class="svg-icon"
-          />Koppen</button
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7ZM8 16a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm1-5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+          Koppen</button
         ><button class="tab-button" data-tab="links">
-          <img
-            src="assets/link-03-svgrepo-com.svg"
+          <svg
+            class="w-6 h-6 text-gray-800 dark:text-white navbar"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
             width="15"
             height="15"
-            class="svg-icon"
-          />Links
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13.213 9.787a3.391 3.391 0 0 0-4.795 0l-3.425 3.426a3.39 3.39 0 0 0 4.795 4.794l.321-.304m-.321-4.49a3.39 3.39 0 0 0 4.795 0l3.424-3.426a3.39 3.39 0 0 0-4.794-4.795l-1.028.961"
+            />
+          </svg>
+          Links
         </button>
         <button class="tab-button" data-tab="images">
-          <img
-            src="assets/image-02-svgrepo-com.svg"
+          <svg
+            class="w-6 h-6 text-gray-800 dark:text-white navbar"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
             width="15"
             height="15"
-            class="svg-icon"
-          />Afbeeldingen
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M13 10a1 1 0 0 1 1-1h.01a1 1 0 1 1 0 2H14a1 1 0 0 1-1-1Z"
+              clip-rule="evenodd"
+            />
+            <path
+              fill-rule="evenodd"
+              d="M2 6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12c0 .556-.227 1.06-.593 1.422A.999.999 0 0 1 20.5 20H4a2.002 2.002 0 0 1-2-2V6Zm6.892 12 3.833-5.356-3.99-4.322a1 1 0 0 0-1.549.097L4 12.879V6h16v9.95l-3.257-3.619a1 1 0 0 0-1.557.088L11.2 18H8.892Z"
+              clip-rule="evenodd"
+            />
+          </svg>
+
+          Afbeeldingen
         </button>
       </div>
 
@@ -52,6 +100,7 @@
         <div class="summary">
           <h2>Links Samenvatting</h2>
           <p>Totaal aantal links: <span id="totalLinks">0</span></p>
+          <p>Unieke links: <span id="uniqueLinks">0</span></p>
           <p>Interne links: <span id="internalLinks">0</span></p>
           <p>Externe links: <span id="externalLinks">0</span></p>
         </div>

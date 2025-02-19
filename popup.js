@@ -65,13 +65,13 @@ function updateImagesUI(images) {
     const imageInfo = document.createElement('div')
     imageInfo.className = 'image-info'
     imageInfo.innerHTML = `
-            <h3>Afbeelding ${index + 1}</h3>
-            <p>Source: ${img.src}</p>
-            <p>Alt Text: ${
-              img.alt || '<span class="warning">Ontbreekt!</span>'
-            }</p>
-            <p>Afmetingen: ${img.width}x${img.height}</p>
-        `
+              <h3>Afbeelding ${index + 1}</h3>
+              <p>Source: ${img.src}</p>
+              <p>Alt Text: ${
+                img.alt || '<span class="warning">Ontbreekt!</span>'
+              }</p>
+              <p>Afmetingen: ${img.width}x${img.height}</p>
+          `
     imageDetails.appendChild(imageInfo)
   })
 }
@@ -92,13 +92,13 @@ function updateLinksUI(links) {
     const linkInfo = document.createElement('div')
     linkInfo.className = 'link-info'
     linkInfo.innerHTML = `
-            <h3>Link ${index + 1}</h3>
-            <p>URL: ${link.href}</p>
-            <p>Text: ${
-              link.text || '<span class="warning">Geen tekst!</span>'
-            }</p>
-            <p>Type: ${link.isInternal ? 'Intern' : 'Extern'}</p>
-        `
+              <h3>Link ${index + 1}</h3>
+              <p>URL: ${link.href}</p>
+              <p>Text: ${
+                link.text || '<span class="warning">Geen tekst!</span>'
+              }</p>
+              <p>Type: ${link.isInternal ? 'Intern' : 'Extern'}</p>
+          `
     linkDetails.appendChild(linkInfo)
   })
 }
