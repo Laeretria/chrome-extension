@@ -112,28 +112,86 @@ function updateLinksUI(response) {
 
   const { metrics } = response
 
-  // Update metrics in UI
+  // Update metrics
   document.getElementById('totalLinks').textContent = metrics.total
   document.getElementById('uniqueLinks').textContent = metrics.unique
   document.getElementById('internalLinks').textContent = metrics.totalInternal
   document.getElementById('externalLinks').textContent = metrics.totalExternal
 
-  // Update link details
-  const linkDetails = document.getElementById('linkDetails')
-  linkDetails.innerHTML = ''
+  // Update link lists
+  const internalList = document.getElementById('internalLinksList')
+  const externalList = document.getElementById('externalLinksList')
+  internalList.innerHTML = ''
+  externalList.innerHTML = ''
 
-  // Use uniqueLinks for display to avoid duplicates in the list
-  metrics.uniqueLinks.forEach((link, index) => {
-    const linkInfo = document.createElement('div')
-    linkInfo.className = 'link-info'
-    linkInfo.innerHTML = `
-            <h3>Link ${index + 1}</h3>
-            <p>URL: ${link.href}</p>
-            <p>Text: ${
-              link.text || '<span class="warning">Geen tekst!</span>'
-            }</p>
-            <p>Type: ${link.isInternal ? 'Intern' : 'Extern'}</p>
-        `
-    linkDetails.appendChild(linkInfo)
+  metrics.uniqueLinks.forEach((link) => {
+    const linkElement = createLinkElement(link)
+    if (link.isInternal) {
+      internalList.appendChild(linkElement)
+    } else {
+      externalList.appendChild(linkElement)
+    }
   })
+
+  // Add export functionality
+  setupExportButtons(metrics.uniqueLinks)
+}
+
+function createLinkElement(link) {
+  const div = document.createElement('div')
+  div.className = 'link-item'
+
+  // Handle undefined href
+  if (link.href === 'Undefined (No href attribute)') {
+    div.innerHTML = `
+            <div class="undefined-link">Undefined (No href attribute)</div>
+            <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+        `
+  } else {
+    div.innerHTML = `
+            <a href="${link.href}" class="link-url" target="_blank">${
+      link.href
+    }</a>
+            <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+            ${link.rel ? `<span class="link-rel">${link.rel}</span>` : ''}
+        `
+  }
+
+  return div
+}
+
+function setupExportButtons(links) {
+  document.getElementById('exportIncomplete').addEventListener('click', () => {
+    const incompleteLinks = links.filter(
+      (link) => !link.text || link.text.trim() === ''
+    )
+    exportLinks(incompleteLinks, 'incomplete-links.csv')
+  })
+
+  document.getElementById('exportComplete').addEventListener('click', () => {
+    const completeLinks = links.filter(
+      (link) => link.text && link.text.trim() !== ''
+    )
+    exportLinks(completeLinks, 'complete-links.csv')
+  })
+}
+
+function exportLinks(links, filename) {
+  const csvContent = [
+    ['URL', 'Anchor Text', 'Type', 'Rel'],
+    ...links.map((link) => [
+      link.href,
+      link.text || '',
+      link.isInternal ? 'Internal' : 'External',
+      link.rel || '',
+    ]),
+  ]
+    .map((row) => row.join(','))
+    .join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  link.click()
 }
