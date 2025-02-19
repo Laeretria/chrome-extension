@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Kreatix SEO Analyse",
+  "version": "1.0.0",
+  "description": "Een uitgebreide SEO analyse tool voor uw webpagina's",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Kreatix SEO Analyse</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Kreatix SEO Analyse</h1>
+
+      <!-- Tab Navigation -->
+      <div class="tabs">
+        <button class="tab-button active" data-tab="images">
+          Afbeeldingen
+        </button>
+        <button class="tab-button" data-tab="links">Links</button>
+      </div>
+
+      <div id="loading">Analyzing page...</div>
+
+      <!-- Overview Tab -->
+      <div id="overview-tab" class="tab-content active">
+        <div class="summary"></div>
+      </div>
+
+      <!-- Headings Tab -->
+      <div id="headings-tab" class="tab-content active">
+        <div class="summary"></div>
+      </div>
+
+      <!-- Links Tab -->
+      <div id="links-tab" class="tab-content">
+        <div class="summary">
+          <h2>Links Samenvatting</h2>
+          <p>Totaal aantal links: <span id="totalLinks">0</span></p>
+          <p>Interne links: <span id="internalLinks">0</span></p>
+          <p>Externe links: <span id="externalLinks">0</span></p>
+        </div>
+        <div class="link-list">
+          <h2>Gevonden Links</h2>
+          <div id="linkDetails"></div>
+        </div>
+      </div>
+
+      <!-- Images Tab -->
+      <div id="images-tab" class="tab-content active">
+        <div class="summary">
+          <h2>Afbeeldingen Samenvatting</h2>
+          <p>Totaal aantal afbeeldingen: <span id="totalImages">0</span></p>
+          <p>Afbeeldingen zonder alt text: <span id="missingAlt">0</span></p>
+        </div>
+        <div class="image-list">
+          <h2>Gevonden Afbeeldingen</h2>
+          <div id="imageDetails"></div>
+        </div>
+      </div>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>
