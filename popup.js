@@ -79,34 +79,53 @@ async function loadTabData(tabName) {
   }
 }
 
-// Function to update the UI with images and summary data
-function updateImagesUI({ images, summary }) {
-  const { total, missingAlt, missingTitle } = summary
+function updateImagesUI(response) {
+  const { images, summary } = response
 
-  // Update the counts in the UI
-  document.getElementById('totalImages').textContent = total
-  document.getElementById('missingAlt').textContent = missingAlt
-  document.getElementById('missingTitle').textContent = missingTitle
+  // Update metrics
+  document.getElementById('totalImages').textContent = summary.total
+  document.getElementById('missingAlt').textContent = summary.missingAlt
+  document.getElementById('missingTitle').textContent = summary.missingTitle
 
-  // Clear any existing image details in the UI
-  const imageDetails = document.getElementById('imageDetails')
-  imageDetails.innerHTML = ''
+  // Setup export buttons
+  setupImageExportButtons(images)
+}
 
-  // Loop through each image to display the details
-  images.forEach((img, index) => {
-    const imageInfo = document.createElement('div')
-    imageInfo.className = 'image-info'
-    imageInfo.innerHTML = `
-        <h3>Afbeelding ${index + 1}</h3>
-        <p>Source: ${img.src}</p>
-        <p>Alt Text: ${img.alt || '<span class="warning">Ontbreekt!</span>'}</p>
-        <p>Title Text: ${
-          img.title || '<span class="warning">Ontbreekt!</span>'
-        }</p>
-        <p>Afmetingen: ${img.width}x${img.height}</p>
-      `
-    imageDetails.appendChild(imageInfo)
-  })
+function setupImageExportButtons(images) {
+  document
+    .getElementById('exportIncompleteImages')
+    .addEventListener('click', () => {
+      const incompleteImages = images.filter((img) => !img.alt || !img.title)
+      exportImages(incompleteImages, 'incomplete-images.csv')
+    })
+
+  document
+    .getElementById('exportCompleteImages')
+    .addEventListener('click', () => {
+      const completeImages = images.filter((img) => img.alt && img.title)
+      exportImages(completeImages, 'complete-images.csv')
+    })
+}
+
+function exportImages(images, filename) {
+  const csvContent = [
+    ['Source', 'Alt Text', 'Title', 'Width', 'Height'],
+    ...images.map((img) => [
+      img.src,
+      img.alt || '',
+      img.title || '',
+      img.width || '',
+      img.height || '',
+    ]),
+  ]
+    .map((row) => row.join(','))
+    .join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  link.click()
 }
 
 function updateLinksUI(response) {

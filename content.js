@@ -1,32 +1,28 @@
 console.log('Content script loaded!')
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // Inside your existing message listener
   if (request.action === 'getImages') {
     const images = Array.from(document.getElementsByTagName('img')).map(
-      (img) => {
-        return {
-          src: img.src,
-          alt: img.alt,
-          title: img.title,
-          hasAltText: !!img.alt, // Check if alt exists
-          hasTitleText: !!img.title, // Check if title exists
-        }
-      }
+      (img) => ({
+        src: img.src,
+        alt: img.alt,
+        title: img.title,
+        width: img.width,
+        height: img.height,
+      })
     )
 
     const summary = {
       total: images.length,
-      missingAlt: images.filter((img) => !img.hasAltText).length,
-      missingTitle: images.filter((img) => !img.hasTitleText).length,
+      missingAlt: images.filter((img) => !img.alt).length,
+      missingTitle: images.filter((img) => !img.title).length,
     }
 
-    // Send both images and summary to the popup
     sendResponse({
-      images: images, // List of images with their details
-      summary: summary, // Summary of counts (total, missingAlt, missingTitle)
+      images: images,
+      summary: summary,
     })
-
-    return true // Keep the message channel open for async response
   }
 })
 
