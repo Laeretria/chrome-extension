@@ -26,6 +26,7 @@
 
 body {
   font-family: 'Regola-Regular';
+  margin: 20px;
 }
 
 .header {
@@ -42,6 +43,7 @@ body {
 .container {
   width: 500px;
   padding: 20px;
+  padding-bottom: 0px !important;
 }
 
 h1 {
@@ -142,8 +144,10 @@ h2 {
   display: flex;
   justify-content: space-between;
   background-color: #f5f5f5;
-  padding: 15px;
+  padding: 20px;
   border-radius: 5px;
+  margin-left: 20px;
+  margin-right: 20px;
   margin-bottom: 20px;
 }
 
@@ -184,7 +188,7 @@ h2 {
   cursor: pointer;
   border: 1px solid #e7e9f1;
   font-family: 'Regola-Medium';
-  font-size: 13px;
+  font-size: 14px;
   color: var(--body);
   transition: background-color 0.3s;
 }
@@ -195,12 +199,16 @@ h2 {
 }
 
 /* Links List Styling */
+
+.internal-links {
+  margin-left: 20px;
+}
+
 .links-sections {
   margin-top: 20px;
 }
 
 .link-item {
-  padding-left: 0px !important;
   padding: 15px;
   border-bottom: 1px solid #eee;
 }
@@ -383,6 +391,103 @@ h2 {
 }
 .h6-heading {
   margin-left: 100px;
+}
+
+/* Overview Tab Styles */
+.overview-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.meta-item {
+  background: var(--white);
+  border: 1px solid #e7e9f1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.meta-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e7e9f1;
+  font-family: 'Regola-Bold';
+}
+
+.meta-header svg {
+  color: var(--body);
+}
+
+.meta-status {
+  margin-left: auto;
+}
+
+.character-count {
+  background-color: #e9ecef;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--body);
+}
+
+.indexable,
+.self-referencing {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.meta-content {
+  padding: 12px 16px;
+  color: var(--body);
+  font-size: 14px;
+  word-break: break-all;
+}
+
+/* Secondary Info Section */
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+.info-item {
+  background: var(--white);
+  border: 1px solid #e7e9f1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.info-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e7e9f1;
+  font-family: 'Regola-Bold';
+}
+
+.info-content {
+  padding: 12px 16px;
+  color: var(--body);
+  font-size: 14px;
+}
+
+.missing {
+  color: #6c757d;
+  font-style: italic;
 }
 
 /* Footer Stats */
