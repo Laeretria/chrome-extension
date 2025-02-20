@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-  // Tab switching functionality
   const tabs = document.querySelectorAll('.tab-button')
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -17,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function () {
     })
   })
 
-  // Initial load of image data
   loadTabData('images')
 })
 
@@ -27,13 +25,7 @@ async function ensureContentScriptInjected(tabId) {
       target: { tabId: tabId },
       files: ['content.js'],
     })
-    console.log('Content script injected successfully')
-  } catch (err) {
-    console.log(
-      'Content script injection error (might already be injected):',
-      err
-    )
-  }
+  } catch (err) {}
 }
 
 async function loadTabData(tabName) {
@@ -45,19 +37,30 @@ async function loadTabData(tabName) {
       throw new Error('No active tab found')
     }
 
-    // Ensure content script is injected
     await ensureContentScriptInjected(currentTab.id)
-
-    // Wait a short moment to ensure content script is ready
     await new Promise((resolve) => setTimeout(resolve, 100))
 
-    const action = tabName === 'images' ? 'getImages' : 'getLinks'
+    let action
+    switch (tabName) {
+      case 'images':
+        action = 'getImages'
+        break
+      case 'links':
+        action = 'getLinks'
+        break
+      case 'headings':
+        action = 'getHeadings'
+        // Setup footer links with current domain
+        const url = new URL(currentTab.url)
+        setupFooterLinks(`${url.protocol}//${url.hostname}`)
+        break
+      default:
+        action = 'getImages'
+    }
 
-    // Send message with timeout
     const response = await new Promise((resolve, reject) => {
       chrome.tabs.sendMessage(currentTab.id, { action: action }, (response) => {
         if (chrome.runtime.lastError) {
-          console.error('Message sending error:', chrome.runtime.lastError)
           reject(chrome.runtime.lastError)
         } else {
           resolve(response)
@@ -67,13 +70,24 @@ async function loadTabData(tabName) {
 
     document.getElementById('loading').classList.add('hidden')
 
-    if (tabName === 'images' && response && response.images) {
-      updateImagesUI(response) // Update images and summary
-    } else if (tabName === 'links' && response) {
-      updateLinksUI(response)
+    switch (tabName) {
+      case 'images':
+        if (response && response.images) {
+          updateImagesUI(response)
+        }
+        break
+      case 'links':
+        if (response) {
+          updateLinksUI(response)
+        }
+        break
+      case 'headings':
+        if (response) {
+          updateHeadingsUI(response)
+        }
+        break
     }
   } catch (error) {
-    console.error('Error in loadTabData:', error)
     document.getElementById('loading').textContent =
       'Error loading data. Please refresh the page and try again.'
   }
@@ -82,51 +96,56 @@ async function loadTabData(tabName) {
 function updateHeadingsUI(response) {
   const { counts, structure, summary } = response
 
-  // Update heading counts
   for (let i = 1; i <= 6; i++) {
-    document.getElementById(`h${i}-count`).textContent = counts[`h${i}`] || 0
+    const countElement = document.getElementById(`h${i}-count`)
+    if (countElement) {
+      countElement.textContent = counts[`h${i}`] || 0
+    }
   }
 
-  // Update page stats
-  document.getElementById('headingsPageLinks').textContent = summary.totalLinks
-  document.getElementById('headingsPageImages').textContent =
-    summary.totalImages
+  const linksElement = document.getElementById('headingsPageLinks')
+  const imagesElement = document.getElementById('headingsPageImages')
 
-  // Display heading structure
+  if (linksElement) linksElement.textContent = summary.totalLinks || 0
+  if (imagesElement) imagesElement.textContent = summary.totalImages || 0
+
   const structureList = document.getElementById('headingsStructure')
-  structureList.innerHTML = ''
+  if (structureList) {
+    structureList.innerHTML = ''
 
-  structure.forEach((heading) => {
-    const headingDiv = document.createElement('div')
-    headingDiv.className = `heading-item h${heading.level}-heading`
+    structure.forEach((heading) => {
+      const headingDiv = document.createElement('div')
+      headingDiv.className = `heading-item h${heading.level}-heading`
 
-    const tagSpan = document.createElement('span')
-    tagSpan.className = 'heading-tag'
-    tagSpan.textContent = `H${heading.level}`
+      const tagSpan = document.createElement('span')
+      tagSpan.className = 'heading-tag'
+      tagSpan.textContent = `H${heading.level}`
 
-    const textSpan = document.createElement('span')
-    textSpan.className = 'heading-text'
-    textSpan.textContent = heading.text
+      const textSpan = document.createElement('span')
+      textSpan.className = 'heading-text'
+      textSpan.textContent = heading.text
 
-    headingDiv.appendChild(tagSpan)
-    headingDiv.appendChild(textSpan)
-    structureList.appendChild(headingDiv)
-  })
-
-  // Setup copy button
-  document.getElementById('copyHeadings').addEventListener('click', () => {
-    const headingsText = structure
-      .map((heading) => `${'  '.repeat(heading.level - 1)}${heading.text}`)
-      .join('\n')
-
-    navigator.clipboard.writeText(headingsText).then(() => {
-      const button = document.getElementById('copyHeadings')
-      button.textContent = 'Copied!'
-      setTimeout(() => {
-        button.textContent = 'Copy'
-      }, 2000)
+      headingDiv.appendChild(tagSpan)
+      headingDiv.appendChild(textSpan)
+      structureList.appendChild(headingDiv)
     })
-  })
+  }
+
+  const copyButton = document.getElementById('copyHeadings')
+  if (copyButton) {
+    copyButton.addEventListener('click', () => {
+      const headingsText = structure
+        .map((heading) => `${'  '.repeat(heading.level - 1)}${heading.text}`)
+        .join('\n')
+
+      navigator.clipboard.writeText(headingsText).then(() => {
+        copyButton.textContent = 'Copied!'
+        setTimeout(() => {
+          copyButton.textContent = 'Copy'
+        }, 2000)
+      })
+    })
+  }
 }
 
 function updateImagesUI(response) {
@@ -268,4 +287,39 @@ function exportLinks(links, filename) {
   link.href = URL.createObjectURL(blob)
   link.download = filename
   link.click()
+}
+
+function setupFooterLinks(currentDomain) {
+  const robotsLink = document.getElementById('robotsLink')
+  const sitemapLink = document.getElementById('sitemapLink')
+
+  if (robotsLink) {
+    robotsLink.href = `${currentDomain}/robots.txt`
+    robotsLink.addEventListener('click', async (e) => {
+      e.preventDefault()
+      const tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      chrome.tabs.create({
+        url: `${currentDomain}/robots.txt`,
+        index: tabs[0].index + 1,
+      })
+    })
+  }
+
+  if (sitemapLink) {
+    sitemapLink.href = `${currentDomain}/sitemap_index.xml`
+    sitemapLink.addEventListener('click', async (e) => {
+      e.preventDefault()
+      const tabs = await chrome.tabs.query({
+        active: true,
+        currentWindow: true,
+      })
+      chrome.tabs.create({
+        url: `${currentDomain}/sitemap_index.xml`,
+        index: tabs[0].index + 1,
+      })
+    })
+  }
 }
