@@ -24,9 +24,89 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       summary: summary,
     })
   }
-})
+  // Add this to your existing message listener
+  if (request.action === 'getHeadings') {
+    // Get all headings
+    const headings = {}
+    const headingStructure = []
+    let totalHeadings = 0
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    // Collect counts for each heading level
+    for (let i = 1; i <= 6; i++) {
+      const elements = document.getElementsByTagName(`h${i}`)
+      headings[`h${i}`] = elements.length
+      totalHeadings += elements.length
+
+      // Collect structure info
+      Array.from(elements).forEach((heading) => {
+        headingStructure.push({
+          level: i,
+          text: heading.textContent.trim(),
+          id: heading.id || '',
+          classes: Array.from(heading.classList).join(' '),
+        })
+      })
+    }
+
+    // Get page summary data
+    const links = document.getElementsByTagName('a').length
+    const images = document.getElementsByTagName('img').length
+
+    // Get document outline
+    const outline = generateDocumentOutline(headingStructure)
+
+    sendResponse({
+      counts: headings,
+      totalHeadings: totalHeadings,
+      structure: headingStructure,
+      summary: {
+        totalLinks: links,
+        totalImages: images,
+      },
+      outline: outline,
+    })
+  }
+
+  function generateDocumentOutline(headings) {
+    let outline = ''
+    let previousLevel = 0
+    let indent = ''
+
+    headings.forEach((heading) => {
+      // Adjust indentation based on heading level
+      if (heading.level > previousLevel) {
+        indent += '    ' // 4 spaces for each level
+      } else if (heading.level < previousLevel) {
+        indent = '    '.repeat(heading.level - 1) // Reset indent for higher levels
+      }
+
+      outline += `${indent}${heading.text}\n`
+      previousLevel = heading.level
+    })
+
+    return outline
+  }
+
+  function generateXMLStructure(headings) {
+    let xml = '<?xml version="1.0" encoding="UTF-8"?>\n<headings>\n'
+
+    headings.forEach((heading) => {
+      const indent = '    '.repeat(heading.level)
+      xml += `${indent}<h${heading.level}`
+
+      if (heading.id) {
+        xml += ` id="${heading.id}"`
+      }
+      if (heading.classes) {
+        xml += ` class="${heading.classes}"`
+      }
+
+      xml += `>${heading.text}</h${heading.level}>\n`
+    })
+
+    xml += '</headings>'
+    return xml
+  }
   if (request.action === 'getLinks') {
     console.log('Analyzing links...')
 

@@ -79,6 +79,56 @@ async function loadTabData(tabName) {
   }
 }
 
+function updateHeadingsUI(response) {
+  const { counts, structure, summary } = response
+
+  // Update heading counts
+  for (let i = 1; i <= 6; i++) {
+    document.getElementById(`h${i}-count`).textContent = counts[`h${i}`] || 0
+  }
+
+  // Update page stats
+  document.getElementById('headingsPageLinks').textContent = summary.totalLinks
+  document.getElementById('headingsPageImages').textContent =
+    summary.totalImages
+
+  // Display heading structure
+  const structureList = document.getElementById('headingsStructure')
+  structureList.innerHTML = ''
+
+  structure.forEach((heading) => {
+    const headingDiv = document.createElement('div')
+    headingDiv.className = `heading-item h${heading.level}-heading`
+
+    const tagSpan = document.createElement('span')
+    tagSpan.className = 'heading-tag'
+    tagSpan.textContent = `H${heading.level}`
+
+    const textSpan = document.createElement('span')
+    textSpan.className = 'heading-text'
+    textSpan.textContent = heading.text
+
+    headingDiv.appendChild(tagSpan)
+    headingDiv.appendChild(textSpan)
+    structureList.appendChild(headingDiv)
+  })
+
+  // Setup copy button
+  document.getElementById('copyHeadings').addEventListener('click', () => {
+    const headingsText = structure
+      .map((heading) => `${'  '.repeat(heading.level - 1)}${heading.text}`)
+      .join('\n')
+
+    navigator.clipboard.writeText(headingsText).then(() => {
+      const button = document.getElementById('copyHeadings')
+      button.textContent = 'Copied!'
+      setTimeout(() => {
+        button.textContent = 'Copy'
+      }, 2000)
+    })
+  })
+}
+
 function updateImagesUI(response) {
   const { images, summary } = response
 

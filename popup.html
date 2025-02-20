@@ -38,24 +38,24 @@
 
           Overzicht
         </button>
-        <button class="tab-button" data-tab="images">
-          <svg
-            class="w-6 h-6 text-gray-800 dark:text-white navbar"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            width="15"
-            height="15"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7ZM8 16a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm1-5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-          Koppen
-        </button>
+<button class="tab-button" data-tab="headings">
+  <svg
+      class="w-6 h-6 text-gray-800 dark:text-white navbar"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      width="15"
+      height="15"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+  >
+      <path
+          fill-rule="evenodd"
+          d="M9 2.221V7H4.221a2 2 0 0 1 .365-.5L8.5 2.586A2 2 0 0 1 9 2.22ZM11 2v5a2 2 0 0 1-2 2H4v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-7ZM8 16a1 1 0 0 1 1-1h6a1 1 0 1 1 0 2H9a1 1 0 0 1-1-1Zm1-5a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2H9Z"
+          clip-rule="evenodd"
+      />
+  </svg>
+  Koppen
+</button>
         <button class="tab-button" data-tab="links">
           <svg
             class="w-6 h-6 text-gray-800 dark:text-white navbar"
@@ -103,6 +103,70 @@
       </div>
 
       <div id="loading">Analyseren van pagina</div>
+
+      <!-- Headings Tab -->
+<div id="headings-tab" class="tab-content">
+  <!-- Heading Structure List -->
+  <div class="headings-structure">
+      <div class="structure-header">
+          <div class="structure-icon">
+              <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+                  <path fill-rule="evenodd" d="M3 6a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6zm14 1a1 1 0 1 0-2 0v4.268a2 2 0 0 1-.586 1.414l-2.828 2.828a2 2 0 0 1-2.828 0l-1.072-1.072a2 2 0 0 1 0-2.828l2.828-2.828A2 2 0 0 1 11.928 7H16a1 1 0 0 0 1-1z" clip-rule="evenodd"/>
+              </svg>
+          </div>
+          <button id="copyHeadings" class="copy-btn">
+              Copy
+          </button>
+      </div>
+      <div id="headingsStructure" class="structure-list"></div>
+  </div>
+
+  <!-- Footer Stats -->
+  <div class="headings-footer">
+      <div class="heading-stats">
+          <div class="stats-group">
+              <div class="stat-item">
+                  <span class="stat-label">H1</span>
+                  <span class="stat-value" id="h1-count">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">H2</span>
+                  <span class="stat-value" id="h2-count">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">H3</span>
+                  <span class="stat-value" id="h3-count">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">H4</span>
+                  <span class="stat-value" id="h4-count">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">H5</span>
+                  <span class="stat-value" id="h5-count">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">H6</span>
+                  <span class="stat-value" id="h6-count">0</span>
+              </div>
+          </div>
+          <div class="stats-group">
+              <div class="stat-item">
+                  <span class="stat-label">Images</span>
+                  <span class="stat-value" id="headingsPageImages">0</span>
+              </div>
+              <div class="stat-item">
+                  <span class="stat-label">Links</span>
+                  <span class="stat-value" id="headingsPageLinks">0</span>
+              </div>
+          </div>
+      </div>
+      <div class="footer-links">
+          <a href="/robots.txt" target="_blank" class="footer-link">Robots.txt</a>
+          <a href="/sitemap.xml" target="_blank" class="footer-link">Sitemap.xml</a>
+      </div>
+  </div>
+</div>
 
       <!-- Links Tab -->
       <div id="links-tab" class="tab-content">
