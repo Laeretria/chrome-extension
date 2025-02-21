@@ -1,5 +1,131 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === 'getImages') {
+  if (request.action === 'getOverview') {
+    const overview = {
+      publisher:
+        document.querySelector('meta[name="publisher"]')?.content || '',
+      language: document.documentElement.lang || '',
+      title: {
+        content: document.title,
+        length: document.title.length,
+      },
+      description: {
+        content:
+          document.querySelector('meta[name="description"]')?.content || '',
+        length:
+          document.querySelector('meta[name="description"]')?.content?.length ||
+          0,
+      },
+      url: {
+        current: window.location.href,
+        isIndexable: true, // Will be updated based on robots meta
+      },
+      canonical: {
+        href:
+          document.querySelector('link[rel="canonical"]')?.href ||
+          window.location.href,
+        isSelfReferencing: true, // Will be updated in the comparison
+      },
+      robots: {
+        meta: document.querySelector('meta[name="robots"]')?.content || '',
+        xRobotsTag: null, // This will be checked via headers in the popup.js
+      },
+      keywords: document.querySelector('meta[name="keywords"]')?.content || '',
+      wordCount: (() => {
+        try {
+          // Create a clone of the body
+          const clone = document.body.cloneNode(true)
+
+          // First, remove hidden elements and non-content elements
+          const removeSelectors = [
+            'script',
+            'style',
+            'noscript',
+            'iframe',
+            'svg',
+            'path',
+            'meta',
+            'link',
+            'head',
+            'title',
+            'source',
+            '[style*="display: none"]',
+            '[hidden]',
+            '[aria-hidden="true"]',
+            'button',
+            '.button',
+            'input',
+            'select',
+            'textarea',
+            'form',
+          ]
+
+          clone
+            .querySelectorAll(removeSelectors.join(','))
+            .forEach((el) => el.remove())
+
+          // Get all text nodes in the document
+          const walker = document.createTreeWalker(
+            clone,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+          )
+
+          let text = ''
+          let node
+
+          while ((node = walker.nextNode())) {
+            // Skip if parent is hidden
+            const style = window.getComputedStyle(node.parentElement)
+            if (style.display === 'none' || style.visibility === 'hidden') {
+              continue
+            }
+
+            text += ' ' + node.textContent
+          }
+
+          // Clean up the text
+          text = text
+            .replace(/[\r\n\t]+/g, ' ') // Replace newlines and tabs with spaces
+            .replace(/\s+/g, ' ') // Normalize multiple spaces
+            .replace(/[^\w\s'-]+/g, ' ') // Keep only words, spaces, hyphens, and apostrophes
+            .replace(/(?<=\s)-+|-+(?=\s)/g, '') // Remove standalone hyphens
+            .replace(/'+(?=\s)|(?<=\s)'+/g, '') // Remove standalone apostrophes
+            .toLowerCase() // Convert to lowercase
+            .trim() // Remove leading/trailing spaces
+
+          // Split into words and filter
+          const words = text.split(/\s+/).filter((word) => {
+            // Keep words that:
+            // 1. Are longer than 1 character
+            // 2. Contain at least one letter
+            // 3. Aren't just numbers
+            return word.length > 1 && /[a-z]/.test(word) && !/^\d+$/.test(word)
+          })
+
+          return words.length
+        } catch (error) {
+          console.error('Error calculating word count:', error)
+          return 0
+        }
+      })(),
+    }
+
+    // Check if canonical is self-referencing
+    overview.canonical.isSelfReferencing =
+      overview.canonical.href === window.location.href
+
+    // Check indexability based on robots meta
+    if (overview.robots.meta) {
+      const robotsDirectives = overview.robots.meta
+        .toLowerCase()
+        .split(',')
+        .map((d) => d.trim())
+      overview.url.isIndexable = !robotsDirectives.includes('noindex')
+    }
+
+    sendResponse({ overview })
+  } else if (request.action === 'getImages') {
     const images = Array.from(document.getElementsByTagName('img')).map(
       (img) => ({
         src: img.src,

@@ -313,7 +313,102 @@
                 </div>
                 <div class="info-content" id="word-count"></div>
               </div>
+
+              <div class="info-item">
+                <div class="info-header">
+                  <svg
+                    class="w-6 h-6 text-gray-800 dark:text-white navbar"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      clip-rule="evenodd"
+                      d="M8 3H16C17.1046 3 18 3.89543 18 5V19C18 20.1046 17.1046 21 16 21H8C6.89543 21 6 20.1046 6 19V5C6 3.89543 6.89543 3 8 3ZM8 5V19H16V5H8Z"
+                      fill="currentColor"
+                    />
+                    <path d="M8 7H16V9H8V7Z" fill="currentColor" />
+                  </svg>
+                  <span>Publisher</span>
+                </div>
+                <div class="info-content missing" id="publisher">Missing</div>
+              </div>
+              <div class="info-item">
+                <div class="info-header">
+                  <svg
+                    class="w-6 h-6 text-gray-800 dark:text-white navbar"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M12 4L20 8.5L12 13L4 8.5L12 4Z"
+                      fill="currentColor"
+                    />
+                    <path
+                      d="M20 15.5L12 20L4 15.5L4.62936 15.1095L11.9999 19.25L19.3705 15.1095L20 15.5Z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                  <span>Lang</span>
+                </div>
+                <div class="info-content" id="language"></div>
+              </div>
             </div>
+          </div>
+        </div>
+        <!-- Add this footer section to the overview tab -->
+        <div class="headings-footer">
+          <div class="heading-stats">
+            <div class="stats-group">
+              <div class="stat-item">
+                <span class="stat-label">H1</span>
+                <span class="stat-value" id="overview-h1-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">H2</span>
+                <span class="stat-value" id="overview-h2-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">H3</span>
+                <span class="stat-value" id="overview-h3-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">H4</span>
+                <span class="stat-value" id="overview-h4-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">H5</span>
+                <span class="stat-value" id="overview-h5-count">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">H6</span>
+                <span class="stat-value" id="overview-h6-count">0</span>
+              </div>
+            </div>
+            <div class="stats-group">
+              <div class="stat-item">
+                <span class="stat-label">Images</span>
+                <span class="stat-value" id="overview-images">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Links</span>
+                <span class="stat-value" id="overview-links">0</span>
+              </div>
+            </div>
+          </div>
+          <div class="footer-links">
+            <a href="#" id="overview-robotsLink" class="footer-link"
+              >Robots.txt</a
+            >
+            <a href="#" id="overview-sitemapLink" class="footer-link"
+              >Sitemap.xml</a
+            >
           </div>
         </div>
       </div>
@@ -479,7 +574,7 @@
     </div>
 
     <!-- Images Tab -->
-    <div id="images-tab" class="tab-content active">
+    <div id="images-tab" class="tab-content">
       <div class="metrics">
         <div class="metric">
           <span class="metric-label">Total Images</span>
