@@ -108,16 +108,16 @@ async function updateOverviewUI(overview) {
     .querySelector('#page-title')
     .previousElementSibling.querySelector(
       '.character-count'
-    ).textContent = `${overview.title.length} characters`
+    ).textContent = `${overview.title.length} tekens`
 
   // Update description section
   document.getElementById('page-description').textContent =
-    overview.description.content || 'Missing'
+    overview.description.content || 'Ontbreekt'
   document
     .querySelector('#page-description')
     .previousElementSibling.querySelector(
       '.character-count'
-    ).textContent = `${overview.description.length} characters`
+    ).textContent = `${overview.description.length} tekens`
 
   // Update URL section
   document.getElementById('page-url').textContent = overview.url.current
@@ -125,8 +125,8 @@ async function updateOverviewUI(overview) {
     .querySelector('#page-url')
     .previousElementSibling.querySelector('.meta-status')
   urlStatusElement.textContent = overview.url.isIndexable
-    ? 'Indexable'
-    : 'Non-indexable'
+    ? 'Indexeerbaar'
+    : 'Niet-indexeerbaar'
   urlStatusElement.className = `meta-status ${
     overview.url.isIndexable ? 'indexable' : 'non-indexable'
   }`
@@ -139,21 +139,21 @@ async function updateOverviewUI(overview) {
     .previousElementSibling.querySelector('.meta-status')
   canonicalStatusElement.textContent = overview.canonical.isSelfReferencing
     ? 'Self-referencing'
-    : 'External'
+    : 'Extern'
   canonicalStatusElement.className = `meta-status ${
     overview.canonical.isSelfReferencing ? 'self-referencing' : ''
   }`
 
   // Update robots tag
   document.getElementById('robots-tag').textContent =
-    overview.robots.meta || 'Missing'
+    overview.robots.meta || 'Ontbreekt'
   if (!overview.robots.meta) {
     document.getElementById('robots-tag').classList.add('missing')
   }
 
   // Update keywords
   document.getElementById('keywords').textContent =
-    overview.keywords || 'Missing'
+    overview.keywords || 'Ontbreekt'
   if (!overview.keywords) {
     document.getElementById('keywords').classList.add('missing')
   }
@@ -164,14 +164,14 @@ async function updateOverviewUI(overview) {
 
   // Update publisher
   document.getElementById('publisher').textContent =
-    overview.publisher || 'Missing'
+    overview.publisher || 'Ontbreekt'
   if (!overview.publisher) {
     document.getElementById('publisher').classList.add('missing')
   }
 
   // Update language
   document.getElementById('language').textContent =
-    overview.language || 'Missing'
+    overview.language || 'Ontbreekt'
   if (!overview.language) {
     document.getElementById('language').classList.add('missing')
   }
@@ -290,9 +290,9 @@ function updateHeadingsUI(response) {
         .join('\n')
 
       navigator.clipboard.writeText(headingsText).then(() => {
-        copyButton.textContent = 'Copied!'
+        copyButton.textContent = 'Gekopieerd'
         setTimeout(() => {
-          copyButton.textContent = 'Copy'
+          copyButton.textContent = 'Kopiëren'
         }, 2000)
       })
     })
