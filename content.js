@@ -35,72 +35,94 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
           // Create a clone of the body
           const clone = document.body.cloneNode(true)
 
-          // First, remove hidden elements and non-content elements
+          // Remove only essential non-content elements
           const removeSelectors = [
             'script',
             'style',
             'noscript',
             'iframe',
-            'svg',
-            'path',
             'meta',
             'link',
             'head',
-            'title',
-            'source',
             '[style*="display: none"]',
             '[hidden]',
             '[aria-hidden="true"]',
-            'button',
-            '.button',
-            'input',
             'select',
+            'option',
             'textarea',
-            'form',
+            'code',
+            'pre',
+            '.code',
+            '.pre',
           ]
 
           clone
             .querySelectorAll(removeSelectors.join(','))
             .forEach((el) => el.remove())
 
-          // Get all text nodes in the document
+          // Include alt text from images
+          let text = ''
+          clone.querySelectorAll('img[alt]').forEach((img) => {
+            const alt = img.getAttribute('alt')
+            if (alt && alt.trim() && alt.length > 1) {
+              // Only include meaningful alt text
+              text += ' ' + alt
+            }
+          })
+
+          // Get text content from visible elements
           const walker = document.createTreeWalker(
             clone,
             NodeFilter.SHOW_TEXT,
-            null,
+            {
+              acceptNode: (node) => {
+                // Skip if parent is hidden
+                const style = window.getComputedStyle(node.parentElement)
+                if (
+                  style.display === 'none' ||
+                  style.visibility === 'hidden' ||
+                  style.opacity === '0'
+                ) {
+                  return NodeFilter.FILTER_REJECT
+                }
+
+                // Skip empty text nodes or those with just whitespace
+                if (!node.textContent.trim()) {
+                  return NodeFilter.FILTER_REJECT
+                }
+
+                return NodeFilter.FILTER_ACCEPT
+              },
+            },
             false
           )
 
-          let text = ''
           let node
-
           while ((node = walker.nextNode())) {
-            // Skip if parent is hidden
-            const style = window.getComputedStyle(node.parentElement)
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              continue
-            }
-
             text += ' ' + node.textContent
           }
 
-          // Clean up the text
+          // Text cleanup
           text = text
-            .replace(/[\r\n\t]+/g, ' ') // Replace newlines and tabs with spaces
-            .replace(/\s+/g, ' ') // Normalize multiple spaces
-            .replace(/[^\w\s'-]+/g, ' ') // Keep only words, spaces, hyphens, and apostrophes
-            .replace(/(?<=\s)-+|-+(?=\s)/g, '') // Remove standalone hyphens
-            .replace(/'+(?=\s)|(?<=\s)'+/g, '') // Remove standalone apostrophes
-            .toLowerCase() // Convert to lowercase
-            .trim() // Remove leading/trailing spaces
+            .replace(/[\r\n\t]+/g, ' ') // Replace newlines and tabs
+            .replace(/\s+/g, ' ') // Normalize spaces
+            .replace(/[^\w\s'-]+/g, ' ') // Keep only words, spaces, hyphens, apostrophes
+            .replace(/(?<=\s)-+|-+(?=\s)/g, ' ') // Handle hyphens
+            .replace(/'+(?=\s)|(?<=\s)'+/g, ' ') // Handle apostrophes
+            .toLowerCase()
+            .trim()
 
-          // Split into words and filter
+          // Split and count words
           const words = text.split(/\s+/).filter((word) => {
-            // Keep words that:
-            // 1. Are longer than 1 character
-            // 2. Contain at least one letter
-            // 3. Aren't just numbers
-            return word.length > 1 && /[a-z]/.test(word) && !/^\d+$/.test(word)
+            // Include words that:
+            // 1. Are at least 2 characters or are meaningful single characters (like "a")
+            // 2. Contain letters or numbers
+            // 3. Aren't just symbols
+            return (
+              (word.length >= 2 || /^[ai]$/.test(word)) &&
+              (/[a-z]/.test(word) || /\d/.test(word)) &&
+              !/^[-']+$/.test(word)
+            )
           })
 
           return words.length
