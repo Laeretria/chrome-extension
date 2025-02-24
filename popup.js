@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+  // Your existing tab code
   const tabs = document.querySelectorAll('.tab-button')
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -15,6 +16,22 @@ document.addEventListener('DOMContentLoaded', function () {
       loadTabData(tab.dataset.tab)
     })
   })
+
+  // Add logo click handler
+  const logoLink = document.getElementById('logo-link')
+  if (logoLink) {
+    // Use a one-time event listener to prevent multiple tabs opening
+    logoLink.addEventListener(
+      'click',
+      function logoClickHandler(e) {
+        e.preventDefault()
+        chrome.tabs.create({ url: 'https://kreatix.be' })
+        // Remove the event listener to prevent duplicate clicks
+        logoLink.removeEventListener('click', logoClickHandler)
+      },
+      { once: true }
+    )
+  }
 
   // Start with overview tab
   loadTabData('overview')
