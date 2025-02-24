@@ -59,7 +59,7 @@ h1 {
 
 h2 {
   font-size: 16px;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .hidden {
@@ -151,10 +151,9 @@ h2 {
 .metrics {
   display: flex;
   justify-content: space-between;
-  background-color: #f5f5f5;
+  background-color: var(--white);
   padding: 20px;
   border-radius: 5px;
-  margin-left: 20px;
   margin-right: 20px;
   margin-bottom: 20px;
 }
@@ -180,29 +179,53 @@ h2 {
 .export-buttons {
   text-align: center;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: 15px;
   margin-top: 20px;
 }
 
 .export-btn {
+  transition: background-color 0.3s;
+}
+
+.complete-btn {
   display: flex;
   align-items: center;
   gap: 5px;
   padding: 10px 20px;
-  background-color: var(--white);
   border-radius: 4px;
   cursor: pointer;
   border: 1px solid #e7e9f1;
   font-family: 'Regola-Medium';
   font-size: 14px;
   color: var(--body);
+  background-color: #bceabd;
   transition: background-color 0.3s;
 }
 
-.export-btn:hover {
-  background-color: var(--primary-color);
+.complete-btn:hover {
+  background-color: #65be67;
+  color: var(--white);
+}
+
+.incomplete-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid #e7e9f1;
+  font-family: 'Regola-Medium';
+  font-size: 14px;
+  color: var(--body);
+  background-color: #eca9a9;
+  transition: background-color 0.3s;
+}
+
+.incomplete-btn:hover {
+  background-color: #be6565;
   color: var(--white);
 }
 
@@ -504,6 +527,7 @@ h2 {
 .headings-footer {
   background: white;
   border-radius: 8px;
+  margin-top: 15px;
   padding: 16px;
   border: 1px solid #e7e9f1;
 }

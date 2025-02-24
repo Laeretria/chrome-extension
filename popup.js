@@ -395,7 +395,6 @@ function createLinkElement(link) {
     div.innerHTML = `
       <a href="${link.href}" class="link-url" target="_blank">${link.href}</a>
       <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
-      ${link.rel ? `<span class="link-rel">${link.rel}</span>` : ''}
     `
   }
 
