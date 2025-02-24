@@ -232,20 +232,76 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const structure = []
     let totalHeadings = 0
 
+    // First pass: collect all headings with additional context
     for (let i = 1; i <= 6; i++) {
       const elements = document.getElementsByTagName(`h${i}`)
       headings[`h${i}`] = elements.length
       totalHeadings += elements.length
 
       Array.from(elements).forEach((heading) => {
+        // Check parent elements for navigation context
+        let isNavigation = false
+        let currentParent = heading.parentElement
+
+        // Check up to 3 levels of parents for navigation-related elements
+        for (let j = 0; j < 3 && currentParent; j++) {
+          const parentClasses = (currentParent.className || '').toLowerCase()
+          const parentId = (currentParent.id || '').toLowerCase()
+          const parentTag = currentParent.tagName.toLowerCase()
+
+          if (
+            parentTag === 'nav' ||
+            parentClasses.includes('nav') ||
+            parentClasses.includes('menu') ||
+            parentClasses.includes('navigation') ||
+            parentId.includes('nav') ||
+            parentId.includes('menu') ||
+            currentParent.getAttribute('role') === 'navigation'
+          ) {
+            isNavigation = true
+            break
+          }
+
+          currentParent = currentParent.parentElement
+        }
+
         structure.push({
           level: i,
           text: heading.textContent.trim(),
           id: heading.id || '',
           classes: Array.from(heading.classList).join(' '),
+          isNavigation: isNavigation,
+          // Store position in DOM for accurate ordering
+          position: getNodePosition(heading),
         })
       })
     }
+
+    // Add special handling for navigation elements that aren't headings
+    const navigationElements = document.querySelectorAll(
+      'nav, [role="navigation"], .navigation, .nav, .navbar, .menu'
+    )
+    navigationElements.forEach((navElement) => {
+      // Only include text-containing navigation elements
+      const textContent = navElement.textContent.trim()
+      if (textContent && !isElementCapturedInHeadings(navElement, structure)) {
+        structure.push({
+          level: 2, // Treat nav elements as h2 by default
+          text:
+            textContent.substring(0, 50) +
+            (textContent.length > 50 ? '...' : ''),
+          id: navElement.id || '',
+          classes: Array.from(navElement.classList).join(' '),
+          isNavigation: true,
+          position: getNodePosition(navElement),
+        })
+      }
+    })
+
+    // Sort by DOM position to maintain correct order
+    structure.sort((a, b) => {
+      return a.position - b.position
+    })
 
     const links = document.getElementsByTagName('a').length
     const images = document.getElementsByTagName('img').length
@@ -260,7 +316,40 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       },
     })
   }
-  return true
+  // Helper function to get position of a node in the DOM
+  function getNodePosition(node) {
+    // Walk the DOM tree and count nodes
+    let position = 0
+    const walker = document.createTreeWalker(
+      document.documentElement,
+      NodeFilter.SHOW_ELEMENT,
+      null,
+      false
+    )
+
+    while (walker.nextNode()) {
+      position++
+      if (walker.currentNode === node) {
+        return position
+      }
+    }
+
+    return Infinity // Should never happen
+  }
+
+  // Helper function to check if an element is already represented in headings
+  function isElementCapturedInHeadings(element, headingsArray) {
+    // Check if this element contains any of the headings
+    return headingsArray.some((heading) => {
+      const headingElement = heading.id
+        ? document.getElementById(heading.id)
+        : null
+      return (
+        (headingElement && element.contains(headingElement)) ||
+        heading.id === element.id
+      )
+    })
+  }
 })
 
 function generateDocumentOutline(headings) {

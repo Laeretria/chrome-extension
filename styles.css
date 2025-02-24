@@ -374,7 +374,7 @@ h2 {
   padding: 16px;
 }
 
-/* Heading Items */
+/* 
 .heading-item {
   display: flex;
   align-items: center;
@@ -398,7 +398,6 @@ h2 {
   font-size: 14px;
 }
 
-/* Indentation for different heading levels */
 .h1-heading {
   margin-left: 0;
 }
@@ -416,6 +415,71 @@ h2 {
 }
 .h6-heading {
   margin-left: 100px;
+} */
+
+/* Heading item styling */
+.heading-item {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Regola-Regular';
+  border-bottom: 1px solid #f5f5f5;
+}
+
+/* Apply indentation to the entire heading item */
+.heading-item[data-level='1'] {
+  margin-left: 0px;
+}
+
+.heading-item[data-level='2'] {
+  margin-left: 20px;
+}
+
+.heading-item[data-level='3'] {
+  margin-left: 40px;
+}
+
+.heading-item[data-level='4'] {
+  margin-left: 60px;
+}
+
+.heading-item[data-level='5'] {
+  margin-left: 80px;
+}
+
+.heading-item[data-level='6'] {
+  margin-left: 100px;
+}
+
+/* Heading tag badge */
+.heading-tag {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--body);
+  min-width: 35px;
+  text-align: center;
+  font-family: 'Regola-Medium';
+  flex-shrink: 0;
+  background-color: #e9f5ff;
+}
+
+/* Heading text styling */
+.heading-text {
+  color: var(--body);
+  font-size: 14px;
+  flex: 1;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Remove the padding-left from text since we're indenting the whole item */
+.heading-item .heading-text {
+  padding-left: 0;
 }
 
 /* Overview Tab Styles */
