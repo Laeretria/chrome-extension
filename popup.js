@@ -300,7 +300,7 @@ function updateHeadingsUI(response) {
       tagSpan.className = 'heading-tag'
       tagSpan.textContent = `H${heading.level}`
 
-      /*       // Set tag color based on heading level
+      // Set tag color based on heading level
       const colors = {
         1: '#e9f5ff', // Light blue
         2: '#e3f1e3', // Light green
@@ -309,7 +309,7 @@ function updateHeadingsUI(response) {
         5: '#e8eaf6', // Light indigo
         6: '#fbe9e7', // Light orange
       }
-      tagSpan.style.backgroundColor = colors[heading.level] || '#f5f5f5' */
+      tagSpan.style.backgroundColor = colors[heading.level] || '#f5f5f5'
 
       // Add navigation indicator if heading is part of navigation
       if (heading.isNavigation) {
