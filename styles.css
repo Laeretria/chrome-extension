@@ -651,3 +651,66 @@ h2 {
 .footer-link:hover {
   text-decoration: underline;
 }
+
+/* Tooltip Styles */
+.tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #1448ff;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  margin-left: 5px;
+  cursor: help;
+  position: relative;
+}
+
+.tooltip-content {
+  display: none;
+  position: absolute;
+  z-index: 100;
+  width: 280px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #333;
+  text-align: left;
+  font-weight: normal;
+}
+
+.tooltip-content.active {
+  display: block;
+}
+
+.learn-more {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.learn-more a {
+  color: #1448ff;
+  text-decoration: none;
+}
+
+.learn-more a:hover {
+  text-decoration: underline;
+}
+
+/* Fix for tooltip positioning in case parent has overflow hidden */
+.meta-item,
+.info-item {
+  overflow: visible !important;
+}
+
+.meta-header,
+.info-header {
+  overflow: visible !important;
+  position: relative;
+}

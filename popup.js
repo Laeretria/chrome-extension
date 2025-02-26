@@ -1,6 +1,41 @@
 // Store the current domain globally so it's accessible to all export functions
 let currentWebsiteDomain = ''
 
+const tooltipData = {
+  title: {
+    text: 'This is what shows as the text in your browser tab, and often in your page headings in search results (sometimes Google rewrite them). The current maximum that will display fully on search results is around 65 characters, or 568 pixels.',
+    link: 'https://kreatix.be/blog/meta-title-seo',
+  },
+  description: {
+    text: "Meta descriptions summarize your page's content for search results. While not a direct ranking factor, a compelling description can improve click-through rates. Google may generate its own description instead of using yours.",
+    link: 'https://kreatix.be/blog/meta-description-seo',
+  },
+  url: {
+    text: 'Your page URL structure helps users and search engines understand what the page is about. A good URL is concise, descriptive, and contains relevant keywords.',
+    link: 'https://kreatix.be/blog/url-structure-seo',
+  },
+  canonical: {
+    text: 'The canonical tag tells search engines which version of a URL to index when there are multiple pages with similar content. It helps prevent duplicate content issues.',
+    link: 'https://kreatix.be/blog/canonical-tags-seo',
+  },
+  robotsTag: {
+    text: "The robots meta tag tells search engines whether to index your page and follow its links. Common values include 'index,follow', 'noindex,follow', and 'noindex,nofollow'.",
+    link: 'https://kreatix.be/blog/robots-meta-tags',
+  },
+  xRobotsTag: {
+    text: 'X-Robots-Tag is an HTTP header that provides the same directives as the robots meta tag, but can be applied to non-HTML documents like PDFs.',
+    link: 'https://kreatix.be/blog/x-robots-tag',
+  },
+  wordCount: {
+    text: "The total number of words on your page. While there's no perfect word count, comprehensive content tends to perform better in search results for informational queries.",
+    link: 'https://kreatix.be/blog/content-length-seo',
+  },
+  language: {
+    text: "The language declared for this page via the HTML lang attribute. This helps search engines understand the page's language.",
+    link: 'https://kreatix.be/blog/language-settings-seo',
+  },
+}
+
 // Function to extract domain name in a clean format for filenames
 function getCleanDomainName(url) {
   try {
@@ -151,6 +186,7 @@ async function loadTabData(tabName) {
       case 'overview':
         if (response && response.overview) {
           updateOverviewUI(response.overview)
+          setTimeout(setupTooltips, 200)
         }
         break
       case 'images':
@@ -301,6 +337,47 @@ async function updateOverviewUI(overview) {
   } catch (error) {
     console.error('Error updating overview footer:', error)
   }
+}
+
+// Function to set up all tooltips in the overview section
+function setupTooltips() {
+  // Add tooltips to meta items
+  document.querySelectorAll('.meta-item .meta-header').forEach((header) => {
+    const titleElement = header.querySelector('span')
+    if (!titleElement) return
+
+    const titleText = titleElement.textContent.trim().toLowerCase()
+
+    // Map titleText to tooltipData key
+    let tooltipKey
+    if (titleText.includes('titel')) tooltipKey = 'title'
+    else if (titleText.includes('beschrijving')) tooltipKey = 'description'
+    else if (titleText.includes('url')) tooltipKey = 'url'
+    else if (titleText.includes('canonical')) tooltipKey = 'canonical'
+
+    if (tooltipKey && tooltipData[tooltipKey]) {
+      addTooltipToElement(titleElement, tooltipData[tooltipKey])
+    }
+  })
+
+  // Add tooltips to info items
+  document.querySelectorAll('.info-item .info-header').forEach((header) => {
+    const titleElement = header.querySelector('span')
+    if (!titleElement) return
+
+    const titleText = titleElement.textContent.trim().toLowerCase()
+
+    // Map titleText to tooltipData key
+    let tooltipKey
+    if (titleText.includes('robots tag')) tooltipKey = 'robotsTag'
+    else if (titleText.includes('x-robots-tag')) tooltipKey = 'xRobotsTag'
+    else if (titleText.includes('woorden')) tooltipKey = 'wordCount'
+    else if (titleText.includes('taal')) tooltipKey = 'language'
+
+    if (tooltipKey && tooltipData[tooltipKey]) {
+      addTooltipToElement(titleElement, tooltipData[tooltipKey])
+    }
+  })
 }
 
 function updateHeadingsUI(response) {
