@@ -1,4 +1,42 @@
+// Store the current domain globally so it's accessible to all export functions
+let currentWebsiteDomain = ''
+
+// Function to extract domain name in a clean format for filenames
+function getCleanDomainName(url) {
+  try {
+    const urlObj = new URL(url)
+    // Remove www. prefix if present and get hostname
+    let fullDomain = urlObj.hostname.replace(/^www\./, '')
+
+    // Extract just the first part of the domain (before the first dot)
+    let mainDomain = fullDomain.split('.')[0]
+
+    return mainDomain
+  } catch (error) {
+    console.error('Error parsing URL:', error)
+    return 'website' // Fallback name
+  }
+}
+
+// Initialize current domain - call this early in your code
+async function initCurrentDomain() {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
+    if (tabs && tabs[0] && tabs[0].url) {
+      const url = tabs[0].url
+      currentWebsiteDomain = getCleanDomainName(url)
+      console.log('Current website domain:', currentWebsiteDomain)
+    }
+  } catch (error) {
+    console.error('Error getting current domain:', error)
+    currentWebsiteDomain = 'website' // Fallback
+  }
+}
+
 document.addEventListener('DOMContentLoaded', async function () {
+  // Initialize current domain first
+  await initCurrentDomain()
+
   // Your existing tab code
   const tabs = document.querySelectorAll('.tab-button')
   tabs.forEach((tab) => {
@@ -354,6 +392,42 @@ function updateHeadingsUI(response) {
       })
     })
   }
+
+  // Add export button for headings
+  const exportHeadingsButton = document.getElementById('exportHeadings')
+  if (exportHeadingsButton) {
+    // Remove any existing click handlers
+    const newExportButton = exportHeadingsButton.cloneNode(true)
+    exportHeadingsButton.parentNode.replaceChild(
+      newExportButton,
+      exportHeadingsButton
+    )
+
+    newExportButton.addEventListener('click', () => {
+      exportHeadings(structure, `${currentWebsiteDomain}_headings.csv`)
+    })
+  }
+}
+
+function exportHeadings(headings, filename) {
+  const csvContent = [
+    ['Level', 'Text', 'ID', 'Classes', 'Is Navigation'],
+    ...headings.map((heading) => [
+      `H${heading.level}`,
+      heading.text || '',
+      heading.id || '',
+      heading.classes || '',
+      heading.isNavigation ? 'Yes' : 'No',
+    ]),
+  ]
+    .map((row) => row.join(','))
+    .join('\n')
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = filename
+  link.click()
 }
 
 function updateImagesUI(response) {
@@ -369,19 +443,34 @@ function updateImagesUI(response) {
 }
 
 function setupImageExportButtons(images) {
-  document
-    .getElementById('exportIncompleteImages')
-    .addEventListener('click', () => {
-      const incompleteImages = images.filter((img) => !img.alt || !img.title)
-      exportImages(incompleteImages, 'incomplete-images.csv')
-    })
+  // Remove any existing event listeners
+  const exportIncompleteBtn = document.getElementById('exportIncompleteImages')
+  const exportCompleteBtn = document.getElementById('exportCompleteImages')
 
-  document
-    .getElementById('exportCompleteImages')
-    .addEventListener('click', () => {
-      const completeImages = images.filter((img) => img.alt && img.title)
-      exportImages(completeImages, 'complete-images.csv')
-    })
+  const newExportIncompleteBtn = exportIncompleteBtn.cloneNode(true)
+  const newExportCompleteBtn = exportCompleteBtn.cloneNode(true)
+
+  exportIncompleteBtn.parentNode.replaceChild(
+    newExportIncompleteBtn,
+    exportIncompleteBtn
+  )
+  exportCompleteBtn.parentNode.replaceChild(
+    newExportCompleteBtn,
+    exportCompleteBtn
+  )
+
+  newExportIncompleteBtn.addEventListener('click', () => {
+    const incompleteImages = images.filter((img) => !img.alt || !img.title)
+    exportImages(
+      incompleteImages,
+      `${currentWebsiteDomain}_incomplete-images.csv`
+    )
+  })
+
+  newExportCompleteBtn.addEventListener('click', () => {
+    const completeImages = images.filter((img) => img.alt && img.title)
+    exportImages(completeImages, `${currentWebsiteDomain}_complete-images.csv`)
+  })
 }
 
 function exportImages(images, filename) {
@@ -459,18 +548,34 @@ function createLinkElement(link) {
 }
 
 function setupExportButtons(links) {
-  document.getElementById('exportIncomplete').addEventListener('click', () => {
+  // Remove any existing event listeners
+  const exportIncompleteBtn = document.getElementById('exportIncomplete')
+  const exportCompleteBtn = document.getElementById('exportComplete')
+
+  const newExportIncompleteBtn = exportIncompleteBtn.cloneNode(true)
+  const newExportCompleteBtn = exportCompleteBtn.cloneNode(true)
+
+  exportIncompleteBtn.parentNode.replaceChild(
+    newExportIncompleteBtn,
+    exportIncompleteBtn
+  )
+  exportCompleteBtn.parentNode.replaceChild(
+    newExportCompleteBtn,
+    exportCompleteBtn
+  )
+
+  newExportIncompleteBtn.addEventListener('click', () => {
     const incompleteLinks = links.filter(
       (link) => !link.text || link.text.trim() === ''
     )
-    exportLinks(incompleteLinks, 'incomplete-links.csv')
+    exportLinks(incompleteLinks, `${currentWebsiteDomain}_incomplete-links.csv`)
   })
 
-  document.getElementById('exportComplete').addEventListener('click', () => {
+  newExportCompleteBtn.addEventListener('click', () => {
     const completeLinks = links.filter(
       (link) => link.text && link.text.trim() !== ''
     )
-    exportLinks(completeLinks, 'complete-links.csv')
+    exportLinks(completeLinks, `${currentWebsiteDomain}_complete-links.csv`)
   })
 }
 
