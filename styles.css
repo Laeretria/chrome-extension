@@ -55,7 +55,7 @@ body {
   font-weight: 300;
 }
 .container {
-  width: 600px;
+  width: 700px;
   padding-bottom: 0px !important;
 }
 
@@ -80,13 +80,13 @@ h2 {
 
 .tabs {
   display: flex;
-  justify-content: space-between;
   margin-top: 20px;
   margin-bottom: 20px;
+  gap: 4px;
 }
 
 .tab-button {
-  padding: 10px 30px;
+  padding: 10px 17.6px;
   background: var(--white);
   cursor: pointer;
   font-size: 14px;
