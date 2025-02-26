@@ -1,4 +1,5 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  // Keep all existing message handlers
   if (request.action === 'getOverview') {
     const overview = {
       publisher:
@@ -316,6 +317,44 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       },
     })
   }
+  // NEW HANDLER: Add a handler for robots.txt and sitemap information
+  else if (request.action === 'getSitemapInfo') {
+    // We'll handle the sitemap detection on the content side
+    // First, check if current page has any sitemap links in the HTML
+    const sitemapLinks = Array.from(document.querySelectorAll('a'))
+      .filter((a) => {
+        return (
+          a.href &&
+          (a.href.includes('sitemap.xml') ||
+            a.href.includes('sitemap_index.xml') ||
+            a.href.includes('sitemap-index.xml') ||
+            a.href.includes('sitemapindex.xml') ||
+            a.href.includes('wp-sitemap.xml') ||
+            a.href.toLowerCase().includes('sitemap'))
+        )
+      })
+      .map((a) => a.href)
+
+    // Also check for <link> elements that might point to sitemaps
+    const sitemapLinkElements = Array.from(
+      document.querySelectorAll('link[rel="sitemap"]')
+    ).map((link) => link.href)
+
+    // Get the domain from the current URL
+    const domain = window.location.origin
+
+    // Combine all found sitemap URLs
+    const foundSitemaps = [
+      ...new Set([...sitemapLinks, ...sitemapLinkElements]),
+    ]
+
+    sendResponse({
+      domain: domain,
+      foundSitemaps: foundSitemaps,
+    })
+    return true // Important: Return true to indicate async response
+  }
+
   // Helper function to get position of a node in the DOM
   function getNodePosition(node) {
     // Walk the DOM tree and count nodes
@@ -350,6 +389,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       )
     })
   }
+
+  // Return true to indicate we might send a response asynchronously
+  return true
 })
 
 function generateDocumentOutline(headings) {

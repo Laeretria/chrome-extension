@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', async function () {
   // Your existing tab code
   const tabs = document.querySelectorAll('.tab-button')
   tabs.forEach((tab) => {
@@ -16,6 +16,24 @@ document.addEventListener('DOMContentLoaded', function () {
       loadTabData(tab.dataset.tab)
     })
   })
+
+  // New code for sitemap functionality
+  try {
+    // Get the current tab's URL
+    const chromeTabs = await chrome.tabs.query({
+      active: true,
+      currentWindow: true,
+    })
+    if (chromeTabs && chromeTabs[0] && chromeTabs[0].url) {
+      const url = new URL(chromeTabs[0].url)
+      const currentDomain = url.origin // This gets the protocol, hostname, and port
+
+      // Setup the footer links with the current domain
+      await setupFooterLinks(currentDomain)
+    }
+  } catch (error) {
+    console.error('Error setting up footer links:', error)
+  }
 
   // Add logo click handler
   const logoLink = document.getElementById('logo-link')
@@ -476,9 +494,110 @@ function exportLinks(links, filename) {
   link.click()
 }
 
-function setupFooterLinks(currentDomain) {
+// Utility function to fetch robots.txt and extract sitemap URLs
+async function getSitemapFromRobots(domain) {
+  try {
+    const response = await fetch(`${domain}/robots.txt`)
+    const text = await response.text()
+
+    // Look for Sitemap: directives in robots.txt
+    const sitemapMatches = text.match(/^Sitemap:\s*(.+)$/gim)
+    if (sitemapMatches && sitemapMatches.length > 0) {
+      // Extract URLs from all Sitemap: directives
+      return sitemapMatches.map((match) => {
+        return match.replace(/^Sitemap:\s*/i, '').trim()
+      })
+    }
+
+    return []
+  } catch (error) {
+    console.error('Error fetching robots.txt:', error)
+    return []
+  }
+}
+
+// Function to check if a URL exists (returns HTTP status)
+async function checkUrlExists(url) {
+  try {
+    const response = await fetch(url, { method: 'HEAD' })
+    return response.status
+  } catch (error) {
+    console.error('Error checking URL:', error)
+    return 404
+  }
+}
+
+// Function to find working sitemap URL
+async function findSitemapUrl(domain) {
+  // First try to get sitemap from robots.txt
+  const sitemapsFromRobots = await getSitemapFromRobots(domain)
+  if (sitemapsFromRobots.length > 0) {
+    // Return the first valid sitemap URL from robots.txt
+    for (const url of sitemapsFromRobots) {
+      const status = await checkUrlExists(url)
+      if (status >= 200 && status < 400) {
+        return url
+      }
+    }
+  }
+
+  // Get any sitemaps found in the page content via content script
+  const sitemapsInPage = await new Promise((resolve) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        { action: 'getSitemapInfo' },
+        (response) => {
+          if (
+            response &&
+            response.foundSitemaps &&
+            response.foundSitemaps.length > 0
+          ) {
+            resolve(response.foundSitemaps)
+          } else {
+            resolve([])
+          }
+        }
+      )
+    })
+  })
+
+  // Check each sitemap from the page
+  for (const url of sitemapsInPage) {
+    const status = await checkUrlExists(url)
+    if (status >= 200 && status < 400) {
+      return url
+    }
+  }
+
+  // Common sitemap filename patterns to try
+  const sitemapPatterns = [
+    '/sitemap_index.xml',
+    '/sitemap.xml',
+    '/sitemap-index.xml',
+    '/sitemapindex.xml',
+    '/wp-sitemap.xml', // WordPress
+    '/sitemap.php', // Some CMS systems
+  ]
+
+  // Check each pattern
+  for (const pattern of sitemapPatterns) {
+    const url = `${domain}${pattern}`
+    const status = await checkUrlExists(url)
+    if (status >= 200 && status < 400) {
+      return url
+    }
+  }
+
+  // Default fallback
+  return `${domain}/sitemap.xml`
+}
+
+// Updated setupFooterLinks function
+async function setupFooterLinks(currentDomain) {
   const robotsLink = document.getElementById('robotsLink')
   const sitemapLink = document.getElementById('sitemapLink')
+  const sitemapLoader = document.getElementById('sitemapLoader')
 
   if (robotsLink) {
     robotsLink.href = `${currentDomain}/robots.txt`
@@ -496,17 +615,37 @@ function setupFooterLinks(currentDomain) {
   }
 
   if (sitemapLink) {
-    sitemapLink.href = `${currentDomain}/sitemap_index.xml`
-    sitemapLink.addEventListener('click', async (e) => {
-      e.preventDefault()
-      const tabs = await chrome.tabs.query({
-        active: true,
-        currentWindow: true,
+    // Show loading indicator or disable link until we find the sitemap
+    if (sitemapLoader) sitemapLoader.style.display = 'inline'
+    sitemapLink.classList.add('loading')
+
+    try {
+      // Find the actual sitemap URL
+      const sitemapUrl = await findSitemapUrl(currentDomain)
+
+      // Update the link with the found URL
+      sitemapLink.href = sitemapUrl
+      console.log('Found sitemap URL:', sitemapUrl)
+
+      sitemapLink.addEventListener('click', async (e) => {
+        e.preventDefault()
+        const tabs = await chrome.tabs.query({
+          active: true,
+          currentWindow: true,
+        })
+        chrome.tabs.create({
+          url: sitemapUrl,
+          index: tabs[0].index + 1,
+        })
       })
-      chrome.tabs.create({
-        url: `${currentDomain}/sitemap_index.xml`,
-        index: tabs[0].index + 1,
-      })
-    })
+    } catch (error) {
+      console.error('Error finding sitemap:', error)
+      // In case of error, set a default sitemap URL
+      sitemapLink.href = `${currentDomain}/sitemap.xml`
+    } finally {
+      // Hide loader in all cases
+      if (sitemapLoader) sitemapLoader.style.display = 'none'
+      sitemapLink.classList.remove('loading')
+    }
   }
 }
