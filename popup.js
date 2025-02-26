@@ -168,23 +168,9 @@ async function updateOverviewUI(overview) {
     document.getElementById('robots-tag').classList.add('missing')
   }
 
-  // Update keywords
-  document.getElementById('keywords').textContent =
-    overview.keywords || 'Ontbreekt'
-  if (!overview.keywords) {
-    document.getElementById('keywords').classList.add('missing')
-  }
-
   // Update word count
   document.getElementById('word-count').textContent =
     overview.wordCount.toLocaleString()
-
-  // Update publisher
-  document.getElementById('publisher').textContent =
-    overview.publisher || 'Ontbreekt'
-  if (!overview.publisher) {
-    document.getElementById('publisher').classList.add('missing')
-  }
 
   // Update language
   document.getElementById('language').textContent =
