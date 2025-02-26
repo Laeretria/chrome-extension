@@ -3,35 +3,35 @@ let currentWebsiteDomain = ''
 
 const tooltipData = {
   title: {
-    text: 'This is what shows as the text in your browser tab, and often in your page headings in search results (sometimes Google rewrite them). The current maximum that will display fully on search results is around 65 characters, or 568 pixels.',
+    text: 'Dit is de tekst die wordt weergegeven in het browsertabblad en vaak in de koppen van zoekresultaten (soms herschrijft Google ze). De huidige maximale lengte die volledig wordt weergegeven in zoekresultaten is ongeveer 65 tekens of 568 pixels.',
     link: 'https://kreatix.be/blog/meta-title-seo',
   },
   description: {
-    text: "Meta descriptions summarize your page's content for search results. While not a direct ranking factor, a compelling description can improve click-through rates. Google may generate its own description instead of using yours.",
+    text: 'Een korte tekst die een pagina samenvat. Hoewel niet cruciaal, is een ideale lengte tussen de 70 en 155 tekens.',
     link: 'https://kreatix.be/blog/meta-description-seo',
   },
   url: {
-    text: 'Your page URL structure helps users and search engines understand what the page is about. A good URL is concise, descriptive, and contains relevant keywords.',
+    text: 'De URL van de pagina waarop je je momenteel bevindt. URL staat voor Uniform Resource Locator.',
     link: 'https://kreatix.be/blog/url-structure-seo',
   },
   canonical: {
-    text: 'The canonical tag tells search engines which version of a URL to index when there are multiple pages with similar content. It helps prevent duplicate content issues.',
+    text: "Een canonical tag vertelt zoekmachines zoals Google wat de 'voorkeurs-' of 'hoofd-' URL van een pagina moet zijn.",
     link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
   robotsTag: {
-    text: "The robots meta tag tells search engines whether to index your page and follow its links. Common values include 'index,follow', 'noindex,follow', and 'noindex,nofollow'.",
+    text: "De robots-meta tag vertelt zoekmachines of ze je pagina moeten indexeren en de links moeten volgen. Veelvoorkomende waarden zijn 'index,follow', 'noindex,follow' en 'noindex,nofollow'.",
     link: 'https://kreatix.be/blog/robots-meta-tags',
   },
   xRobotsTag: {
-    text: 'X-Robots-Tag is an HTTP header that provides the same directives as the robots meta tag, but can be applied to non-HTML documents like PDFs.',
+    text: "De X-Robots-Tag is een HTTP-header die dezelfde richtlijnen biedt als de robots-meta tag, maar kan worden toegepast op niet-HTML-documenten zoals PDF's.",
     link: 'https://kreatix.be/blog/x-robots-tag',
   },
   wordCount: {
-    text: "The total number of words on your page. While there's no perfect word count, comprehensive content tends to perform better in search results for informational queries.",
+    text: 'Het totale aantal woorden op je pagina. Hoewel er geen perfect aantal woorden is, presteert uitgebreide content vaak beter in zoekresultaten voor informatieve zoekopdrachten.',
     link: 'https://kreatix.be/blog/content-length-seo',
   },
   language: {
-    text: "The language declared for this page via the HTML lang attribute. This helps search engines understand the page's language.",
+    text: 'De opgegeven taal van de pagina.',
     link: 'https://kreatix.be/blog/language-settings-seo',
   },
 }
@@ -339,7 +339,7 @@ async function updateOverviewUI(overview) {
   }
 }
 
-// Improved helper function to add a tooltip with adaptive arrow direction
+// Improved helper function with better hover behavior
 function addTooltipToElement(element, tooltipInfo) {
   console.log('Adding tooltip to element:', element.textContent.trim())
 
@@ -382,7 +382,7 @@ function addTooltipToElement(element, tooltipInfo) {
 
     const link = document.createElement('a')
     link.href = tooltipInfo.link
-    link.textContent = 'Learn more'
+    link.textContent = 'Leer meer'
     link.target = '_blank'
 
     learnMoreDiv.appendChild(link)
@@ -421,22 +421,60 @@ function addTooltipToElement(element, tooltipInfo) {
     }
   }
 
-  // Add event listeners
-  tooltipIcon.addEventListener('mouseenter', function () {
+  // Variables for hover management
+  let hideTimeout
+  let isHoveringIcon = false
+  let isHoveringTooltip = false
+
+  function showTooltip() {
+    clearTimeout(hideTimeout)
     positionTooltip()
     tooltipWrapper.classList.add('active')
+  }
+
+  function hideTooltip() {
+    // Only hide if neither the icon nor the tooltip is being hovered
+    if (!isHoveringIcon && !isHoveringTooltip) {
+      hideTimeout = setTimeout(() => {
+        tooltipWrapper.classList.remove('active')
+      }, 100)
+    }
+  }
+
+  // Mouse events for icon
+  tooltipIcon.addEventListener('mouseenter', function () {
+    isHoveringIcon = true
+    showTooltip()
   })
 
   tooltipIcon.addEventListener('mouseleave', function () {
-    tooltipWrapper.classList.remove('active')
+    isHoveringIcon = false
+    hideTooltip()
+  })
+
+  // Mouse events for tooltip content
+  tooltipWrapper.addEventListener('mouseenter', function () {
+    isHoveringTooltip = true
+    showTooltip()
+  })
+
+  tooltipWrapper.addEventListener('mouseleave', function () {
+    isHoveringTooltip = false
+    hideTooltip()
   })
 
   // Add click event for mobile devices
   tooltipIcon.addEventListener('click', function (e) {
     e.preventDefault()
     e.stopPropagation()
-    positionTooltip()
-    tooltipWrapper.classList.toggle('active')
+
+    // If the tooltip is already active, we want to toggle it off
+    if (tooltipWrapper.classList.contains('active')) {
+      tooltipWrapper.classList.remove('active')
+    } else {
+      positionTooltip()
+      tooltipWrapper.classList.add('active')
+    }
   })
 
   // Close tooltip when clicking elsewhere on the page

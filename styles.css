@@ -652,18 +652,18 @@ h2 {
   text-decoration: underline;
 }
 
-/* Tooltip styles with adaptive arrow direction */
+/* Updated tooltip styles for better hover interaction */
 
 .tooltip-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  background-color: rgb(176, 176, 176);
+  font-size: 12px;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: rgb(176, 176, 176);
   color: white;
-  font-size: 12px;
   font-weight: bold;
   margin-left: 5px;
   cursor: help;
@@ -684,32 +684,32 @@ h2 {
 .tooltip-wrapper {
   position: fixed;
   z-index: 9999;
-  pointer-events: none; /* Allow clicks to pass through when inactive */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
+  /* Create a hover target area that's slightly larger than the visible tooltip */
+  padding: 15px;
+  margin: -15px;
 }
 
 .tooltip-wrapper.active {
   opacity: 1;
   visibility: visible;
-  pointer-events: auto; /* Re-enable pointer events when visible */
 }
 
 .tooltip-content {
   width: 280px;
   background-color: #fff;
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   border-radius: 8px;
   padding: 12px;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.4;
   color: #333;
   text-align: left;
   font-weight: normal;
   border: 1px solid #e0e0e0;
-  pointer-events: auto; /* Make sure the tooltip content can be interacted with */
-  position: relative; /* Needed for arrow positioning */
+  position: relative;
 }
 
 /* Default arrow position (pointing left) */
