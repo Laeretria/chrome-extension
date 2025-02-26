@@ -38,15 +38,22 @@ body {
 
 .header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
 }
 
 .titel {
   margin: 0;
   font-size: medium;
+  font-weight: 300;
 }
-
 .container {
   width: 600px;
   padding-bottom: 0px !important;
