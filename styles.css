@@ -652,7 +652,8 @@ h2 {
   text-decoration: underline;
 }
 
-/* Tooltip Styles */
+/* Tooltip styles with adaptive arrow direction */
+
 .tooltip-icon {
   display: inline-flex;
   align-items: center;
@@ -660,22 +661,45 @@ h2 {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: #1448ff;
+  background-color: rgb(176, 176, 176);
   color: white;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
   margin-left: 5px;
   cursor: help;
-  position: relative;
+  border: none;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: background-color 0.2s;
+}
+
+.tooltip-icon:hover,
+.tooltip-icon:focus {
+  background-color: #0f36c0;
+}
+
+/* Container that will break out of the parent and be positioned fixed on the page */
+.tooltip-wrapper {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none; /* Allow clicks to pass through when inactive */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+}
+
+.tooltip-wrapper.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto; /* Re-enable pointer events when visible */
 }
 
 .tooltip-content {
-  display: none;
-  position: absolute;
-  z-index: 100;
   width: 280px;
   background-color: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
   border-radius: 8px;
   padding: 12px;
   font-size: 12px;
@@ -683,10 +707,33 @@ h2 {
   color: #333;
   text-align: left;
   font-weight: normal;
+  border: 1px solid #e0e0e0;
+  pointer-events: auto; /* Make sure the tooltip content can be interacted with */
+  position: relative; /* Needed for arrow positioning */
 }
 
-.tooltip-content.active {
-  display: block;
+/* Default arrow position (pointing left) */
+.tooltip-content::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: 15px;
+  width: 10px;
+  height: 10px;
+  background-color: #fff;
+  transform: rotate(45deg);
+  border-left: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+/* Arrow pointing right when tooltip is on the left */
+.tooltip-content.arrow-right::before {
+  left: auto;
+  right: -6px;
+  border-left: none;
+  border-bottom: none;
+  border-right: 1px solid #e0e0e0;
+  border-top: 1px solid #e0e0e0;
 }
 
 .learn-more {
@@ -703,14 +750,11 @@ h2 {
   text-decoration: underline;
 }
 
-/* Fix for tooltip positioning in case parent has overflow hidden */
+/* Make sure parent containers don't clip the tooltip */
 .meta-item,
-.info-item {
-  overflow: visible !important;
-}
-
+.info-item,
 .meta-header,
-.info-header {
+.info-header,
+.container {
   overflow: visible !important;
-  position: relative;
 }

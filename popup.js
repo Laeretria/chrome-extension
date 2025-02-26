@@ -186,7 +186,7 @@ async function loadTabData(tabName) {
       case 'overview':
         if (response && response.overview) {
           updateOverviewUI(response.overview)
-          setTimeout(setupTooltips, 200)
+          setTimeout(setupTooltips, 300)
         }
         break
       case 'images':
@@ -339,14 +339,165 @@ async function updateOverviewUI(overview) {
   }
 }
 
-// Function to set up all tooltips in the overview section
+// Improved helper function to add a tooltip with adaptive arrow direction
+function addTooltipToElement(element, tooltipInfo) {
+  console.log('Adding tooltip to element:', element.textContent.trim())
+
+  // First, check if tooltip already exists
+  let nextSibling = element.nextSibling
+  while (nextSibling) {
+    if (
+      nextSibling.classList &&
+      nextSibling.classList.contains('tooltip-icon')
+    ) {
+      // Tooltip already exists, don't add another one
+      return
+    }
+    nextSibling = nextSibling.nextSibling
+  }
+
+  // Create the tooltip icon
+  const tooltipIcon = document.createElement('button')
+  tooltipIcon.type = 'button'
+  tooltipIcon.className = 'tooltip-icon'
+  tooltipIcon.setAttribute('aria-label', 'More information')
+  tooltipIcon.textContent = '?'
+
+  // Position it after the element
+  element.insertAdjacentElement('afterend', tooltipIcon)
+
+  // Create a wrapper for the tooltip that will be appended to body
+  const tooltipWrapper = document.createElement('div')
+  tooltipWrapper.className = 'tooltip-wrapper'
+
+  // Create the tooltip content container
+  const tooltipContent = document.createElement('div')
+  tooltipContent.className = 'tooltip-content'
+  tooltipContent.textContent = tooltipInfo.text
+
+  // Add "Learn more" link if provided
+  if (tooltipInfo.link) {
+    const learnMoreDiv = document.createElement('div')
+    learnMoreDiv.className = 'learn-more'
+
+    const link = document.createElement('a')
+    link.href = tooltipInfo.link
+    link.textContent = 'Learn more'
+    link.target = '_blank'
+
+    learnMoreDiv.appendChild(link)
+    tooltipContent.appendChild(learnMoreDiv)
+  }
+
+  // Add tooltip content to wrapper, and wrapper to body
+  tooltipWrapper.appendChild(tooltipContent)
+  document.body.appendChild(tooltipWrapper)
+
+  // Add data attribute to link icon and wrapper
+  const tooltipId = 'tooltip-' + Date.now()
+  tooltipIcon.setAttribute('data-tooltip-id', tooltipId)
+  tooltipWrapper.setAttribute('data-tooltip-id', tooltipId)
+
+  // Function to position the tooltip
+  function positionTooltip() {
+    const rect = tooltipIcon.getBoundingClientRect()
+
+    // Position to the right of the icon by default
+    tooltipWrapper.style.top = rect.top - 10 + 'px'
+    tooltipWrapper.style.left = rect.right + 10 + 'px'
+
+    // Remove the arrow-right class by default (arrow points left)
+    tooltipContent.classList.remove('arrow-right')
+
+    // Check if tooltip would extend beyond right edge of viewport
+    const tooltipRect = tooltipContent.getBoundingClientRect()
+    if (rect.right + 10 + tooltipRect.width > window.innerWidth) {
+      // Position to the left of the icon if it would overflow
+      tooltipWrapper.style.left = 'auto'
+      tooltipWrapper.style.right = window.innerWidth - rect.left + 10 + 'px'
+
+      // Add class to flip the arrow (arrow points right)
+      tooltipContent.classList.add('arrow-right')
+    }
+  }
+
+  // Add event listeners
+  tooltipIcon.addEventListener('mouseenter', function () {
+    positionTooltip()
+    tooltipWrapper.classList.add('active')
+  })
+
+  tooltipIcon.addEventListener('mouseleave', function () {
+    tooltipWrapper.classList.remove('active')
+  })
+
+  // Add click event for mobile devices
+  tooltipIcon.addEventListener('click', function (e) {
+    e.preventDefault()
+    e.stopPropagation()
+    positionTooltip()
+    tooltipWrapper.classList.toggle('active')
+  })
+
+  // Close tooltip when clicking elsewhere on the page
+  document.addEventListener('click', function (e) {
+    if (!tooltipIcon.contains(e.target) && !tooltipWrapper.contains(e.target)) {
+      tooltipWrapper.classList.remove('active')
+    }
+  })
+
+  // Close tooltip when pressing Escape
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      tooltipWrapper.classList.remove('active')
+    }
+  })
+
+  // Update position on scroll or resize
+  window.addEventListener(
+    'scroll',
+    function () {
+      if (tooltipWrapper.classList.contains('active')) {
+        positionTooltip()
+      }
+    },
+    { passive: true }
+  )
+
+  window.addEventListener('resize', function () {
+    if (tooltipWrapper.classList.contains('active')) {
+      positionTooltip()
+    }
+  })
+
+  return tooltipIcon
+}
+
+// Updated setupTooltips function to clean up previous tooltips properly
 function setupTooltips() {
+  console.log('Setting up tooltips...')
+
+  // Remove any existing tooltips to prevent duplicates
+  document.querySelectorAll('.tooltip-icon').forEach((icon) => {
+    const tooltipId = icon.getAttribute('data-tooltip-id')
+    if (tooltipId) {
+      const tooltipWrapper = document.querySelector(
+        `.tooltip-wrapper[data-tooltip-id="${tooltipId}"]`
+      )
+      if (tooltipWrapper) {
+        tooltipWrapper.remove()
+      }
+    }
+    icon.remove()
+  })
+
   // Add tooltips to meta items
   document.querySelectorAll('.meta-item .meta-header').forEach((header) => {
     const titleElement = header.querySelector('span')
     if (!titleElement) return
 
     const titleText = titleElement.textContent.trim().toLowerCase()
+    console.log('Found meta header:', titleText)
 
     // Map titleText to tooltipData key
     let tooltipKey
@@ -366,6 +517,7 @@ function setupTooltips() {
     if (!titleElement) return
 
     const titleText = titleElement.textContent.trim().toLowerCase()
+    console.log('Found info header:', titleText)
 
     // Map titleText to tooltipData key
     let tooltipKey
@@ -378,6 +530,8 @@ function setupTooltips() {
       addTooltipToElement(titleElement, tooltipData[tooltipKey])
     }
   })
+
+  console.log('Tooltip setup complete')
 }
 
 function updateHeadingsUI(response) {
