@@ -661,6 +661,17 @@
         <div id="imagesDetails"></div>
       </div>
     </div>
+    <!-- Add this to your popup.html file -->
+    <div id="schema-tab" class="tab-content">
+      <div class="tab-header">
+        <h2>Schema</h2>
+        <p>Structured data on this page</p>
+      </div>
+
+      <div id="schema-container" class="schema-container">
+        <div id="loading-schemas" class="loading">Schema data laden...</div>
+      </div>
+    </div>
     <div class="header">
       <div class="logo-container">
         <h1 class="titel">Gemaakt door</h1>
@@ -674,6 +685,6 @@
       </div>
       <h2 class="titel">SEO Analyse Tool</h2>
     </div>
-    <script src="popup.js"></script>
+    <script type="module" src="popup.js"></script>
   </body>
 </html>

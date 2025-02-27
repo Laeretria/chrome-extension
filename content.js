@@ -353,6 +353,85 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       foundSitemaps: foundSitemaps,
     })
     return true // Important: Return true to indicate async response
+  } else if (request.action === 'getSchema') {
+    console.log('Processing getSchema request')
+
+    function extractSchemaData() {
+      const schemas = []
+
+      // Extract JSON-LD schemas
+      const jsonLdScripts = document.querySelectorAll(
+        'script[type="application/ld+json"]'
+      )
+      console.log('Found', jsonLdScripts.length, 'JSON-LD scripts')
+
+      jsonLdScripts.forEach((script, index) => {
+        try {
+          const jsonContent = JSON.parse(script.textContent)
+
+          // Process JSON-LD content into flattened properties
+          const properties = []
+
+          function flattenObject(obj, prefix = '') {
+            if (!obj) return
+
+            if (typeof obj === 'object') {
+              if (Array.isArray(obj)) {
+                obj.forEach((item, index) => {
+                  if (typeof item === 'object' && item !== null) {
+                    flattenObject(item, `${prefix}${index}`)
+                  } else {
+                    properties.push({ key: `${prefix}${index}`, value: item })
+                  }
+                })
+              } else {
+                Object.keys(obj).forEach((key) => {
+                  const value = obj[key]
+
+                  if (typeof value === 'object' && value !== null) {
+                    flattenObject(value, `${prefix}${key}@`)
+                  } else {
+                    properties.push({ key: `${prefix}${key}`, value: value })
+                  }
+                })
+              }
+            }
+          }
+
+          flattenObject(jsonContent)
+
+          schemas.push({
+            type: 'JSON-LD',
+            properties: properties,
+          })
+        } catch (error) {
+          console.error('Error parsing JSON-LD:', error)
+        }
+      })
+
+      // Add code for Microdata and RDFa extraction here...
+
+      return schemas
+    }
+
+    try {
+      const schemas = extractSchemaData()
+      console.log('Extracted schemas:', schemas)
+
+      sendResponse({
+        schemas: schemas,
+        success: true,
+      })
+    } catch (error) {
+      console.error('Schema extraction error:', error)
+      sendResponse({
+        schemas: [],
+        success: false,
+        error: error.message,
+      })
+    }
+
+    return true
   }
 
   // Helper function to get position of a node in the DOM

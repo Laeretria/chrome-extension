@@ -758,3 +758,57 @@ h2 {
 .container {
   overflow: visible !important;
 }
+
+/* Schema tab styles */
+.schema-container {
+  padding: 15px;
+}
+
+.schema-property {
+  display: flex;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.schema-key {
+  flex: 0 0 150px;
+  font-weight: 600;
+  color: #6366f1;
+  text-align: left;
+  padding-right: 30px;
+}
+
+.schema-value {
+  flex: 1;
+  word-break: break-word;
+  text-align: left;
+}
+
+.schema-export-btn {
+  background-color: #1448ff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  float: right;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.schema-export-btn:hover {
+  background-color: #0c34d1;
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+.hidden {
+  display: none;
+}

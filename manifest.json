@@ -8,6 +8,12 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["js/*.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
