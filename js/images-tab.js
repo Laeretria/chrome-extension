@@ -1,3 +1,5 @@
+import { currentWebsiteDomain } from './domain-utils.js'
+
 export function updateImagesUI(response) {
   const { images, summary } = response
 

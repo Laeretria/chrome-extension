@@ -1,3 +1,6 @@
+// Declare the variable to hold the current domain
+export let currentWebsiteDomain = 'website' // Default value
+
 // Function to extract domain name in a clean format for filenames
 export function getCleanDomainName(url) {
   try {

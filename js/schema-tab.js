@@ -1,6 +1,6 @@
-export function updateSchemaUI(response) {
-  console.log('Schema response structure:', JSON.stringify(response, null, 2))
+import { currentWebsiteDomain } from './domain-utils.js'
 
+export function updateSchemaUI(response) {
   const container = document.getElementById('schema-container')
   if (!container) {
     console.error('Schema container not found')
@@ -12,6 +12,9 @@ export function updateSchemaUI(response) {
     loadingElement.classList.add('hidden')
   }
 
+  // Clear container
+  container.innerHTML = ''
+
   // Check if we have schema data
   if (!response || !response.schemas || response.schemas.length === 0) {
     container.innerHTML =
@@ -19,72 +22,126 @@ export function updateSchemaUI(response) {
     return
   }
 
-  // Clear container
-  container.innerHTML = ''
+  // Create a button container at the top-right
+  const buttonContainer = document.createElement('div')
+  buttonContainer.style.width = '100%'
+  buttonContainer.style.textAlign = 'right'
 
   // Add export button
   const exportButton = document.createElement('button')
   exportButton.className = 'schema-export-btn'
+  exportButton.style.padding = '8px 16px'
+  exportButton.style.borderRadius = '4px'
+  exportButton.style.color = 'white'
+  exportButton.style.border = 'none'
+  exportButton.style.cursor = 'pointer'
   exportButton.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-      </svg>
-      Export Schema
-    `
+           <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+            stroke="currentColor"
+            stroke-width="1.5"
+            style="vertical-align: middle;
+            margin-right: 6px;
+          >
+            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+            <g
+              id="SVGRepo_tracerCarrier"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></g>
+            <g id="SVGRepo_iconCarrier">
+              <path
+                d="M12.5535 16.5061C12.4114 16.6615 12.2106 16.75 12 16.75C11.7894 16.75 11.5886 16.6615 11.4465 16.5061L7.44648 12.1311C7.16698 11.8254 7.18822 11.351 7.49392 11.0715C7.79963 10.792 8.27402 10.8132 8.55352 11.1189L11.25 14.0682V3C11.25 2.58579 11.5858 2.25 12 2.25C12.4142 2.25 12.75 2.58579 12.75 3V14.0682L15.4465 11.1189C15.726 10.8132 16.2004 10.792 16.5061 11.0715C16.8118 11.351 16.833 11.8254 16.5535 12.1311L12.5535 16.5061Z"
+                fill="#1C274C"
+              ></path>
+              <path
+                d="M3.75 15C3.75 14.5858 3.41422 14.25 3 14.25C2.58579 14.25 2.25 14.5858 2.25 15V15.0549C2.24998 16.4225 2.24996 17.5248 2.36652 18.3918C2.48754 19.2919 2.74643 20.0497 3.34835 20.6516C3.95027 21.2536 4.70814 21.5125 5.60825 21.6335C6.47522 21.75 7.57754 21.75 8.94513 21.75H15.0549C16.4225 21.75 17.5248 21.75 18.3918 21.6335C19.2919 21.5125 20.0497 21.2536 20.6517 20.6516C21.2536 20.0497 21.5125 19.2919 21.6335 18.3918C21.75 17.5248 21.75 16.4225 21.75 15.0549V15C21.75 14.5858 21.4142 14.25 21 14.25C20.5858 14.25 20.25 14.5858 20.25 15C20.25 16.4354 20.2484 17.4365 20.1469 18.1919C20.0482 18.9257 19.8678 19.3142 19.591 19.591C19.3142 19.8678 18.9257 20.0482 18.1919 20.1469C17.4365 20.2484 16.4354 20.25 15 20.25H9C7.56459 20.25 6.56347 20.2484 5.80812 20.1469C5.07435 20.0482 4.68577 19.8678 4.40901 19.591C4.13225 19.3142 3.9518 18.9257 3.85315 18.1919C3.75159 17.4365 3.75 16.4354 3.75 15Z"
+                fill="#1C274C"
+              ></path>
+            </g>
+          </svg>
+    Export Schema
+  `
   exportButton.addEventListener('click', () => {
     exportSchemaData(response.schemas)
   })
-  container.appendChild(exportButton)
+  buttonContainer.appendChild(exportButton)
+  container.appendChild(buttonContainer)
 
-  // Create a container for schema data
-  const schemaData = document.createElement('div')
-  schemaData.className = 'schema-data'
-  container.appendChild(schemaData)
-
-  // Process and display each schema
+  // Process schema data
   let processedData = []
-
   response.schemas.forEach((schema) => {
-    console.log('Processing schema:', schema)
-
-    // Check if schema has properties array
     if (schema.properties && Array.isArray(schema.properties)) {
       processedData = processedData.concat(schema.properties)
     } else if (schema.content) {
-      // Alternative format - schema might have content directly
       const properties = extractProperties(schema.content)
       processedData = processedData.concat(properties)
     }
   })
 
-  console.log('Total properties to display:', processedData.length)
+  // Sort properties alphabetically
+  processedData.sort((a, b) => a.key.localeCompare(b.key))
 
-  // Now create the display for each property
-  processedData.forEach((prop) => {
+  // Create a table for schema data with consistent styling
+  const schemaTable = document.createElement('div')
+  schemaTable.style.display = 'table'
+  schemaTable.style.width = '100%'
+  schemaTable.style.borderCollapse = 'collapse'
+  schemaTable.style.marginTop = '10px'
+  schemaTable.style.backgroundColor = '#e6f3ff'
+  schemaTable.style.borderRadius = '6px'
+  schemaTable.style.overflow = 'hidden'
+  container.appendChild(schemaTable)
+
+  // Add each property as a table row
+  processedData.forEach((prop, index) => {
     const row = document.createElement('div')
-    row.className = 'schema-property'
-    row.style.display = 'flex'
-    row.style.marginBottom = '8px'
-    row.style.paddingBottom = '8px'
-    row.style.borderBottom = '1px solid #eee'
+    row.style.display = 'table-row'
 
-    const keyEl = document.createElement('div')
-    keyEl.className = 'schema-key'
-    keyEl.style.flex = '0 0 200px'
-    keyEl.style.fontWeight = 'bold'
-    keyEl.style.color = '#6366f1'
-    keyEl.textContent = prop.key || ''
+    // Alternate row colors for better readability
+    if (index % 2 === 0) {
+      row.style.backgroundColor = '#e6f3ff'
+    } else {
+      row.style.backgroundColor = '#d9e9ff'
+    }
 
-    const valueEl = document.createElement('div')
-    valueEl.className = 'schema-value'
-    valueEl.style.flex = '1'
-    valueEl.style.wordBreak = 'break-word'
-    valueEl.textContent = prop.value !== undefined ? String(prop.value) : ''
+    const keyCell = document.createElement('div')
+    keyCell.style.display = 'table-cell'
+    keyCell.style.padding = '10px 15px'
+    keyCell.style.color = '#1448ff'
+    keyCell.style.fontWeight = 'bold'
+    keyCell.style.width = '200px'
+    keyCell.style.verticalAlign = 'top'
+    keyCell.textContent = prop.key || ''
 
-    row.appendChild(keyEl)
-    row.appendChild(valueEl)
-    schemaData.appendChild(row)
+    const valueCell = document.createElement('div')
+    valueCell.style.display = 'table-cell'
+    valueCell.style.padding = '10px'
+    valueCell.style.wordBreak = 'break-word'
+    valueCell.style.verticalAlign = 'top'
+
+    // Format URLs as links
+    if (
+      typeof prop.value === 'string' &&
+      (prop.value.startsWith('http://') || prop.value.startsWith('https://'))
+    ) {
+      const link = document.createElement('a')
+      link.href = prop.value
+      link.target = '_blank'
+      link.textContent = prop.value
+      link.style.color = '#1448ff' // Orange color for links
+      valueCell.appendChild(link)
+    } else {
+      valueCell.textContent = prop.value !== undefined ? String(prop.value) : ''
+    }
+
+    row.appendChild(keyCell)
+    row.appendChild(valueCell)
+    schemaTable.appendChild(row)
   })
 }
 
@@ -136,10 +193,18 @@ export function exportSchemaData(schemas) {
     }
   })
 
+  // Sort properties alphabetically
+  processedData.sort((a, b) => a.key.localeCompare(b.key))
+
+  // Format each property with bold keys
   processedData.forEach((prop) => {
-    exportContent += `${prop.key || ''}\n${
-      prop.value !== undefined ? prop.value : ''
-    }\n\n`
+    if (!prop.key) return
+
+    // Add the key in bold
+    exportContent += `**${prop.key}**\n`
+
+    // Add the value
+    exportContent += `${prop.value !== undefined ? prop.value : ''}\n`
   })
 
   // Create and download file

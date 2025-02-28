@@ -761,7 +761,12 @@ h2 {
 
 /* Schema tab styles */
 .schema-container {
-  padding: 15px;
+  padding: 0;
+  margin: 0;
+}
+
+.info-schema {
+  font-size: 14px;
 }
 
 .schema-property {
@@ -772,17 +777,13 @@ h2 {
 }
 
 .schema-key {
-  flex: 0 0 150px;
-  font-weight: 600;
-  color: #6366f1;
-  text-align: left;
-  padding-right: 30px;
+  color: var(--primary-color);
 }
 
 .schema-value {
-  flex: 1;
-  word-break: break-word;
   text-align: left;
+  word-break: break-word;
+  width: 50%;
 }
 
 .schema-export-btn {
@@ -793,14 +794,14 @@ h2 {
   border-radius: 4px;
   display: flex;
   align-items: center;
-  gap: 5px;
-  float: right;
   margin-bottom: 15px;
+  float: right;
   cursor: pointer;
+  font-family: 'Regola-Regular';
 }
 
 .schema-export-btn:hover {
-  background-color: #0c34d1;
+  background-color: var(--secondary-color);
 }
 
 .no-data {

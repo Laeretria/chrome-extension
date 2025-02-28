@@ -1,9 +1,9 @@
 // Import footer utilities to ensure footer links work
 import { setupFooterLinks } from './footer-utils.js'
+import { currentWebsiteDomain } from './domain-utils.js'
 
 export function updateHeadingsUI(response) {
   const { counts, structure, summary } = response
-  const domain = window.currentWebsiteDomain || ''
 
   // Update heading count statistics
   for (let i = 1; i <= 6; i++) {
@@ -103,14 +103,12 @@ export function updateHeadingsUI(response) {
     )
 
     newExportButton.addEventListener('click', () => {
-      // Use window.currentWebsiteDomain if available, otherwise use a generic name
-      const domain = window.currentWebsiteDomain || 'website'
-      exportHeadings(structure, `${domain}_headings.csv`)
+      exportHeadings(structure, `${currentWebsiteDomain}_headings.csv`)
     })
   }
 
   // Setup footer links
-  setupFooterLinks(domain)
+  setupFooterLinks(currentWebsiteDomain)
 }
 
 export function exportHeadings(headings, filename) {
