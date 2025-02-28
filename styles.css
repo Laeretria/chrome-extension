@@ -854,6 +854,7 @@ h2 {
 .social-preview-tab.active {
   background-color: var(--primary-color);
   color: var(--white);
+  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
 }
 
 .social-preview-tab[data-platform='twitter'].active {
@@ -878,7 +879,7 @@ h2 {
   display: flex;
   padding: 12px;
   border-bottom: 1px solid #eee;
-  background: #f9f9f9;
+  background-color: var(--white);
 }
 
 .preview-avatar {
@@ -918,6 +919,7 @@ h2 {
 
 .preview-content {
   padding: 12px;
+  background-color: var(--white);
 }
 
 .preview-image img,
@@ -953,6 +955,7 @@ h2 {
   padding: 8px 12px;
   border-top: 1px solid #eee;
   color: #666;
+  background-color: var(--white);
 }
 
 .preview-action {
@@ -991,10 +994,11 @@ h2 {
 
 /* Metadata Summary */
 .metadata-summary {
-  background: #f5f5f5;
+  background: var(--white);
   padding: 15px;
   border-radius: 8px;
   margin-top: 20px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
 }
 
 .metadata-summary h3 {
