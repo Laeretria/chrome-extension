@@ -813,3 +813,236 @@ h2 {
 .hidden {
   display: none;
 }
+
+/* social-tab.css - Add this to your styles.css file */
+
+/* Social Preview Container */
+.social-preview-container {
+  margin-bottom: 20px;
+}
+
+/* Tabs */
+.social-preview-tabs {
+  display: flex;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.social-preview-tab {
+  padding: 10px 16px;
+  background: var(--white);
+  border: none;
+  cursor: pointer;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  font-size: 14px;
+  font-family: 'Regola-Medium';
+
+  transition: 0.3s;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
+}
+
+.social-preview-tab:not(:last-child) {
+  margin-right: 5px;
+}
+
+.social-preview-tab:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.social-preview-tab.active {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.social-preview-tab[data-platform='twitter'].active {
+  background: #1da1f2;
+}
+
+.social-preview-tab[data-platform='linkedin'].active {
+  background: #0077b5;
+}
+
+/* Preview Containers */
+.social-preview-item {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+/* Common Preview Elements */
+.preview-header {
+  display: flex;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+  background: #f9f9f9;
+}
+
+.preview-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #4267b2;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.twitter-preview .preview-avatar {
+  background: #1da1f2;
+}
+
+.linkedin-preview .preview-avatar {
+  background: #0077b5;
+}
+
+.preview-info {
+  margin-left: 10px;
+}
+
+.preview-site-name {
+  font-weight: bold;
+}
+
+.preview-date,
+.preview-handle,
+.preview-meta {
+  font-size: 12px;
+  color: #666;
+}
+
+.preview-content {
+  padding: 12px;
+}
+
+.preview-image img,
+.preview-card-image img,
+.preview-link-image img {
+  width: 100%;
+  max-height: 250px;
+  object-fit: cover;
+}
+
+.preview-title,
+.preview-card-title,
+.preview-link-title {
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.preview-description,
+.preview-text {
+  color: #333;
+  margin: 5px 0 10px;
+}
+
+.preview-domain,
+.preview-card-domain,
+.preview-link-url {
+  font-size: 12px;
+  color: #666;
+}
+
+.preview-footer {
+  display: flex;
+  padding: 8px 12px;
+  border-top: 1px solid #eee;
+  color: #666;
+}
+
+.preview-action {
+  margin-right: 15px;
+  font-size: 13px;
+}
+
+/* Twitter specific */
+.twitter-preview .preview-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.twitter-preview .preview-card-content {
+  padding: 10px;
+}
+
+/* LinkedIn specific */
+.linkedin-preview .preview-link-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.linkedin-preview .preview-link-content {
+  padding: 10px;
+}
+
+.linkedin-preview .preview-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Metadata Summary */
+.metadata-summary {
+  background: #f5f5f5;
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.metadata-summary h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.metadata-summary h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.metadata-columns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.metadata-column {
+  flex: 1;
+  min-width: 250px;
+}
+
+.metadata-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.metadata-column li {
+  margin-bottom: 5px;
+  font-size: 12px;
+  word-break: break-word;
+}
+
+/* Error message */
+.error-message {
+  padding: 15px;
+  background-color: #ffdddd;
+  border-left: 4px solid #f44336;
+  margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .metadata-columns {
+    flex-direction: column;
+  }
+}

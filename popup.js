@@ -7,6 +7,7 @@ import { updateImagesUI } from './js/images-tab.js'
 import { setupTooltips } from './js/tooltips.js'
 import { setupFooterLinks } from './js/footer-utils.js'
 import { getCleanDomainName, initCurrentDomain } from './js/domain-utils.js'
+import { updateSocialUI } from './js/social-tab.js'
 
 // Make currentWebsiteDomain available globally
 let currentWebsiteDomain = ''
@@ -134,6 +135,9 @@ async function loadTabData(tabName) {
       case 'schema':
         action = 'getSchema'
         break
+      case 'social':
+        action = 'getSocial'
+        break
       default:
         action = 'getOverview'
     }
@@ -177,6 +181,11 @@ async function loadTabData(tabName) {
       case 'schema':
         if (response) {
           updateSchemaUI(response)
+        }
+        break
+      case 'social':
+        if (response) {
+          updateSocialUI(response)
         }
         break
     }

@@ -432,6 +432,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 
     return true
+  } else if (request.action === 'getSocial') {
+    sendResponse({
+      social: extractSocialMetadata(),
+    })
   }
 
   // Helper function to get position of a node in the DOM
@@ -511,4 +515,41 @@ function generateXMLStructure(headings) {
 
   xml += '</headings>'
   return xml
+}
+
+/**
+ * Extracts Open Graph and Twitter Card metadata from the current page
+ * @returns {Object} Object containing all social metadata
+ */
+function extractSocialMetadata() {
+  const metadata = {
+    og: {},
+    twitter: {},
+  }
+
+  // Get all meta tags
+  const metaTags = document.querySelectorAll('meta')
+
+  // Extract Open Graph metadata
+  metaTags.forEach((tag) => {
+    // Open Graph tags
+    if (
+      tag.getAttribute('property') &&
+      tag.getAttribute('property').startsWith('og:')
+    ) {
+      const key = tag.getAttribute('property').replace('og:', '')
+      metadata.og[key] = tag.getAttribute('content')
+    }
+
+    // Twitter Card tags
+    if (
+      tag.getAttribute('name') &&
+      tag.getAttribute('name').startsWith('twitter:')
+    ) {
+      const key = tag.getAttribute('name').replace('twitter:', '')
+      metadata.twitter[key] = tag.getAttribute('content')
+    }
+  })
+
+  return metadata
 }
