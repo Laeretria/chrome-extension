@@ -1,23 +1,76 @@
 export async function updateOverviewUI(overview) {
+  // SEO recommendation constants
+  const SEO_LIMITS = {
+    title: {
+      min: 30,
+      recommended: 50,
+      max: 60,
+    },
+    description: {
+      min: 120,
+      recommended: 155,
+      max: 160,
+    },
+  }
+
+  // Helper function to validate and set appropriate class
+  function validateCharacterCount(count, element, type) {
+    element.textContent = `${count} tekens`
+
+    // Remove any existing status classes
+    element.classList.remove('count-good', 'count-warning', 'count-error')
+
+    const limits = SEO_LIMITS[type]
+
+    if (count >= limits.min && count <= limits.max) {
+      // Within recommended range - green
+      element.classList.add('count-good')
+    } else if (count < limits.min) {
+      // Below minimum - red
+      element.classList.add('count-error')
+    } else if (count > limits.max) {
+      // Above maximum - red
+      element.classList.add('count-error')
+    }
+  }
+
   // Update title section
   document.getElementById('page-title').textContent = overview.title.content
-  document
+  const titleCountElement = document
     .querySelector('#page-title')
-    .previousElementSibling.querySelector(
-      '.character-count'
-    ).textContent = `${overview.title.length} tekens`
+    .previousElementSibling.querySelector('.character-count')
+  validateCharacterCount(overview.title.length, titleCountElement, 'title')
 
   // Update description section
-  document.getElementById('page-description').textContent =
-    overview.description.content || 'Ontbreekt'
-  document
-    .querySelector('#page-description')
-    .previousElementSibling.querySelector(
-      '.character-count'
-    ).textContent = `${overview.description.length} tekens`
+  const descriptionElement = document.getElementById('page-description')
+  descriptionElement.textContent = overview.description.content || 'Ontbreekt'
 
-  // Update URL section
-  document.getElementById('page-url').textContent = overview.url.current
+  // Mark missing descriptions with red text
+  if (!overview.description.content) {
+    descriptionElement.classList.add('missing')
+  } else {
+    descriptionElement.classList.remove('missing')
+  }
+
+  const descriptionCountElement = document
+    .querySelector('#page-description')
+    .previousElementSibling.querySelector('.character-count')
+  validateCharacterCount(
+    overview.description.length,
+    descriptionCountElement,
+    'description'
+  )
+
+  // Update URL section and make it clickable
+  const urlElement = document.getElementById('page-url')
+  urlElement.textContent = overview.url.current
+
+  // Make URL clickable
+  urlElement.classList.add('clickable-link')
+  urlElement.addEventListener('click', () => {
+    chrome.tabs.create({ url: overview.url.current })
+  })
+
   const urlStatusElement = document
     .querySelector('#page-url')
     .previousElementSibling.querySelector('.meta-status')
@@ -28,9 +81,18 @@ export async function updateOverviewUI(overview) {
     overview.url.isIndexable ? 'indexable' : 'non-indexable'
   }`
 
-  // Update canonical section
-  document.getElementById('page-canonical').textContent =
-    overview.canonical.href
+  // Update canonical section and make it clickable
+  const canonicalElement = document.getElementById('page-canonical')
+  canonicalElement.textContent = overview.canonical.href
+
+  // Make canonical link clickable
+  if (overview.canonical.href) {
+    canonicalElement.classList.add('clickable-link')
+    canonicalElement.addEventListener('click', () => {
+      chrome.tabs.create({ url: overview.canonical.href })
+    })
+  }
+
   const canonicalStatusElement = document
     .querySelector('#page-canonical')
     .previousElementSibling.querySelector('.meta-status')

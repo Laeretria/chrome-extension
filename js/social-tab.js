@@ -252,7 +252,7 @@ function createMetadataSummary(metadata) {
 
   // Create header
   const header = document.createElement('h3')
-  header.textContent = 'Detected Metadata'
+  header.textContent = 'Gedetecteerde Metadata'
   container.appendChild(header)
 
   // Create two-column layout

@@ -64,7 +64,7 @@ export function updateSchemaUI(response) {
               ></path>
             </g>
           </svg>
-    Export Schema
+    Exporteer Schema
   `
   exportButton.addEventListener('click', () => {
     exportSchemaData(response.schemas)

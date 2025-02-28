@@ -1050,3 +1050,49 @@ h2 {
     flex-direction: column;
   }
 }
+
+/* Add these styles to your CSS file */
+
+.character-count {
+  font-size: 12px;
+  margin-left: 5px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: normal;
+}
+
+.count-good {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.count-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.count-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Missing content styling */
+.missing {
+  color: #dc3545;
+  font-style: italic;
+}
+
+/* Clickable links styling */
+.clickable-link {
+  color: #0366d6;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.clickable-link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
