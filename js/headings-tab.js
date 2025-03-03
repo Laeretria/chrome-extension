@@ -19,17 +19,26 @@ export function updateHeadingsUI(response) {
     }
   }
 
-  // Update images and links counts
-  const linksElement = document.getElementById('headingsPageLinks')
-  const imagesElement = document.getElementById('headingsPageImages')
-
-  if (linksElement) linksElement.textContent = summary.totalLinks || 0
-  if (imagesElement) imagesElement.textContent = summary.totalImages || 0
-
-  // Update the headings structure list
+  // Add warning for multiple H1 tags
+  const h1Count = counts.h1 || 0
   const structureList = document.getElementById('headingsStructure')
+
   if (structureList) {
+    // Clear the structure list
     structureList.innerHTML = ''
+
+    // Add warning message if multiple H1 tags are detected
+    if (h1Count > 1) {
+      const warningDiv = document.createElement('div')
+      warningDiv.className = 'heading-warning multiple-h1-warning'
+
+      warningDiv.innerHTML = `
+        <strong>Warning:</strong> Found ${h1Count} H1 tags on this page. 
+        For optimal SEO, it's recommended to have only one H1 tag per page.
+      `
+
+      structureList.appendChild(warningDiv)
+    }
 
     // Display all headings in DOM order with proper indentation
     structure.forEach((heading) => {
@@ -57,6 +66,11 @@ export function updateHeadingsUI(response) {
         tagSpan.style.borderLeft = '3px solid #1448ff'
       }
 
+      // Highlight H1 tags if there are multiple
+      if (heading.level === 1 && h1Count > 1) {
+        tagSpan.classList.add('multiple-h1-tag')
+      }
+
       const textSpan = document.createElement('span')
       textSpan.className = 'heading-text'
       textSpan.textContent = heading.text
@@ -66,6 +80,13 @@ export function updateHeadingsUI(response) {
       structureList.appendChild(headingDiv)
     })
   }
+
+  // Update images and links counts
+  const linksElement = document.getElementById('headingsPageLinks')
+  const imagesElement = document.getElementById('headingsPageImages')
+
+  if (linksElement) linksElement.textContent = summary.totalLinks || 0
+  if (imagesElement) imagesElement.textContent = summary.totalImages || 0
 
   // Update the copy button functionality
   const copyButton = document.getElementById('copyHeadings')

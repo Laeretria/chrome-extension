@@ -100,3 +100,21 @@
 .heading-item .heading-text {
   padding-left: 0;
 }
+
+/* H1 warning message styling */
+.multiple-h1-warning {
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #ffcdcdad;
+  border: 1px solid #ffbaba;
+  border-radius: 4px;
+  color: var(--body);
+  font-size: 14px;
+}
+
+/* H1 tag highlight when multiple H1s exist */
+.multiple-h1-tag {
+  border-left: 3px solid #ff6f6f;
+  font-weight: bold;
+  font-size: 16px;
+}
