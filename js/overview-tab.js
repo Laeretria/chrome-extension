@@ -76,7 +76,7 @@ export async function updateOverviewUI(overview) {
     'description'
   )
 
-  // Update URL section and make it clickable
+  /*   // Update URL section and make it clickable
   const urlElement = document.getElementById('page-url')
   urlElement.textContent = overview.url.current
 
@@ -84,7 +84,21 @@ export async function updateOverviewUI(overview) {
   urlElement.classList.add('clickable-link')
   urlElement.addEventListener('click', () => {
     chrome.tabs.create({ url: overview.url.current })
-  })
+  }) */
+
+  const urlElement = document.getElementById('page-url')
+
+  // Create an <a> tag and set its properties
+  const link = document.createElement('a')
+  link.href = overview.url.current
+  link.textContent = overview.url.current
+  link.target = '_blank' // Opens in a new tab
+  link.rel = 'noopener noreferrer' // Security best practice
+  link.classList.add('clickable-link') // Optional styling
+
+  // Clear existing content and append the new link
+  urlElement.textContent = '' // Clear any existing text
+  urlElement.appendChild(link)
 
   const urlStatusElement = document
     .querySelector('#page-url')
@@ -134,7 +148,7 @@ export async function updateOverviewUI(overview) {
     createCustomTooltip(textContainerURL, tooltipData[tooltipKey], 'url')
   }
 
-  // Update canonical section and make it clickable
+  /*   // Update canonical section and make it clickable
   const canonicalElement = document.getElementById('page-canonical')
   canonicalElement.textContent = overview.canonical.href
 
@@ -144,6 +158,22 @@ export async function updateOverviewUI(overview) {
     canonicalElement.addEventListener('click', () => {
       chrome.tabs.create({ url: overview.canonical.href })
     })
+  } */
+
+  const canonicalElement = document.getElementById('page-canonical')
+
+  if (overview.canonical.href) {
+    // Create an <a> tag and set its properties
+    const link = document.createElement('a')
+    link.href = overview.canonical.href
+    link.textContent = overview.canonical.href
+    link.target = '_blank' // Opens in a new tab
+    link.rel = 'noopener noreferrer' // Security best practice
+    link.classList.add('clickable-link') // Optional styling
+
+    // Clear existing content and append the new link
+    canonicalElement.textContent = '' // Clear any existing text
+    canonicalElement.appendChild(link)
   }
 
   const canonicalStatusElement = document
