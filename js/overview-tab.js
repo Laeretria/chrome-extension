@@ -1,3 +1,6 @@
+// Import the setupFooterLinks function from footer-utils.js
+import { setupFooterLinks } from './footer-utils.js'
+
 export async function updateOverviewUI(overview) {
   // SEO recommendation constants
   const SEO_LIMITS = {
@@ -156,34 +159,12 @@ export async function updateOverviewUI(overview) {
         headingsResponse.summary.totalLinks || 0
     }
 
-    // Setup footer links
+    // Get domain from current tab URL
     const url = new URL(currentTab.url)
     const domain = `${url.protocol}//${url.hostname}`
 
-    const robotsLink = document.getElementById('overview-robotsLink')
-    const sitemapLink = document.getElementById('overview-sitemapLink')
-
-    if (robotsLink) {
-      robotsLink.href = `${domain}/robots.txt`
-      robotsLink.addEventListener('click', async (e) => {
-        e.preventDefault()
-        chrome.tabs.create({
-          url: `${domain}/robots.txt`,
-          index: currentTab.index + 1,
-        })
-      })
-    }
-
-    if (sitemapLink) {
-      sitemapLink.href = `${domain}/sitemap_index.xml`
-      sitemapLink.addEventListener('click', async (e) => {
-        e.preventDefault()
-        chrome.tabs.create({
-          url: `${domain}/sitemap_index.xml`,
-          index: currentTab.index + 1,
-        })
-      })
-    }
+    // Use the centralized footer setup function instead of duplicating the code
+    await setupFooterLinks(domain)
   } catch (error) {
     console.error('Error updating overview footer:', error)
   }
