@@ -1,0 +1,59 @@
+/* Make sure parent containers don't clip the tooltip */
+.meta-item,
+.info-item,
+.meta-header,
+.info-header,
+.container {
+  overflow: visible !important;
+}
+
+/* Schema tab styles */
+.schema-container {
+  padding: 0;
+  margin: 0;
+}
+
+.info-schema {
+  font-size: 14px;
+}
+
+.schema-property {
+  display: flex;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.schema-key {
+  color: var(--primary-color);
+}
+
+.schema-value {
+  text-align: left;
+  word-break: break-word;
+  width: 50%;
+}
+
+.schema-export-btn {
+  background-color: #1448ff;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  float: right;
+  cursor: pointer;
+  font-family: 'Regola-Regular';
+}
+
+.schema-export-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.no-data {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}

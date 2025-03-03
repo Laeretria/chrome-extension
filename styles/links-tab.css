@@ -1,0 +1,72 @@
+/* Links Summary Styling */
+.links-summary {
+  margin-bottom: 20px;
+}
+
+.metrics {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--white);
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.metric {
+  text-align: center;
+}
+
+.metric-label {
+  display: block;
+  color: var(--body);
+  font-size: 14px;
+  margin-bottom: 5px;
+  font-family: 'Regola-Bold';
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* Links List Styling */
+
+.links-sections {
+  margin-top: 20px;
+}
+
+.link-item {
+  padding-left: 0px !important;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.link-url {
+  color: var(--primary-color);
+  text-decoration: none;
+  word-break: break-all;
+  font-size: 14px;
+}
+
+.link-anchor {
+  display: block;
+  color: var(--body);
+  margin-top: 5px;
+  font-size: 13px;
+}
+
+.link-rel {
+  display: inline-block;
+  background-color: #dc3545;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.undefined-link {
+  color: #6c757d;
+  font-style: italic;
+}

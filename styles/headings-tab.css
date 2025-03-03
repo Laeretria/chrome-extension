@@ -1,0 +1,102 @@
+/* Headings Tab Styles */
+.headings-structure {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #e7e9f1;
+}
+
+.structure-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e7e9f1;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background-color: #f1f3f9;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  color: var(--body);
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.copy-btn:hover {
+  background-color: #e7e9f1;
+}
+
+.structure-list {
+  padding: 16px;
+}
+
+/* Heading item styling */
+.heading-item {
+  padding: 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Regola-Regular';
+  border-bottom: 1px solid #f5f5f5;
+}
+
+/* Apply indentation to the entire heading item */
+.heading-item[data-level='1'] {
+  margin-left: 0px;
+}
+
+.heading-item[data-level='2'] {
+  margin-left: 20px;
+}
+
+.heading-item[data-level='3'] {
+  margin-left: 40px;
+}
+
+.heading-item[data-level='4'] {
+  margin-left: 60px;
+}
+
+.heading-item[data-level='5'] {
+  margin-left: 80px;
+}
+
+.heading-item[data-level='6'] {
+  margin-left: 100px;
+}
+
+/* Heading tag badge */
+.heading-tag {
+  display: inline-block;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--body);
+  min-width: 35px;
+  text-align: center;
+  font-family: 'Regola-Medium';
+  flex-shrink: 0;
+  background-color: #e9f5ff;
+}
+
+/* Heading text styling */
+.heading-text {
+  color: var(--body);
+  font-size: 14px;
+  flex: 1;
+  word-break: break-word;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Remove the padding-left from text since we're indenting the whole item */
+.heading-item .heading-text {
+  padding-left: 0;
+}
