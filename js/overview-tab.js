@@ -1,5 +1,7 @@
 // Import the setupFooterLinks function from footer-utils.js
 import { setupFooterLinks } from './footer-utils.js'
+import { tooltipData } from './tooltips.js'
+import { createCustomTooltip, setupCustomTooltips } from './custom-tooltips.js'
 
 export async function updateOverviewUI(overview) {
   // SEO recommendation constants
@@ -16,25 +18,35 @@ export async function updateOverviewUI(overview) {
     },
   }
 
+  setupCustomTooltips()
+
   // Helper function to validate and set appropriate class
   function validateCharacterCount(count, element, type) {
-    element.textContent = `${count} tekens`
-
     // Remove any existing status classes
     element.classList.remove('count-good', 'count-warning', 'count-error')
 
     const limits = SEO_LIMITS[type]
+    let statusClass = ''
+    let svgIcon = ''
 
     if (count >= limits.min && count <= limits.max) {
       // Within recommended range - green
-      element.classList.add('count-good')
-    } else if (count < limits.min) {
-      // Below minimum - red
-      element.classList.add('count-error')
-    } else if (count > limits.max) {
-      // Above maximum - red
-      element.classList.add('count-error')
+      statusClass = 'count-good'
+      svgIcon =
+        '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+    } else {
+      // Below or above range - red
+      statusClass = 'count-error'
+      svgIcon =
+        '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
     }
+
+    // Add the appropriate class
+    element.classList.add(statusClass)
+
+    // Set the content with SVG followed by text
+    element.innerHTML =
+      svgIcon + `<span class="count-text">${count} tekens</span>`
   }
 
   // Update title section
@@ -77,12 +89,50 @@ export async function updateOverviewUI(overview) {
   const urlStatusElement = document
     .querySelector('#page-url')
     .previousElementSibling.querySelector('.meta-status')
-  urlStatusElement.textContent = overview.url.isIndexable
+
+  // Clear existing content
+  urlStatusElement.innerHTML = ''
+
+  // Determine status
+  let statusText = overview.url.isIndexable
     ? 'Indexeerbaar'
-    : 'Niet-indexeerbaar'
-  urlStatusElement.className = `meta-status ${
-    overview.url.isIndexable ? 'indexable' : 'non-indexable'
-  }`
+    : 'Niet indexeerbaar'
+  let statusClass = overview.url.isIndexable ? 'indexable' : 'non-indexable'
+  let svgIcon = ''
+
+  // Set appropriate SVG based on indexability
+  if (overview.url.isIndexable) {
+    // Checkmark SVG for indexable
+    svgIcon =
+      '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+  } else {
+    // X mark SVG for non-indexable
+    svgIcon =
+      '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
+  }
+
+  // Create SVG container
+  const svgContainerURL = document.createElement('span')
+  svgContainerURL.className = 'status-icon'
+  svgContainerURL.innerHTML = svgIcon
+
+  // Create text container
+  const textContainerURL = document.createElement('span')
+  textContainerURL.className = 'status-text'
+  textContainerURL.textContent = statusText
+
+  // Append both containers to the main element
+  urlStatusElement.appendChild(svgContainerURL)
+  urlStatusElement.appendChild(textContainerURL)
+
+  // Set the appropriate class
+  urlStatusElement.className = `meta-status ${statusClass}`
+
+  // In your code where you need the URL tooltip
+  const tooltipKey = overview.url.isIndexable ? 'indexable' : 'nonIndexable'
+  if (tooltipData[tooltipKey]) {
+    createCustomTooltip(textContainerURL, tooltipData[tooltipKey], 'url')
+  }
 
   // Update canonical section and make it clickable
   const canonicalElement = document.getElementById('page-canonical')
@@ -99,12 +149,58 @@ export async function updateOverviewUI(overview) {
   const canonicalStatusElement = document
     .querySelector('#page-canonical')
     .previousElementSibling.querySelector('.meta-status')
-  canonicalStatusElement.textContent = overview.canonical.isSelfReferencing
+
+  // Clear existing content
+  canonicalStatusElement.innerHTML = ''
+
+  // Determine status
+  let statusTextCanonical = overview.canonical.isSelfReferencing
     ? 'Self-referencing'
     : 'Extern'
-  canonicalStatusElement.className = `meta-status ${
-    overview.canonical.isSelfReferencing ? 'self-referencing' : ''
-  }`
+  let statusClassCanonical = overview.canonical.isSelfReferencing
+    ? 'self-referencing'
+    : 'external'
+  let svgIconCanonical = ''
+
+  // Set appropriate SVG based on canonical status
+  if (overview.canonical.isSelfReferencing) {
+    // Checkmark SVG for self-referencing
+    svgIconCanonical =
+      '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+  } else {
+    // X mark SVG for external
+    svgIconCanonical =
+      '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
+  }
+
+  // Create SVG container
+  const svgContainer = document.createElement('span')
+  svgContainer.className = 'status-icon'
+  svgContainer.innerHTML = svgIconCanonical
+
+  // Create text container
+  const textContainer = document.createElement('span')
+  textContainer.className = 'status-text'
+  textContainer.textContent = statusTextCanonical
+
+  // Append both containers to the main element
+  canonicalStatusElement.appendChild(svgContainer)
+  canonicalStatusElement.appendChild(textContainer)
+
+  // Set the appropriate class
+  canonicalStatusElement.className = `meta-status ${statusClassCanonical}`
+
+  // In your code where you need the canonical tooltip
+  const tooltipKeyCanonical = overview.canonical.isSelfReferencing
+    ? 'selfReferencing'
+    : 'external'
+  if (tooltipData[tooltipKeyCanonical]) {
+    createCustomTooltip(
+      textContainer,
+      tooltipData[tooltipKeyCanonical],
+      'canonical'
+    )
+  }
 
   // Update robots tag
   document.getElementById('robots-tag').textContent =

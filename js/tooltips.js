@@ -1,4 +1,4 @@
-const tooltipData = {
+export const tooltipData = {
   title: {
     text: 'Dit is de tekst die wordt weergegeven in het browsertabblad en vaak in de koppen van zoekresultaten (soms herschrijft Google ze). De huidige maximale lengte die volledig wordt weergegeven in zoekresultaten is ongeveer 65 tekens of 568 pixels.',
     link: 'https://kreatix.be/blog/meta-title-seo',
@@ -30,6 +30,22 @@ const tooltipData = {
   language: {
     text: 'De opgegeven taal van de pagina.',
     link: 'https://kreatix.be/blog/language-settings-seo',
+  },
+  indexable: {
+    text: 'Deze pagina kan worden geïndexeerd door zoekmachines zoals Google, wat betekent dat deze kan verschijnen in zoekresultaten.',
+    link: 'https://kreatix.be/blog/indexing-seo',
+  },
+  nonIndexable: {
+    text: 'Deze pagina kan niet worden geïndexeerd door zoekmachines en zal niet verschijnen in zoekresultaten.',
+    link: 'https://kreatix.be/blog/noindex-seo',
+  },
+  selfReferencing: {
+    text: 'De canonical URL verwijst naar dezelfde pagina, wat aangeeft dat dit de oorspronkelijke/hoofdversie van de content is.',
+    link: 'https://kreatix.be/blog/canonical-tags-seo',
+  },
+  external: {
+    text: 'De canonical URL verwijst naar een andere pagina, wat aangeeft dat dit niet de oorspronkelijke/hoofdversie van de content is.',
+    link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
 }
 
