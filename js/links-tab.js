@@ -1,3 +1,5 @@
+import { currentWebsiteDomain } from './domain-utils.js'
+
 export function updateLinksUI(response) {
   if (!response || !response.metrics) {
     console.error('Invalid response format:', response)
