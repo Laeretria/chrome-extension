@@ -219,7 +219,7 @@ h2 {
   color: #721c24;
 }
 
-/*Export Buttons Links and Images*/
+/* Export Buttons Links and Images */
 .export-buttons {
   text-align: center;
   display: flex;
@@ -227,10 +227,12 @@ h2 {
   align-items: center;
   gap: 15px;
   margin-top: 20px;
+  position: relative;
 }
 
 .export-btn {
-  transition: background-color 0.3s;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .complete-btn {
@@ -248,7 +250,7 @@ h2 {
   transition: background-color 0.3s;
 }
 
-.complete-btn:hover {
+.complete-btn:not(.disabled):hover {
   background-color: #9fe6a1;
 }
 
@@ -267,9 +269,82 @@ h2 {
   transition: background-color 0.3s;
 }
 
-.incomplete-btn:hover {
+.incomplete-btn:not(.disabled):hover {
   background-color: #e89292;
 }
+
+.export-btn.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* Tooltip base styling */
+.disabled-button-tooltip {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  display: none;
+  background-color: #fff;
+  color: #333;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px !important;
+  border: 1px solid #e0e0e0;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+  opacity: 1;
+  transition: opacity 0.2s;
+  font-family: 'Regola-Regular';
+
+  width: max-content;
+  max-width: 220px;
+}
+
+/* Arrow for different positions */
+.disabled-button-tooltip::after {
+  content: '';
+  position: absolute;
+  border-style: solid;
+}
+
+/* Top position (arrow on bottom) */
+.disabled-button-tooltip[data-position='top']::after {
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 8px 0;
+  border-color: white transparent transparent transparent;
+}
+
+/* Bottom position (arrow on top) */
+.disabled-button-tooltip[data-position='bottom']::after {
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 0 8px 8px;
+  border-color: transparent transparent white transparent;
+}
+
+/* Left position (arrow on right) */
+.disabled-button-tooltip[data-position='left']::after {
+  top: 50%;
+  right: -8px;
+  transform: translateY(-50%);
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent white;
+}
+
+/* Right position (arrow on left) */
+.disabled-button-tooltip[data-position='right']::after {
+  top: 50%;
+  left: -8px;
+  transform: translateY(-50%);
+  border-width: 8px 8px 8px 0;
+  border-color: transparent white transparent transparent;
+}
+
+/* You can add additional custom styling here */
 
 /* Footer Stats */
 .headings-footer {

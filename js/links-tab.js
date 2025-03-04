@@ -1,4 +1,5 @@
 import { currentWebsiteDomain } from './domain-utils.js'
+import { getTooltipManager } from './tooltipManager.js'
 
 export function updateLinksUI(response) {
   if (!response || !response.metrics) {
@@ -54,10 +55,12 @@ export function createLinkElement(link) {
 }
 
 export function setupExportButtons(links) {
+  // Get tooltip manager instance
+  const tooltipManager = getTooltipManager()
+
   // Remove any existing event listeners
   const exportIncompleteBtn = document.getElementById('exportIncomplete')
   const exportCompleteBtn = document.getElementById('exportComplete')
-
   const newExportIncompleteBtn = exportIncompleteBtn.cloneNode(true)
   const newExportCompleteBtn = exportCompleteBtn.cloneNode(true)
 
@@ -70,19 +73,52 @@ export function setupExportButtons(links) {
     exportCompleteBtn
   )
 
-  newExportIncompleteBtn.addEventListener('click', () => {
-    const incompleteLinks = links.filter(
-      (link) => !link.text || link.text.trim() === ''
-    )
-    exportLinks(incompleteLinks, `${currentWebsiteDomain}_incomplete-links.csv`)
-  })
+  // Check if there are links with missing anchor text
+  const incompleteLinks = links.filter(
+    (link) => !link.text || link.text.trim() === ''
+  )
 
-  newExportCompleteBtn.addEventListener('click', () => {
-    const completeLinks = links.filter(
-      (link) => link.text && link.text.trim() !== ''
+  // Check if there are links with anchor text
+  const completeLinks = links.filter(
+    (link) => link.text && link.text.trim() !== ''
+  )
+
+  // Set up tooltip for incomplete links button
+  if (incompleteLinks.length === 0) {
+    newExportIncompleteBtn.classList.add('disabled')
+    newExportIncompleteBtn.style.cursor = 'not-allowed'
+    newExportIncompleteBtn.style.opacity = '0.6'
+
+    // Attach tooltip to the disabled button
+    tooltipManager.attachToElement(
+      newExportIncompleteBtn,
+      'Alle links hebben ankertekst.'
     )
-    exportLinks(completeLinks, `${currentWebsiteDomain}_complete-links.csv`)
-  })
+  } else {
+    newExportIncompleteBtn.addEventListener('click', () => {
+      exportLinks(
+        incompleteLinks,
+        `${currentWebsiteDomain}_incomplete-links.csv`
+      )
+    })
+  }
+
+  // Set up tooltip for complete links button
+  if (completeLinks.length === 0) {
+    newExportCompleteBtn.classList.add('disabled')
+    newExportCompleteBtn.style.cursor = 'not-allowed'
+    newExportCompleteBtn.style.opacity = '0.6'
+
+    // Attach tooltip to the disabled button
+    tooltipManager.attachToElement(
+      newExportCompleteBtn,
+      'Er zijn geen links met ankertekst gevonden. Controleer de onvolledige links om de navigatie te verbeteren.'
+    )
+  } else {
+    newExportCompleteBtn.addEventListener('click', () => {
+      exportLinks(completeLinks, `${currentWebsiteDomain}_complete-links.csv`)
+    })
+  }
 }
 
 export function exportLinks(links, filename) {

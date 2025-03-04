@@ -1,8 +1,8 @@
 import { currentWebsiteDomain } from './domain-utils.js'
+import { getTooltipManager } from './tooltipManager.js'
 
 export function updateImagesUI(response) {
   const { images, summary } = response
-
   // Update metrics
   document.getElementById('totalImages').textContent = summary.total
   document.getElementById('missingAlt').textContent = summary.missingAlt
@@ -13,10 +13,12 @@ export function updateImagesUI(response) {
 }
 
 export function setupImageExportButtons(images) {
+  // Get tooltip manager instance
+  const tooltipManager = getTooltipManager()
+
   // Remove any existing event listeners
   const exportIncompleteBtn = document.getElementById('exportIncompleteImages')
   const exportCompleteBtn = document.getElementById('exportCompleteImages')
-
   const newExportIncompleteBtn = exportIncompleteBtn.cloneNode(true)
   const newExportCompleteBtn = exportCompleteBtn.cloneNode(true)
 
@@ -29,18 +31,50 @@ export function setupImageExportButtons(images) {
     exportCompleteBtn
   )
 
-  newExportIncompleteBtn.addEventListener('click', () => {
-    const incompleteImages = images.filter((img) => !img.alt || !img.title)
-    exportImages(
-      incompleteImages,
-      `${currentWebsiteDomain}_incomplete-images.csv`
-    )
-  })
+  // Check if there are images with missing alt or title attributes
+  const incompleteImages = images.filter((img) => !img.alt || !img.title)
+  // Check if there are images with both alt and title attributes
+  const completeImages = images.filter((img) => img.alt && img.title)
 
-  newExportCompleteBtn.addEventListener('click', () => {
-    const completeImages = images.filter((img) => img.alt && img.title)
-    exportImages(completeImages, `${currentWebsiteDomain}_complete-images.csv`)
-  })
+  // Set up tooltip for incomplete images button
+  if (incompleteImages.length === 0) {
+    newExportIncompleteBtn.classList.add('disabled')
+    newExportIncompleteBtn.style.cursor = 'not-allowed'
+    newExportIncompleteBtn.style.opacity = '0.6'
+
+    // Attach tooltip to the disabled button
+    tooltipManager.attachToElement(
+      newExportIncompleteBtn,
+      'Alle afbeeldingen hebben alt-tekst en titels.'
+    )
+  } else {
+    newExportIncompleteBtn.addEventListener('click', () => {
+      exportImages(
+        incompleteImages,
+        `${currentWebsiteDomain}_incomplete-images.csv`
+      )
+    })
+  }
+
+  // Set up tooltip for complete images button
+  if (completeImages.length === 0) {
+    newExportCompleteBtn.classList.add('disabled')
+    newExportCompleteBtn.style.cursor = 'not-allowed'
+    newExportCompleteBtn.style.opacity = '0.6'
+
+    // Attach tooltip to the disabled button
+    tooltipManager.attachToElement(
+      newExportCompleteBtn,
+      'Er zijn geen afbeeldingen met zowel alt-tekst als titel. Controleer de onvolledige afbeeldingen om dit probleem op te lossen.'
+    )
+  } else {
+    newExportCompleteBtn.addEventListener('click', () => {
+      exportImages(
+        completeImages,
+        `${currentWebsiteDomain}_complete-images.csv`
+      )
+    })
+  }
 }
 
 export function exportImages(images, filename) {
