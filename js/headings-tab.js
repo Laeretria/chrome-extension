@@ -150,13 +150,10 @@ export function exportHeadings(headings, filename) {
   }
 
   const csvContent = [
-    ['Level', 'Text', 'ID', 'Classes', 'Is Navigation'],
+    ['Level', 'Text'],
     ...headings.map((heading) => [
       `H${heading.level}`,
       normalizeText(heading.text) || '',
-      heading.id || '',
-      heading.classes || '',
-      heading.isNavigation ? 'Yes' : 'No',
     ]),
   ]
     .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
