@@ -88,6 +88,14 @@ export function updateHeadingsUI(response) {
   if (linksElement) linksElement.textContent = summary.totalLinks || 0
   if (imagesElement) imagesElement.textContent = summary.totalImages || 0
 
+  // Helper function to normalize text by removing extra whitespace
+  function normalizeText(text) {
+    return text
+      .replace(/[\n\r\t]+/g, ' ') // Replace all newlines and tabs with spaces
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to a single space
+      .trim() // Remove spaces from beginning and end
+  }
+
   // Update the copy button functionality
   const copyButton = document.getElementById('copyHeadings')
   if (copyButton) {
@@ -96,11 +104,11 @@ export function updateHeadingsUI(response) {
     copyButton.parentNode.replaceChild(newCopyButton, copyButton)
 
     newCopyButton.addEventListener('click', () => {
-      // Format headings with perfect left alignment
+      // Format headings with perfect left alignment and fix all whitespace issues
       const headingsText = structure
         .map((heading) => {
           const tagPart = `H${heading.level}: `
-          return tagPart + heading.text
+          return tagPart + normalizeText(heading.text)
         })
         .join('\n')
 
@@ -133,11 +141,19 @@ export function updateHeadingsUI(response) {
 }
 
 export function exportHeadings(headings, filename) {
+  // Helper function to normalize text by removing extra whitespace
+  function normalizeText(text) {
+    return text
+      .replace(/[\n\r\t]+/g, ' ') // Replace all newlines and tabs with spaces
+      .replace(/\s+/g, ' ') // Normalize multiple spaces to a single space
+      .trim() // Remove spaces from beginning and end
+  }
+
   const csvContent = [
     ['Level', 'Text', 'ID', 'Classes', 'Is Navigation'],
     ...headings.map((heading) => [
       `H${heading.level}`,
-      heading.text || '',
+      normalizeText(heading.text) || '',
       heading.id || '',
       heading.classes || '',
       heading.isNavigation ? 'Yes' : 'No',
