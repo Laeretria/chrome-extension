@@ -335,6 +335,33 @@ button.custom-tooltip-icon {
   transition: background-color 0.2s;
 }
 
+.missingCanonical button.custom-tooltip-icon,
+externalCanonical button.custom-tooltip-icon,
+.non-indexable button.custom-tooltip-icon {
+  background-color: #cc7c83;
+}
+
+.missingCanonical .custom-tooltip-icon:hover,
+button.custom-tooltip-icon:focus,
+.externalCanonical .custom-tooltip-icon:hover,
+button.custom-tooltip-icon:focus,
+.non-indexable .custom-tooltip-icon:hover,
+button.custom-tooltip-icon:focus {
+  background-color: #721c24;
+}
+
+.self-referencing button.custom-tooltip-icon,
+.indexable button.custom-tooltip-icon {
+  background-color: #79ad84;
+}
+
+.self-referencing .custom-tooltip-icon:hover,
+button.custom-tooltip-icon:focus,
+.indexable .custom-tooltip-icon:hover,
+button.custom-tooltip-icon:focus {
+  background-color: #155724;
+}
+
 button.custom-tooltip-icon:hover,
 button.custom-tooltip-icon:focus {
   background-color: var(--body);
