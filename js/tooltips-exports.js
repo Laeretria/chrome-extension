@@ -1,4 +1,3 @@
-// tooltipManager.js
 export class TooltipManager {
   constructor(options = {}) {
     this.tooltip = null

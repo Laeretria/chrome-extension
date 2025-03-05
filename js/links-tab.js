@@ -1,5 +1,5 @@
 import { currentWebsiteDomain } from './domain-utils.js'
-import { getTooltipManager } from './tooltipManager.js'
+import { getTooltipManager } from './tooltips-exports.js'
 
 export function updateLinksUI(response) {
   if (!response || !response.metrics) {
