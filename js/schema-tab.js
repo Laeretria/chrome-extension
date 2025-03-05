@@ -1,7 +1,5 @@
 import { currentWebsiteDomain } from './domain-utils.js'
 
-// Modify the updateSchemaUI function to add the JSON export button
-
 export function updateSchemaUI(response) {
   const container = document.getElementById('schema-container')
   if (!container) {
@@ -123,33 +121,167 @@ export function updateSchemaUI(response) {
 
   container.appendChild(buttonContainer)
 
-  // Process schema data
-  let processedData = []
-  response.schemas.forEach((schema) => {
-    if (schema.properties && Array.isArray(schema.properties)) {
-      processedData = processedData.concat(schema.properties)
-    } else if (schema.content) {
-      const properties = extractProperties(schema.content)
-      processedData = processedData.concat(properties)
+  // Group identical schemas (especially for ratings)
+  const groupedSchemas = groupSimilarSchemas(response.schemas)
+
+  // Process and display each schema group
+  groupedSchemas.forEach((schemaGroup, groupIndex) => {
+    const { schema, count } = schemaGroup
+
+    // Create a schema section
+    const schemaSection = document.createElement('div')
+    schemaSection.style.marginBottom = '20px'
+    schemaSection.style.backgroundColor = '#f5f9ff'
+    schemaSection.style.borderRadius = '8px'
+    container.appendChild(schemaSection)
+
+    // Add schema type header
+    const schemaHeader = document.createElement('div')
+    schemaHeader.style.fontSize = '16px'
+    schemaHeader.style.fontWeight = 'bold'
+    schemaHeader.style.padding = '10px'
+    schemaHeader.style.backgroundColor = '#1448ff'
+    schemaHeader.style.color = 'white'
+    schemaHeader.style.borderRadius = '6px 6px 0 0'
+
+    // Determine schema type and add a counter
+    let schemaType = 'Unknown Schema'
+    if (schema.type) {
+      schemaType = schema.type
+    } else if (schema.content && schema.content['@type']) {
+      schemaType = schema.content['@type']
+    } else if (
+      schema.content &&
+      schema.content['@context'] &&
+      schema.content['@context'].includes('schema.org')
+    ) {
+      schemaType = 'Schema.org'
+    }
+
+    // Show count if there are duplicates
+    const countText = count > 1 ? ` (${count} instances)` : ''
+    schemaHeader.textContent = `${schemaType} #${groupIndex + 1}${countText}`
+    schemaSection.appendChild(schemaHeader)
+
+    // Create a table for this schema's data
+    const schemaTable = document.createElement('div')
+    schemaTable.style.display = 'table'
+    schemaTable.style.width = '100%'
+    schemaTable.style.borderCollapse = 'collapse'
+    schemaTable.style.backgroundColor = '#e6f3ff'
+    schemaTable.style.borderRadius = '0 0 6px 6px'
+    schemaTable.style.overflow = 'hidden'
+    schemaSection.appendChild(schemaTable)
+
+    // Special handling for JSON-LD with @graph structure
+    if (
+      schema.content &&
+      schema.content['@graph'] &&
+      Array.isArray(schema.content['@graph'])
+    ) {
+      // Add context row
+      addTableRow(
+        schemaTable,
+        '@context',
+        schema.content['@context'],
+        0,
+        '@context'
+      )
+
+      // Process each graph item's properties
+      schema.content['@graph'].forEach((item, graphIndex) => {
+        Object.keys(item)
+          .sort()
+          .forEach((key, propIndex) => {
+            const value = item[key]
+            const rowIndex =
+              propIndex + 2 + graphIndex * Object.keys(item).length
+            const fullKey = `@graph[${graphIndex}].${key}`
+            // Extract just the property name for display
+            const displayKey = key
+
+            if (typeof value !== 'object' || value === null) {
+              addTableRow(schemaTable, fullKey, value, rowIndex, displayKey)
+            } else if (Array.isArray(value)) {
+              // Skip showing array placeholders
+              // Don't add a row for this
+            } else {
+              // Display object reference
+              const objectId = value['@id'] || ''
+              if (objectId) {
+                addTableRow(
+                  schemaTable,
+                  fullKey,
+                  objectId,
+                  rowIndex,
+                  displayKey
+                )
+              } else {
+                // Skip showing object placeholders
+                // Don't add a row for this
+
+                // Add nested object properties
+                Object.entries(value).forEach(
+                  ([nestedKey, nestedValue], nestedIndex) => {
+                    if (
+                      typeof nestedValue !== 'object' ||
+                      nestedValue === null
+                    ) {
+                      const nestedRowIndex = rowIndex + nestedIndex + 1
+                      const nestedFullKey = `${fullKey}.${nestedKey}`
+                      // Extract just the property name for display
+                      const nestedDisplayKey = nestedKey
+                      addTableRow(
+                        schemaTable,
+                        nestedFullKey,
+                        nestedValue,
+                        nestedRowIndex,
+                        nestedDisplayKey
+                      )
+                    }
+                  }
+                )
+              }
+            }
+          })
+      })
+    } else {
+      // For non-graph schemas, process properties
+      let schemaProperties = []
+      if (schema.properties && Array.isArray(schema.properties)) {
+        schemaProperties = schema.properties
+      } else if (schema.content) {
+        schemaProperties = extractPropertiesImproved(schema.content)
+      }
+
+      // Sort properties alphabetically
+      schemaProperties.sort((a, b) => a.key.localeCompare(b.key))
+
+      // Add each property as a table row
+      schemaProperties.forEach((prop, index) => {
+        if (!prop.key) return
+
+        // Extract just the property name for display
+        const parts = prop.key.split(/[\.\[\]@]/)
+        const displayKey = parts[parts.length - 1] || parts[parts.length - 2] // Handle cases where the last part is empty
+
+        addTableRow(schemaTable, prop.key, prop.value, index, displayKey)
+      })
     }
   })
 
-  // Sort properties alphabetically
-  processedData.sort((a, b) => a.key.localeCompare(b.key))
+  // Helper function to add a table row with consistent styling and display name
+  function addTableRow(table, fullKey, value, index, displayKey) {
+    // Skip placeholder values
+    if (
+      typeof value === 'string' &&
+      (value === '{...}' ||
+        value.includes('[Array of') ||
+        value.includes('complex items'))
+    ) {
+      return
+    }
 
-  // Create a table for schema data with consistent styling
-  const schemaTable = document.createElement('div')
-  schemaTable.style.display = 'table'
-  schemaTable.style.width = '100%'
-  schemaTable.style.borderCollapse = 'collapse'
-  schemaTable.style.marginTop = '10px'
-  schemaTable.style.backgroundColor = '#e6f3ff'
-  schemaTable.style.borderRadius = '6px'
-  schemaTable.style.overflow = 'hidden'
-  container.appendChild(schemaTable)
-
-  // Add each property as a table row
-  processedData.forEach((prop, index) => {
     const row = document.createElement('div')
     row.style.display = 'table-row'
 
@@ -167,7 +299,10 @@ export function updateSchemaUI(response) {
     keyCell.style.fontWeight = 'bold'
     keyCell.style.width = '200px'
     keyCell.style.verticalAlign = 'top'
-    keyCell.textContent = prop.key || ''
+    keyCell.textContent = displayKey || fullKey || '' // Use display key if provided, otherwise use full key
+
+    // Store the full key as a data attribute for reference
+    keyCell.dataset.fullKey = fullKey
 
     const valueCell = document.createElement('div')
     valueCell.style.display = 'table-cell'
@@ -177,124 +312,282 @@ export function updateSchemaUI(response) {
 
     // Format URLs as links
     if (
-      typeof prop.value === 'string' &&
-      (prop.value.startsWith('http://') || prop.value.startsWith('https://'))
+      typeof value === 'string' &&
+      (value.startsWith('http://') || value.startsWith('https://'))
     ) {
       const link = document.createElement('a')
-      link.href = prop.value
+      link.href = value
       link.target = '_blank'
-      link.textContent = prop.value
+      link.textContent = value
       link.style.color = '#1448ff' // Blue color for links
       valueCell.appendChild(link)
     } else {
-      valueCell.textContent = prop.value !== undefined ? String(prop.value) : ''
+      valueCell.textContent = value !== undefined ? String(value) : ''
     }
 
     row.appendChild(keyCell)
     row.appendChild(valueCell)
-    schemaTable.appendChild(row)
-  })
+    table.appendChild(row)
+  }
 }
 
-// New function for exporting JSON
-export function exportSchemaDataAsJSON(schemas) {
-  let processedData = []
-  schemas.forEach((schema) => {
-    if (schema.properties && Array.isArray(schema.properties)) {
-      processedData = processedData.concat(schema.properties)
-    } else if (schema.content) {
-      const properties = extractProperties(schema.content)
-      processedData = processedData.concat(properties)
+// Helper function to group similar schemas (especially for ratings)
+function groupSimilarSchemas(schemas) {
+  const groups = []
+  const processedIndices = new Set()
+
+  // First pass - group identical Microdata schemas
+  schemas.forEach((schema, index) => {
+    if (processedIndices.has(index)) return
+
+    // Mark this schema as processed
+    processedIndices.add(index)
+
+    // Check if this is a Rating schema
+    const isRatingSchema = schema.type && schema.type.includes('Rating')
+
+    // If it's not a Rating, or we can't determine properties, treat it as unique
+    if (!isRatingSchema || !schema.properties) {
+      groups.push({ schema, count: 1 })
+      return
     }
+
+    // Count identical Rating schemas
+    let count = 1
+    const schemaJSON = JSON.stringify(schema.properties)
+
+    // Look for identical schemas
+    schemas.forEach((otherSchema, otherIndex) => {
+      if (index === otherIndex || processedIndices.has(otherIndex)) return
+
+      const otherIsRating =
+        otherSchema.type && otherSchema.type.includes('Rating')
+
+      if (otherIsRating && otherSchema.properties) {
+        const otherJSON = JSON.stringify(otherSchema.properties)
+
+        if (schemaJSON === otherJSON) {
+          count++
+          processedIndices.add(otherIndex)
+        }
+      }
+    })
+
+    groups.push({ schema, count })
   })
 
-  // Sort properties alphabetically
-  processedData.sort((a, b) => a.key.localeCompare(b.key))
+  // Second pass - handle non-Microdata schemas
+  schemas.forEach((schema, index) => {
+    if (processedIndices.has(index)) return
 
-  // Convert to JSON object
-  const jsonObject = {}
-  processedData.forEach((prop) => {
-    if (prop.key) {
-      jsonObject[prop.key] = prop.value
-    }
+    processedIndices.add(index)
+    groups.push({ schema, count: 1 })
   })
 
-  // Convert to JSON string with pretty formatting
-  const jsonString = JSON.stringify(jsonObject, null, 2)
-
-  // Create and download file
-  const blob = new Blob([jsonString], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${currentWebsiteDomain}_schema.json`
-  link.click()
-
-  URL.revokeObjectURL(url)
+  return groups
 }
 
-// Original helper function (unchanged)
-export function extractProperties(content, prefix = '') {
+// Improved function to extract properties without duplication
+export function extractPropertiesImproved(content) {
   const properties = []
 
-  if (typeof content === 'object' && content !== null) {
-    if (Array.isArray(content)) {
-      // Handle arrays
-      content.forEach((item, index) => {
-        if (typeof item === 'object' && item !== null) {
-          properties.push(...extractProperties(item, `${prefix}${index}`))
-        } else {
+  // Handle @graph separately for better organization
+  if (content['@graph'] && Array.isArray(content['@graph'])) {
+    properties.push({
+      key: '@context',
+      value: content['@context'],
+    })
+
+    // Don't add the array summary
+    // properties.push({
+    //   key: '@graph',
+    //   value: `[Array of ${content['@graph'].length} items]`
+    // });
+
+    // Process each graph item independently
+    content['@graph'].forEach((item, index) => {
+      Object.entries(item).forEach(([key, value]) => {
+        if (typeof value !== 'object' || value === null) {
           properties.push({
-            key: `${prefix}${index}`,
-            value: item,
+            key: `@graph[${index}].${key}`,
+            value: value,
+          })
+        } else if (Array.isArray(value)) {
+          // Skip array placeholders in the display
+          // But still process nested values
+          if (
+            value.length > 0 &&
+            typeof value[0] === 'object' &&
+            value[0] !== null
+          ) {
+            value.forEach((nestedItem, nestedIndex) => {
+              if (typeof nestedItem === 'object' && nestedItem !== null) {
+                Object.entries(nestedItem).forEach(
+                  ([nestedKey, nestedValue]) => {
+                    if (
+                      typeof nestedValue !== 'object' ||
+                      nestedValue === null
+                    ) {
+                      properties.push({
+                        key: `@graph[${index}].${key}[${nestedIndex}].${nestedKey}`,
+                        value: nestedValue,
+                      })
+                    }
+                  }
+                )
+              }
+            })
+          }
+        } else {
+          // Handle nested objects in graph items
+          Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+            if (typeof nestedValue !== 'object' || nestedValue === null) {
+              properties.push({
+                key: `@graph[${index}].${key}.${nestedKey}`,
+                value: nestedValue,
+              })
+            }
           })
         }
       })
+    })
+
+    return properties
+  }
+
+  // For non-graph content, process normally
+  Object.entries(content).forEach(([key, value]) => {
+    if (typeof value !== 'object' || value === null) {
+      properties.push({
+        key: key,
+        value: value,
+      })
+    } else if (Array.isArray(value)) {
+      // Skip array placeholders in the display
+      // But still process nested values
+      if (
+        value.length > 0 &&
+        typeof value[0] === 'object' &&
+        value[0] !== null
+      ) {
+        value.forEach((item, i) => {
+          if (typeof item === 'object' && item !== null) {
+            Object.entries(item).forEach(([nestedKey, nestedValue]) => {
+              if (typeof nestedValue !== 'object' || nestedValue === null) {
+                properties.push({
+                  key: `${key}[${i}].${nestedKey}`,
+                  value: nestedValue,
+                })
+              }
+            })
+          }
+        })
+      }
     } else {
-      // Handle objects
-      Object.entries(content).forEach(([key, value]) => {
-        if (typeof value === 'object' && value !== null) {
-          properties.push(...extractProperties(value, `${prefix}${key}@`))
-        } else {
+      // Skip object placeholders in the display
+      // But still process nested values
+      Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+        if (typeof nestedValue !== 'object' || nestedValue === null) {
           properties.push({
-            key: `${prefix}${key}`,
-            value: value,
+            key: `${key}.${nestedKey}`,
+            value: nestedValue,
           })
         }
       })
     }
-  }
+  })
 
   return properties
 }
 
-// Original export function (renamed for clarity)
+// Export functions for text and JSON remain the same
 export function exportSchemaData(schemas) {
   let exportContent = ''
 
-  let processedData = []
-  schemas.forEach((schema) => {
-    if (schema.properties && Array.isArray(schema.properties)) {
-      processedData = processedData.concat(schema.properties)
-    } else if (schema.content) {
-      const properties = extractProperties(schema.content)
-      processedData = processedData.concat(properties)
+  schemas.forEach((schema, schemaIndex) => {
+    // Extract schema type
+    let schemaType = 'Unknown Schema'
+    if (schema.type) {
+      schemaType = schema.type
+    } else if (schema.content && schema.content['@type']) {
+      schemaType = schema.content['@type']
+    } else if (
+      schema.content &&
+      schema.content['@context'] &&
+      schema.content['@context'].includes('schema.org')
+    ) {
+      schemaType = 'Schema.org'
     }
-  })
 
-  // Sort properties alphabetically
-  processedData.sort((a, b) => a.key.localeCompare(b.key))
+    // Add schema header
+    exportContent += `=== ${schemaType} #${schemaIndex + 1} ===\n\n`
 
-  // Format each property with bold keys
-  processedData.forEach((prop) => {
-    if (!prop.key) return
+    // Special handling for JSON-LD with @graph
+    if (
+      schema.content &&
+      schema.content['@graph'] &&
+      Array.isArray(schema.content['@graph'])
+    ) {
+      // Add context information
+      exportContent += `**@context**\n${schema.content['@context']}\n\n`
 
-    // Add the key in bold
-    exportContent += `**${prop.key}**\n`
+      // Add information about number of items in the graph
+      exportContent += `**@graph**\n[Array of ${schema.content['@graph'].length} items]\n\n`
 
-    // Add the value
-    exportContent += `${prop.value !== undefined ? prop.value : ''}\n`
+      // Process each item in the graph
+      schema.content['@graph'].forEach((item, graphIndex) => {
+        // Sort the properties alphabetically
+        const sortedKeys = Object.keys(item).sort()
+
+        sortedKeys.forEach((key) => {
+          const value = item[key]
+
+          if (typeof value !== 'object' || value === null) {
+            exportContent += `**@graph[${graphIndex}].${key}**\n${
+              value !== undefined ? value : ''
+            }\n\n`
+          } else if (Array.isArray(value)) {
+            exportContent += `**@graph[${graphIndex}].${key}**\n[Array of ${value.length} items]\n\n`
+          } else {
+            exportContent += `**@graph[${graphIndex}].${key}**\n{Object}\n\n`
+
+            // Also include nested object properties
+            Object.entries(value).forEach(([nestedKey, nestedValue]) => {
+              if (typeof nestedValue !== 'object' || nestedValue === null) {
+                exportContent += `**@graph[${graphIndex}].${key}.${nestedKey}**\n${
+                  nestedValue !== undefined ? nestedValue : ''
+                }\n\n`
+              }
+            })
+          }
+        })
+      })
+    } else {
+      // For non-graph schemas, use the existing logic
+      let schemaProperties = []
+      if (schema.properties && Array.isArray(schema.properties)) {
+        schemaProperties = schema.properties
+      } else if (schema.content) {
+        schemaProperties = extractPropertiesImproved(schema.content)
+      }
+
+      // Sort properties alphabetically
+      schemaProperties.sort((a, b) => a.key.localeCompare(b.key))
+
+      // Format each property with bold keys
+      schemaProperties.forEach((prop) => {
+        if (!prop.key) return
+
+        // Add the key in bold
+        exportContent += `**${prop.key}**\n`
+
+        // Add the value
+        exportContent += `${prop.value !== undefined ? value : ''}\n\n`
+      })
+    }
+
+    // Add separator between schemas
+    exportContent += '\n---\n\n'
   })
 
   // Create and download file
@@ -303,7 +596,68 @@ export function exportSchemaData(schemas) {
 
   const link = document.createElement('a')
   link.href = url
-  link.download = `${currentWebsiteDomain}_schema.txt`
+  link.download = `${currentWebsiteDomain}_schemas.txt`
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
+export function exportSchemaDataAsJSON(schemas) {
+  // Process each schema to make it more readable
+  const processedSchemas = schemas.map((schema, index) => {
+    // Extract schema type
+    let schemaType = 'Unknown Schema'
+    if (schema.type) {
+      schemaType = schema.type
+    } else if (schema.content && schema.content['@type']) {
+      schemaType = schema.content['@type']
+    } else if (
+      schema.content &&
+      schema.content['@context'] &&
+      schema.content['@context'].includes('schema.org')
+    ) {
+      schemaType = 'Schema.org'
+    }
+
+    // Return schema with appropriate structure based on type
+    if (schema.content) {
+      return {
+        schemaType,
+        schemaIndex: index + 1,
+        data: schema.content,
+      }
+    } else if (schema.properties && Array.isArray(schema.properties)) {
+      // Convert properties array to object
+      const propsObject = {}
+      schema.properties.forEach((prop) => {
+        if (prop.key) {
+          propsObject[prop.key] = prop.value
+        }
+      })
+      return {
+        schemaType,
+        schemaIndex: index + 1,
+        data: propsObject,
+      }
+    }
+
+    return {
+      schemaType,
+      schemaIndex: index + 1,
+      data: {},
+    }
+  })
+
+  // Convert to JSON string with pretty formatting
+  const jsonString = JSON.stringify(processedSchemas, null, 2)
+
+  // Create and download file
+  const blob = new Blob([jsonString], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${currentWebsiteDomain}_schemas.json`
   link.click()
 
   URL.revokeObjectURL(url)

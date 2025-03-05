@@ -395,6 +395,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     })
     return true // Important: Return true to indicate async response
   } else if (request.action === 'getSchema') {
+    sendResponse(getAllSchemas())
     console.log('Processing getSchema request')
 
     function extractSchemaData() {
@@ -593,6 +594,102 @@ function extractSocialMetadata() {
   })
 
   return metadata
+}
+
+function getAllSchemas() {
+  const schemas = []
+
+  // 1. Detect JSON-LD schemas (most common)
+  const jsonldScripts = document.querySelectorAll(
+    'script[type="application/ld+json"]'
+  )
+  jsonldScripts.forEach((script) => {
+    try {
+      const content = JSON.parse(script.textContent)
+      schemas.push({
+        type: 'JSON-LD',
+        content: content,
+      })
+    } catch (e) {
+      console.error('Error parsing JSON-LD:', e)
+    }
+  })
+
+  // 2. Detect Microdata schemas
+  const itemscopes = document.querySelectorAll('[itemscope]')
+  itemscopes.forEach((element) => {
+    const properties = []
+    const itemType = element.getAttribute('itemtype') || 'Unknown'
+
+    // Get all itemprop elements
+    const itemprops = element.querySelectorAll('[itemprop]')
+    itemprops.forEach((prop) => {
+      let value = ''
+
+      // Extract value based on tag and attributes
+      if (prop.tagName === 'META') {
+        value = prop.getAttribute('content') || ''
+      } else if (prop.tagName === 'IMG') {
+        value = prop.getAttribute('src') || ''
+      } else if (prop.tagName === 'A') {
+        value = prop.getAttribute('href') || prop.textContent.trim()
+      } else if (prop.tagName === 'TIME') {
+        value = prop.getAttribute('datetime') || prop.textContent.trim()
+      } else {
+        value = prop.textContent.trim()
+      }
+
+      properties.push({
+        key: prop.getAttribute('itemprop'),
+        value: value,
+      })
+    })
+
+    if (properties.length > 0) {
+      schemas.push({
+        type: 'Microdata: ' + itemType.replace('http://schema.org/', ''),
+        properties: properties,
+      })
+    }
+  })
+
+  // 3. Detect RDFa schemas
+  const rdfaElements = document.querySelectorAll('[typeof]')
+  rdfaElements.forEach((element) => {
+    const properties = []
+    const itemType = element.getAttribute('typeof') || 'Unknown'
+
+    // Get all property elements
+    const propElements = element.querySelectorAll('[property]')
+    propElements.forEach((prop) => {
+      let value = ''
+
+      // Extract value based on tag and attributes
+      if (prop.getAttribute('content')) {
+        value = prop.getAttribute('content')
+      } else if (prop.tagName === 'IMG') {
+        value = prop.getAttribute('src') || ''
+      } else if (prop.tagName === 'A') {
+        value = prop.getAttribute('href') || prop.textContent.trim()
+      } else {
+        value = prop.textContent.trim()
+      }
+
+      properties.push({
+        key: prop.getAttribute('property').replace('schema:', ''),
+        value: value,
+      })
+    })
+
+    if (properties.length > 0) {
+      schemas.push({
+        type: 'RDFa: ' + itemType.replace('schema:', ''),
+        properties: properties,
+      })
+    }
+  })
+
+  return { schemas }
 }
 
 // Function to normalize URLs for comparison
