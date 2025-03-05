@@ -8,8 +8,69 @@ export function updateImagesUI(response) {
   document.getElementById('missingAlt').textContent = summary.missingAlt
   document.getElementById('missingTitle').textContent = summary.missingTitle
 
+  // Setup highlight button
+  setupHighlightButton(summary.missingAlt > 0)
+
   // Setup export buttons
   setupImageExportButtons(images)
+}
+
+// Add this new function for the highlight button functionality
+function setupHighlightButton(hasMissingAlt) {
+  const highlightBtn = document.getElementById('highlightMissingAlt')
+
+  // If button doesn't exist, create it
+  if (!highlightBtn) {
+    console.error('Highlight button not found in the DOM')
+    return
+  }
+
+  // Remove any existing event listeners
+  const newHighlightBtn = highlightBtn.cloneNode(true)
+  highlightBtn.parentNode.replaceChild(newHighlightBtn, highlightBtn)
+
+  // Get tooltip manager instance
+  const tooltipManager = getTooltipManager()
+
+  // Disable button if there are no images missing alt text
+  if (!hasMissingAlt) {
+    newHighlightBtn.classList.add('disabled')
+    newHighlightBtn.style.cursor = 'not-allowed'
+    newHighlightBtn.style.opacity = '0.6'
+    tooltipManager.attachToElement(
+      newHighlightBtn,
+      'Alle afbeeldingen hebben alt-tekst.'
+    )
+    return
+  }
+
+  // Variable to track highlight state
+  let isHighlighted = false
+
+  // Add click event listener
+  newHighlightBtn.addEventListener('click', () => {
+    isHighlighted = !isHighlighted
+
+    // Send message to content script to toggle highlighting
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        action: 'highlightImagesWithNoAlt',
+        highlight: isHighlighted,
+      })
+    })
+
+    // Update button text based on state
+    newHighlightBtn.textContent = isHighlighted
+      ? 'Verwijder markering'
+      : 'Markeer afbeeldingen zonder alt-tags'
+
+    // Optional: change button style when active
+    if (isHighlighted) {
+      newHighlightBtn.classList.add('active-highlight')
+    } else {
+      newHighlightBtn.classList.remove('active-highlight')
+    }
+  })
 }
 
 export function setupImageExportButtons(images) {
@@ -21,7 +82,6 @@ export function setupImageExportButtons(images) {
   const exportCompleteBtn = document.getElementById('exportCompleteImages')
   const newExportIncompleteBtn = exportIncompleteBtn.cloneNode(true)
   const newExportCompleteBtn = exportCompleteBtn.cloneNode(true)
-
   exportIncompleteBtn.parentNode.replaceChild(
     newExportIncompleteBtn,
     exportIncompleteBtn
@@ -33,6 +93,7 @@ export function setupImageExportButtons(images) {
 
   // Check if there are images with missing alt or title attributes
   const incompleteImages = images.filter((img) => !img.alt || !img.title)
+
   // Check if there are images with both alt and title attributes
   const completeImages = images.filter((img) => img.alt && img.title)
 
@@ -41,7 +102,6 @@ export function setupImageExportButtons(images) {
     newExportIncompleteBtn.classList.add('disabled')
     newExportIncompleteBtn.style.cursor = 'not-allowed'
     newExportIncompleteBtn.style.opacity = '0.6'
-
     // Attach tooltip to the disabled button
     tooltipManager.attachToElement(
       newExportIncompleteBtn,
@@ -61,7 +121,6 @@ export function setupImageExportButtons(images) {
     newExportCompleteBtn.classList.add('disabled')
     newExportCompleteBtn.style.cursor = 'not-allowed'
     newExportCompleteBtn.style.opacity = '0.6'
-
     // Attach tooltip to the disabled button
     tooltipManager.attachToElement(
       newExportCompleteBtn,
@@ -90,7 +149,6 @@ export function exportImages(images, filename) {
   ]
     .map((row) => row.join(','))
     .join('\n')
-
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)

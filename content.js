@@ -478,6 +478,48 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse({
       social: extractSocialMetadata(),
     })
+  } else if (request.action === 'highlightImagesWithNoAlt') {
+    // Either apply or remove the highlighting
+    if (request.highlight) {
+      // Add style for highlighted images
+      const style = document.createElement('style')
+      style.id = 'seo-extension-highlight-style'
+      style.textContent = `
+        .seo-extension-highlighted-img {
+          outline: 5px solid red !important;
+          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
+          position: relative !important;
+          z-index: 9999 !important;
+        }
+      `
+      document.head.appendChild(style)
+
+      // Find all images without alt
+      const imagesWithoutAlt = Array.from(
+        document.getElementsByTagName('img')
+      ).filter((img) => !img.alt || img.alt.trim() === '')
+
+      // Add highlighting class only
+      imagesWithoutAlt.forEach((img) => {
+        img.classList.add('seo-extension-highlighted-img')
+      })
+
+      sendResponse({ success: true, count: imagesWithoutAlt.length })
+    } else {
+      // Remove highlighting
+      document
+        .querySelectorAll('.seo-extension-highlighted-img')
+        .forEach((img) => {
+          img.classList.remove('seo-extension-highlighted-img')
+        })
+
+      // Remove the style
+      const style = document.getElementById('seo-extension-highlight-style')
+      if (style) style.remove()
+
+      sendResponse({ success: true })
+    }
+    return true
   }
 
   // Helper function to get position of a node in the DOM
