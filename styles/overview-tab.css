@@ -65,6 +65,17 @@
   font-size: 12px;
 }
 
+.missingCanonical,
+.externalCanonical {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #f5c6cb;
+  display: flex;
+}
+
 .non-indexable {
   background-color: #f8d7da;
   color: #721c24;
@@ -198,7 +209,9 @@
 
 .count-error .status-svg,
 .non-indexable .status-svg,
-.external .status-svg {
+.external .status-svg,
+.externalCanonical .status-svg,
+.missingCanonical .status-svg {
   color: #721c24;
 }
 

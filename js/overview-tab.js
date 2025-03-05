@@ -76,16 +76,6 @@ export async function updateOverviewUI(overview) {
     'description'
   )
 
-  /*   // Update URL section and make it clickable
-  const urlElement = document.getElementById('page-url')
-  urlElement.textContent = overview.url.current
-
-  // Make URL clickable
-  urlElement.classList.add('clickable-link')
-  urlElement.addEventListener('click', () => {
-    chrome.tabs.create({ url: overview.url.current })
-  }) */
-
   const urlElement = document.getElementById('page-url')
 
   // Create an <a> tag and set its properties
@@ -148,21 +138,9 @@ export async function updateOverviewUI(overview) {
     createCustomTooltip(textContainerURL, tooltipData[tooltipKey], 'url')
   }
 
-  /*   // Update canonical section and make it clickable
-  const canonicalElement = document.getElementById('page-canonical')
-  canonicalElement.textContent = overview.canonical.href
-
-  // Make canonical link clickable
-  if (overview.canonical.href) {
-    canonicalElement.classList.add('clickable-link')
-    canonicalElement.addEventListener('click', () => {
-      chrome.tabs.create({ url: overview.canonical.href })
-    })
-  } */
-
   const canonicalElement = document.getElementById('page-canonical')
 
-  if (overview.canonical.href) {
+  if (overview.canonical.exists && overview.canonical.href) {
     // Create an <a> tag and set its properties
     const link = document.createElement('a')
     link.href = overview.canonical.href
@@ -174,6 +152,10 @@ export async function updateOverviewUI(overview) {
     // Clear existing content and append the new link
     canonicalElement.textContent = '' // Clear any existing text
     canonicalElement.appendChild(link)
+  } else {
+    // Show "Ontbreekt" when canonical doesn't exist
+    canonicalElement.textContent = 'Ontbreekt'
+    canonicalElement.classList.add('missing')
   }
 
   const canonicalStatusElement = document
@@ -184,21 +166,28 @@ export async function updateOverviewUI(overview) {
   canonicalStatusElement.innerHTML = ''
 
   // Determine status
-  let statusTextCanonical = overview.canonical.isSelfReferencing
-    ? 'Self-referencing'
-    : 'Extern'
-  let statusClassCanonical = overview.canonical.isSelfReferencing
-    ? 'self-referencing'
-    : 'external'
+  let statusTextCanonical = 'Ontbreekt'
+  let statusClassCanonical = 'missing'
   let svgIconCanonical = ''
 
-  // Set appropriate SVG based on canonical status
-  if (overview.canonical.isSelfReferencing) {
-    // Checkmark SVG for self-referencing
-    svgIconCanonical =
-      '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+  if (overview.canonical.exists) {
+    if (overview.canonical.isSelfReferencing) {
+      // Self-referencing canonical
+      statusTextCanonical = 'Self-referencing'
+      statusClassCanonical = 'self-referencing'
+      svgIconCanonical =
+        '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M4 12.6111L8.92308 17.5L20 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>'
+    } else {
+      // External canonical
+      statusTextCanonical = 'Extern'
+      statusClassCanonical = 'externalCanonical'
+      svgIconCanonical =
+        '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
+    }
   } else {
-    // X mark SVG for external
+    // Missing canonical
+    statusTextCanonical = 'Ontbreekt'
+    statusClassCanonical = 'missingCanonical'
     svgIconCanonical =
       '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
   }
@@ -220,10 +209,17 @@ export async function updateOverviewUI(overview) {
   // Set the appropriate class
   canonicalStatusElement.className = `meta-status ${statusClassCanonical}`
 
-  // In your code where you need the canonical tooltip
-  const tooltipKeyCanonical = overview.canonical.isSelfReferencing
-    ? 'selfReferencing'
-    : 'external'
+  // Determine tooltip key based on status
+  let tooltipKeyCanonical
+  if (!overview.canonical.exists) {
+    tooltipKeyCanonical = 'missingCanonical'
+  } else if (overview.canonical.isSelfReferencing) {
+    tooltipKeyCanonical = 'selfReferencing'
+  } else {
+    tooltipKeyCanonical = 'external'
+  }
+
+  // Add tooltip if data exists
   if (tooltipData[tooltipKeyCanonical]) {
     createCustomTooltip(
       textContainer,

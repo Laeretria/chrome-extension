@@ -1,6 +1,45 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // Keep all existing message handlers
   if (request.action === 'getOverview') {
+    // Enhanced canonical detection logic
+    // 1. First try with querySelector (your current method)
+    let canonicalElement = document.querySelector('link[rel="canonical"]')
+
+    // 2. If not found, try with getElementsByTagName which can sometimes catch elements missed by querySelector
+    if (!canonicalElement) {
+      const allLinks = document.getElementsByTagName('link')
+      for (let i = 0; i < allLinks.length; i++) {
+        if (allLinks[i].getAttribute('rel') === 'canonical') {
+          canonicalElement = allLinks[i]
+          break
+        }
+      }
+    }
+
+    // 3. Look in the raw HTML as a last resort (for dynamically added or malformed tags)
+    if (!canonicalElement) {
+      const htmlContent = document.documentElement.outerHTML
+      const canonicalRegex =
+        /<link[^>]*rel=["']canonical["'][^>]*href=["']([^"']+)["'][^>]*>/i
+      const match = htmlContent.match(canonicalRegex)
+
+      if (match && match[1]) {
+        // Create a temporary element to extract the href properly
+        const tempLink = document.createElement('a')
+        tempLink.href = match[1]
+
+        // Create a synthetic canonicalElement with an href getter
+        canonicalElement = {
+          get href() {
+            return tempLink.href // This returns the absolute URL
+          },
+        }
+      }
+    }
+
+    // Now determine if canonical exists and get its href
+    const canonicalHref = canonicalElement ? canonicalElement.href : null
+
     const overview = {
       publisher:
         document.querySelector('meta[name="publisher"]')?.content || '',
@@ -21,10 +60,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         isIndexable: true, // Will be updated based on robots meta
       },
       canonical: {
-        href:
-          document.querySelector('link[rel="canonical"]')?.href ||
-          window.location.href,
-        isSelfReferencing: true, // Will be updated in the comparison
+        href: canonicalHref,
+        isSelfReferencing: false,
+        exists: !!canonicalHref,
       },
       robots: {
         meta: document.querySelector('meta[name="robots"]')?.content || '',
@@ -134,9 +172,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       })(),
     }
 
-    // Check if canonical is self-referencing
-    overview.canonical.isSelfReferencing =
-      overview.canonical.href === window.location.href
+    // Use normalized URL comparison for self-referencing check
+    if (overview.canonical.exists && overview.canonical.href) {
+      overview.canonical.isSelfReferencing =
+        normalizeUrl(overview.canonical.href) ===
+        normalizeUrl(window.location.href)
+    }
 
     // Check indexability based on robots meta
     if (overview.robots.meta) {
@@ -552,4 +593,36 @@ function extractSocialMetadata() {
   })
 
   return metadata
+}
+
+// Function to normalize URLs for comparison
+function normalizeUrl(url) {
+  try {
+    // Parse the URL
+    const parsedUrl = new URL(url)
+
+    // Convert to lowercase
+    let normalizedUrl = parsedUrl.toString().toLowerCase()
+
+    // Remove trailing slash if present
+    if (normalizedUrl.endsWith('/')) {
+      normalizedUrl = normalizedUrl.slice(0, -1)
+    }
+
+    // Remove 'www.' subdomain if present
+    normalizedUrl = normalizedUrl.replace(/^(https?:\/\/)www\./i, '$1')
+
+    // Remove default ports (80 for HTTP, 443 for HTTPS)
+    normalizedUrl = normalizedUrl.replace(':80/', '/').replace(':443/', '/')
+
+    // Handle URL fragments and query parameters based on your requirements
+    // This example removes them, but you might want different behavior
+    const urlWithoutFragment = normalizedUrl.split('#')[0]
+    const urlWithoutQuery = urlWithoutFragment.split('?')[0]
+
+    return urlWithoutQuery
+  } catch (e) {
+    console.error('Error normalizing URL:', e)
+    return url // Return original URL if parsing fails
+  }
 }

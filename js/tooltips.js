@@ -47,6 +47,10 @@ export const tooltipData = {
     text: 'De canonical URL verwijst naar een andere pagina, wat aangeeft dat dit niet de oorspronkelijke/hoofdversie van de content is.',
     link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
+  missingCanonical: {
+    text: 'Er is geen canonical tag gevonden op deze pagina. Het toevoegen van een canonical tag helpt zoekmachines begrijpen welke URL de geprefereerde versie van deze pagina is.',
+    link: 'https://kreatix.be/blog/canonical-tags-seo',
+  },
 }
 
 // Improved helper function with better hover behavior
