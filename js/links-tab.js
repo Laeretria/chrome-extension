@@ -171,7 +171,7 @@ export function setupExportButtons(links) {
     newExportIncompleteBtn.addEventListener('click', () => {
       exportLinks(
         incompleteLinks,
-        `${currentWebsiteDomain}_incomplete-links.csv`
+        `${currentWebsiteDomain}_onvolledige-links.csv`
       )
     })
   }
@@ -189,7 +189,7 @@ export function setupExportButtons(links) {
     )
   } else {
     newExportCompleteBtn.addEventListener('click', () => {
-      exportLinks(completeLinks, `${currentWebsiteDomain}_complete-links.csv`)
+      exportLinks(completeLinks, `${currentWebsiteDomain}_volledige-links.csv`)
     })
   }
 }
@@ -204,7 +204,7 @@ export function exportLinks(links, filename) {
       link.rel || '',
     ]),
   ]
-    .map((row) => row.join(','))
+    .map((row) => row.join(';'))
     .join('\n')
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })

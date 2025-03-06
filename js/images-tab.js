@@ -111,7 +111,7 @@ export function setupImageExportButtons(images) {
     newExportIncompleteBtn.addEventListener('click', () => {
       exportImages(
         incompleteImages,
-        `${currentWebsiteDomain}_incomplete-images.csv`
+        `${currentWebsiteDomain}_onvolledige-afbeeldingen.csv`
       )
     })
   }
@@ -130,7 +130,7 @@ export function setupImageExportButtons(images) {
     newExportCompleteBtn.addEventListener('click', () => {
       exportImages(
         completeImages,
-        `${currentWebsiteDomain}_complete-images.csv`
+        `${currentWebsiteDomain}_volledige-afbeeldingen.csv`
       )
     })
   }
@@ -147,7 +147,7 @@ export function exportImages(images, filename) {
       img.height || '',
     ]),
   ]
-    .map((row) => row.join(','))
+    .map((row) => row.join(';'))
     .join('\n')
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')

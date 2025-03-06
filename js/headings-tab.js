@@ -191,7 +191,7 @@ export function updateHeadingsUI(response) {
     // Only add click handler if there are headings to export
     if (structure.length > 0) {
       newExportButton.addEventListener('click', () => {
-        exportHeadings(structure, `${currentWebsiteDomain}_headings.csv`)
+        exportHeadings(structure, `${currentWebsiteDomain}_koppen.csv`)
       })
     }
   }
@@ -209,6 +209,7 @@ export function exportHeadings(headings, filename) {
       .trim() // Remove spaces from beginning and end
   }
 
+  // Create CSV content with proper escaping for special characters
   const csvContent = [
     ['Level', 'Text'],
     ...headings.map((heading) => [
@@ -216,12 +217,22 @@ export function exportHeadings(headings, filename) {
       normalizeText(heading.text) || '',
     ]),
   ]
-    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(','))
+    .map((row) => row.map((cell) => `"${cell.replace(/"/g, '""')}"`).join(';'))
     .join('\n')
 
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+  // Add BOM (Byte Order Mark) for proper UTF-8 encoding
+  const BOM = '\uFEFF'
+  const csvContentWithBOM = BOM + csvContent
+
+  // Create blob with UTF-8 encoding explicitly set
+  const blob = new Blob([csvContentWithBOM], { type: 'text/csv;charset=utf-8' })
+
+  // Create download link and trigger download
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
   link.download = filename
   link.click()
+
+  // Clean up
+  URL.revokeObjectURL(link.href)
 }
