@@ -23,14 +23,14 @@ export const tooltipData = {
     text: "De X-Robots-Tag is een HTTP-header die dezelfde richtlijnen biedt als de robots-meta tag, maar kan worden toegepast op niet-HTML-documenten zoals PDF's.",
     link: 'https://kreatix.be/blog/x-robots-tag',
   },
-  wordCount: {
+  /*   wordCount: {
     text: 'Het totale aantal woorden op je pagina. Hoewel er geen perfect aantal woorden is, presteert uitgebreide content vaak beter in zoekresultaten voor informatieve zoekopdrachten.',
     link: 'https://kreatix.be/blog/content-length-seo',
   },
   language: {
     text: 'De opgegeven taal van de pagina.',
     link: 'https://kreatix.be/blog/language-settings-seo',
-  },
+  }, */
   indexable: {
     text: 'Deze pagina kan worden geïndexeerd door zoekmachines zoals Google, wat betekent dat deze kan verschijnen in zoekresultaten.',
     link: 'https://kreatix.be/blog/indexing-seo',
