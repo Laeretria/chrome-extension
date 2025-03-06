@@ -51,6 +51,22 @@ export const tooltipData = {
     text: 'Er is geen canonical tag gevonden op deze pagina. Het toevoegen van een canonical tag helpt zoekmachines begrijpen welke URL de geprefereerde versie van deze pagina is.',
     link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
+  titleTooShort: {
+    text: 'De titel is te kort. Titels korter dan 30 tekens benutten de zichtbare ruimte in zoekresultaten niet optimaal en kunnen minder relevant lijken voor zoekmachines.',
+    link: null,
+  },
+  titleTooLong: {
+    text: 'De titel is te lang. Titels langer dan 60 tekens worden mogelijk afgekapt in zoekresultaten, waardoor belangrijke informatie niet zichtbaar is.',
+    link: null,
+  },
+  descriptionTooShort: {
+    text: 'De beschrijving is te kort. Beschrijvingen korter dan 120 tekens geven mogelijk niet genoeg context over de pagina-inhoud, wat kan leiden tot lagere click-through rates.',
+    link: null,
+  },
+  descriptionTooLong: {
+    text: 'De beschrijving is te lang. Beschrijvingen langer dan 160 tekens worden mogelijk afgekapt in zoekresultaten, waardoor belangrijke informatie niet zichtbaar is.',
+    link: null,
+  },
 }
 
 // Improved helper function with better hover behavior

@@ -335,16 +335,19 @@ button.custom-tooltip-icon {
 
 .missingCanonical button.custom-tooltip-icon,
 externalCanonical button.custom-tooltip-icon,
-.non-indexable button.custom-tooltip-icon {
+.non-indexable button.custom-tooltip-icon,
+.count-error button.custom-tooltip-icon {
   background-color: #cc7c83;
 }
 
-.missingCanonical .custom-tooltip-icon:hover,
+.missingCanonical button.custom-tooltip-icon:hover,
 button.custom-tooltip-icon:focus,
 .externalCanonical .custom-tooltip-icon:hover,
 button.custom-tooltip-icon:focus,
 .non-indexable .custom-tooltip-icon:hover,
-button.custom-tooltip-icon:focus {
+button.custom-tooltip-icon:focus,
+.count-error button.custom-tooltip-icon:hover,
+.count-error button.custom-tooltip-icon:focus {
   background-color: #721c24;
 }
 
@@ -418,7 +421,8 @@ button.custom-tooltip-icon:focus {
 }
 
 .custom-tooltip-content-url,
-.custom-tooltip-content-canonical {
+.custom-tooltip-content-canonical,
+.custom-tooltip-content-count {
   width: 280px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
@@ -432,13 +436,3 @@ button.custom-tooltip-icon:focus {
   border: 1px solid #e0e0e0;
   position: relative;
 }
-
-/* .custom-tooltip-icon-url {
-    background-color: #ec29c2;
-    border-color: #e24ace;
-  }
-  
-  .custom-tooltip-icon-canonical {
-    background-color: #f5fff0;
-    border-color: #6fb936;
-  } */

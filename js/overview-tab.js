@@ -28,6 +28,7 @@ export async function updateOverviewUI(overview) {
     const limits = SEO_LIMITS[type]
     let statusClass = ''
     let svgIcon = ''
+    let tooltipKey = null
 
     if (count >= limits.min && count <= limits.max) {
       // Within recommended range - green
@@ -39,6 +40,13 @@ export async function updateOverviewUI(overview) {
       statusClass = 'count-error'
       svgIcon =
         '<svg class="status-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M20 20L4 4.00003M20 4L4.00002 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path> </g></svg>'
+
+      // Determine tooltip key based on type and whether it's too short or too long
+      if (count < limits.min) {
+        tooltipKey = type === 'title' ? 'titleTooShort' : 'descriptionTooShort'
+      } else if (count > limits.max) {
+        tooltipKey = type === 'title' ? 'titleTooLong' : 'descriptionTooLong'
+      }
     }
 
     // Add the appropriate class
@@ -47,6 +55,12 @@ export async function updateOverviewUI(overview) {
     // Set the content with SVG followed by text
     element.innerHTML =
       svgIcon + `<span class="count-text">${count} tekens</span>`
+
+    // Add tooltip if needed
+    if (tooltipKey && tooltipData[tooltipKey]) {
+      const textSpan = element.querySelector('.count-text')
+      createCustomTooltip(textSpan, tooltipData[tooltipKey], 'count')
+    }
   }
 
   // Update title section
