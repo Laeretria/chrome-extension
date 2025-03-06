@@ -68,7 +68,7 @@ export function updateSchemaUI(response) {
               ></path>
             </g>
           </svg>
-    Exporteer Text
+    Exporteer Tekst
   `
   exportButton.addEventListener('click', () => {
     exportSchemaData(response.schemas)
@@ -500,7 +500,6 @@ export function extractPropertiesImproved(content) {
   return properties
 }
 
-// Export functions for text and JSON remain the same
 export function exportSchemaData(schemas) {
   let exportContent = ''
 
@@ -581,8 +580,8 @@ export function exportSchemaData(schemas) {
         // Add the key in bold
         exportContent += `**${prop.key}**\n`
 
-        // Add the value
-        exportContent += `${prop.value !== undefined ? value : ''}\n\n`
+        // Add the value - FIX: Use prop.value instead of value
+        exportContent += `${prop.value !== undefined ? prop.value : ''}\n\n`
       })
     }
 
