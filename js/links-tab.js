@@ -1,5 +1,6 @@
 import { currentWebsiteDomain } from './domain-utils.js'
 import { getTooltipManager } from './tooltips-exports.js'
+import { addScrollToTopToSEOTool } from './scroll-to-top.js'
 
 export function updateLinksUI(response) {
   if (!response || !response.metrics) {
@@ -14,6 +15,13 @@ export function updateLinksUI(response) {
   document.getElementById('uniqueLinks').textContent = metrics.unique
   document.getElementById('internalLinks').textContent = metrics.totalInternal
   document.getElementById('externalLinks').textContent = metrics.totalExternal
+
+  // Add click event listeners to metric elements for scrolling
+  // Call this after DOM is updated with link lists
+  setupMetricScrolling()
+
+  // Initialize the scroll to top button if it hasn't been done yet
+  addScrollToTopToSEOTool()
 
   // Update link lists
   const internalList = document.getElementById('internalLinksList')
@@ -32,6 +40,71 @@ export function updateLinksUI(response) {
 
   // Add export functionality
   setupExportButtons(metrics.uniqueLinks)
+}
+
+// New function to set up scrolling functionality
+function setupMetricScrolling() {
+  // Get individual metric elements by ID
+  const internalLinksElement = document.getElementById('internalLinks')
+  const externalLinksElement = document.getElementById('externalLinks')
+
+  // Make internal links metric clickable
+  if (internalLinksElement) {
+    internalLinksElement.style.cursor = 'pointer'
+
+    // Add click event listener
+    internalLinksElement.addEventListener('click', () => {
+      // Try multiple possible selectors for internal links section
+      const internalSection =
+        document.getElementById('internalLinksList') ||
+        document.querySelector('.interne-links') ||
+        document.querySelector('.internal-links') ||
+        document.querySelector('[data-section="internal"]')
+
+      if (internalSection) {
+        // Scroll to the section
+        internalSection.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        console.error('Could not find internal links section to scroll to')
+      }
+    })
+
+    // Add tooltip to indicate clickability
+    const tooltipManager = getTooltipManager()
+    tooltipManager.attachToElement(
+      internalLinksElement,
+      'Klik om naar interne links te scrollen'
+    )
+  }
+
+  // Make external links metric clickable
+  if (externalLinksElement) {
+    externalLinksElement.style.cursor = 'pointer'
+
+    // Add click event listener
+    externalLinksElement.addEventListener('click', () => {
+      // Try multiple possible selectors for external links section
+      const externalSection =
+        document.getElementById('externalLinksList') ||
+        document.querySelector('.externe-links') ||
+        document.querySelector('.external-links') ||
+        document.querySelector('[data-section="external"]')
+
+      if (externalSection) {
+        // Scroll to the section
+        externalSection.scrollIntoView({ behavior: 'smooth' })
+      } else {
+        console.error('Could not find external links section to scroll to')
+      }
+    })
+
+    // Add tooltip to indicate clickability
+    const tooltipManager = getTooltipManager()
+    tooltipManager.attachToElement(
+      externalLinksElement,
+      'Klik om naar externe links te scrollen'
+    )
+  }
 }
 
 export function createLinkElement(link) {
