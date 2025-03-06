@@ -62,8 +62,10 @@
 .preview-header {
   display: flex;
   padding: 12px;
-  border-bottom: 1px solid #eee;
-  background-color: var(--white);
+  border-bottom: 1px solid #e7e7e7;
+  background-color: #eee;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .preview-avatar {
@@ -103,7 +105,7 @@
 
 .preview-content {
   padding: 12px;
-  background-color: var(--white);
+  background-color: #eee;
 }
 
 .preview-image img,
@@ -137,9 +139,11 @@
 .preview-footer {
   display: flex;
   padding: 8px 12px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #e7e7e7;
   color: #666;
-  background-color: var(--white);
+  background-color: #eee;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
 }
 
 .preview-action {
@@ -182,11 +186,11 @@ h4 .empty-state-title {
 
 /* Metadata Summary */
 .metadata-summary {
-  background: var(--white);
+  background: #eee;
   padding: 15px;
   border-radius: 8px;
   margin-top: 20px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
+  /* box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0; */
 }
 
 .metadata-summary h3 {

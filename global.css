@@ -150,6 +150,12 @@ h2 {
   font-style: italic;
 }
 
+.loading {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
 .image-grid {
   display: grid;
   gap: 20px;
@@ -342,6 +348,15 @@ h2 {
   transform: translateY(-50%);
   border-width: 8px 8px 8px 0;
   border-color: transparent white transparent transparent;
+}
+
+/*structure header*/
+
+.structure-header-content {
+  background: white;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #e7e9f1;
 }
 
 /* You can add additional custom styling here */

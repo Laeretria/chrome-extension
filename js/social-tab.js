@@ -235,11 +235,6 @@ function createSocialPreviewUI(metadata) {
     metadata.twitter && Object.keys(metadata.twitter).length > 0
   const hasData = hasOgData || hasTwitterData
 
-  // Create preview header
-  const previewHeader = document.createElement('h3')
-  previewHeader.textContent = 'Social'
-  container.appendChild(previewHeader)
-
   // Create preview container
   const previewContainer = document.createElement('div')
   previewContainer.className = 'social-preview-content'
@@ -339,12 +334,12 @@ function createSocialPreviewUI(metadata) {
     
     .empty-state-container {
       text-align: center;
-      background: var(--white);
+      background: white;
       padding: 15px;
       border-radius: 8px;
       margin-top: 20px;
-      box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
       margin: 1.5rem 0;
+      border: 1px solid #eee;
     }
     
     .empty-state-icon svg {
@@ -372,7 +367,7 @@ function createSocialPreviewUI(metadata) {
     
     .empty-state-recommendations {
       text-align: left;
-      background: #e9ecef;
+      background:rgb(255, 255, 255);
       padding: 1.5rem;
       border-radius: 6px;
     }
@@ -438,32 +433,39 @@ function createEmptyStateMessageHTML() {
 export function updateSocialUI(data) {
   // Always create a preview, even with empty data
   const socialData = data && data.social ? data.social : { og: {}, twitter: {} }
+
+  // Get the main tab container
   const container = document.getElementById('social-tab')
 
-  // Clear any existing content
-  const contentContainer =
-    container.querySelector('.tab-content-container') || container
-  contentContainer.innerHTML = ''
+  // Find the social-preview div inside the structure-list (your existing HTML)
+  const socialPreviewDiv = document.getElementById('social-preview')
 
-  // Create the social preview UI (it will handle empty data internally)
-  const socialPreviewUI = createSocialPreviewUI(socialData)
-  contentContainer.appendChild(socialPreviewUI)
+  // Clear any existing content in the social-preview div
+  if (socialPreviewDiv) {
+    socialPreviewDiv.innerHTML = ''
 
-  // If no data was found, also show the detailed empty state message below the preview
-  if (
-    !data ||
-    !data.social ||
-    (Object.keys(socialData.og || {}).length === 0 &&
-      Object.keys(socialData.twitter || {}).length === 0)
-  ) {
-    // Create the empty state message container
-    const emptyStateContainer = document.createElement('div')
-    emptyStateContainer.className = 'empty-state-container'
+    // Create the social preview UI (it will handle empty data internally)
+    const socialPreviewUI = createSocialPreviewUI(socialData)
 
-    // Add the empty state message
-    emptyStateContainer.innerHTML = createEmptyStateMessageHTML()
+    // Append the content to the existing social-preview div
+    socialPreviewDiv.appendChild(socialPreviewUI)
 
-    // Append it after the preview
-    contentContainer.appendChild(emptyStateContainer)
+    // If no data was found, also show the detailed empty state message below the preview
+    if (
+      !data ||
+      !data.social ||
+      (Object.keys(socialData.og || {}).length === 0 &&
+        Object.keys(socialData.twitter || {}).length === 0)
+    ) {
+      // Create the empty state message container
+      const emptyStateContainer = document.createElement('div')
+      emptyStateContainer.className = 'empty-state-container'
+
+      // Add the empty state message
+      emptyStateContainer.innerHTML = createEmptyStateMessageHTML()
+
+      // Append it after the preview
+      socialPreviewDiv.appendChild(emptyStateContainer)
+    }
   }
 }
