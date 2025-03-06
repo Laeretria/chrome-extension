@@ -33,6 +33,7 @@
   color: white;
   cursor: pointer;
   transition: background-color 0.3s;
+  font-family: 'Regola-Medium';
 }
 
 .copy-btn:hover {
@@ -145,7 +146,7 @@
   color: white;
   border: none;
   cursor: pointer;
-  font-family: 'Regola-Regular';
+  font-family: 'Regola-Medium';
 }
 
 .action-button:hover {
@@ -157,4 +158,29 @@
   stroke: white;
   vertical-align: middle;
   margin-right: 6px;
+}
+
+/* Styling for when no headings are found */
+.no-headings-message {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+/* Disabled button styling */
+.button-disabled {
+  opacity: 0.6;
+  cursor: not-allowed !important;
+  transition: none !important;
+}
+
+/* Remove hover effects for disabled buttons */
+.button-disabled:hover {
+  /* Override any existing hover styles */
+  background-color: var(--primary-color) !important;
+  transform: none !important;
 }
