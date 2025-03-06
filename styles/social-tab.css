@@ -147,6 +147,10 @@
   font-size: 13px;
 }
 
+h4 .empty-state-title {
+  padding-top: 0 !important;
+}
+
 /* Twitter specific */
 .twitter-preview .preview-card {
   border: 1px solid #ddd;
