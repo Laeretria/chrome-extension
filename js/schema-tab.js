@@ -67,7 +67,7 @@ export function updateSchemaUI(response) {
               ></path>
             </g>
           </svg>
-    Exporteer Tekst
+    Export Tekst
   `
   exportButton.addEventListener('click', () => {
     exportSchemaData(response.schemas)
@@ -111,7 +111,7 @@ export function updateSchemaUI(response) {
               ></path>
             </g>
           </svg>
-    Exporteer JSON
+    Export JSON
   `
   jsonExportButton.addEventListener('click', () => {
     exportSchemaDataAsJSON(response.schemas)
