@@ -1,4 +1,7 @@
 export function initScrollToTopButton() {
+  // Check if the button already exists to prevent multiple creations
+  if (document.getElementById('scrollToTopBtn')) return
+
   // Create the button element
   const scrollToTopButton = document.createElement('button')
   scrollToTopButton.id = 'scrollToTopBtn'
@@ -21,6 +24,7 @@ export function initScrollToTopButton() {
     zIndex: '1000',
     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)',
     transition: 'opacity 0.3s, transform 0.3s',
+    opacity: '0',
   })
 
   // Add hover effect
@@ -36,27 +40,52 @@ export function initScrollToTopButton() {
 
   // Add click event to scroll to top
   scrollToTopButton.addEventListener('click', () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
+    // Target the main content div for scrolling
+    const mainContent = document.querySelector('.main-content')
+    if (mainContent) {
+      mainContent.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    } else {
+      // Fallback to window scrolling
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      })
+    }
   })
 
-  // Append the button to the body
-  document.body.appendChild(scrollToTopButton)
+  // Append the button to the app container
+  const appContainer = document.querySelector('.app-container')
+  if (appContainer) {
+    appContainer.appendChild(scrollToTopButton)
+  } else {
+    // Fallback to body if app container is not found
+    document.body.appendChild(scrollToTopButton)
+  }
 
   // Show/hide button based on scroll position
-  window.addEventListener('scroll', toggleScrollToTopButton)
+  const mainContent = document.querySelector('.main-content')
+  if (mainContent) {
+    mainContent.addEventListener('scroll', toggleScrollToTopButton)
+  } else {
+    // Fallback to window scroll event
+    window.addEventListener('scroll', toggleScrollToTopButton)
+  }
 }
 
 function toggleScrollToTopButton() {
   const scrollToTopButton = document.getElementById('scrollToTopBtn')
   if (!scrollToTopButton) return
 
-  // Show button when user scrolls down 300px from the top
-  if (window.scrollY > 300) {
-    scrollToTopButton.style.display = 'block'
+  // Get the main content area for scroll calculation
+  const mainContent = document.querySelector('.main-content')
+  const scrollY = mainContent ? mainContent.scrollTop : window.scrollY
 
+  // Show button when user scrolls down 300px from the top
+  if (scrollY > 300) {
+    scrollToTopButton.style.display = 'block'
     // Fade in animation
     setTimeout(() => {
       scrollToTopButton.style.opacity = '1'
@@ -64,10 +93,9 @@ function toggleScrollToTopButton() {
   } else {
     // Fade out animation
     scrollToTopButton.style.opacity = '0'
-
     // Hide after fade out animation completes
     setTimeout(() => {
-      if (window.scrollY <= 300) {
+      if (scrollY <= 300) {
         // Check again in case user scrolled back down
         scrollToTopButton.style.display = 'none'
       }
@@ -77,7 +105,7 @@ function toggleScrollToTopButton() {
 
 // Function to add the scroll to top button to the SEO tool
 export function addScrollToTopToSEOTool() {
-  // Wait for DOM to be fully loaded
+  // Ensure the function runs after the DOM is fully loaded
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initScrollToTopButton)
   } else {

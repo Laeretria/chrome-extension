@@ -8,6 +8,7 @@ import { setupTooltips } from './js/tooltips.js'
 import { setupFooterLinks } from './js/footer-utils.js'
 import { getCleanDomainName, initCurrentDomain } from './js/domain-utils.js'
 import { updateSocialUI } from './js/social-tab.js'
+import { initScrollToTopButton } from './js/scroll-to-top.js'
 
 // Make currentWebsiteDomain available globally
 let currentWebsiteDomain = ''
@@ -22,6 +23,8 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Setup tab navigation
     setupTabNavigation()
+
+    initScrollToTopButton()
 
     // Setup footer links
     await setupInitialFooterLinks()
@@ -154,8 +157,6 @@ async function loadTabData(tabName) {
       })
     })
 
-    document.getElementById('loading').classList.add('hidden')
-
     switch (tabName) {
       case 'overview':
         if (response && response.overview) {
@@ -191,7 +192,5 @@ async function loadTabData(tabName) {
     }
   } catch (error) {
     console.error('Error loading tab data:', error)
-    document.getElementById('loading').textContent =
-      'Error loading data. Please refresh the page and try again.'
   }
 }

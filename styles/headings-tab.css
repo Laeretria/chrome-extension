@@ -16,7 +16,7 @@
 
 .structure-buttons {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   text-align: right;
   justify-content: flex-end;
 }
@@ -124,7 +124,7 @@
 .multiple-h1-tag {
   border-left: 3px solid #ff6f6f;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
 }
 
 /*export button*/

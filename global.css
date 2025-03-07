@@ -2,11 +2,12 @@
   --primary-color: #1448ff;
   --secondary-color: #1371ff;
   --acent-color: #37dbdb;
-  --headline: #172653;
+  --title-color: #172653;
   --body: #424861;
   --white: #fff;
   --black: #000;
   --background-color: #eff5ff;
+  --sidebar-width: 220px;
 }
 
 @font-face {
@@ -24,18 +25,201 @@
   src: url('assets/fonts/RegolaPro-Regular.ttf');
 }
 
-html {
-  margin: 0;
-  padding: 0;
-  background-color: var(--background-color);
+html,
+body {
+  padding: 0px;
+  margin: 0px;
 }
 
-body {
+/*testing styling side bar*/
+/* Add CSS variables for colors */
+/* :root {
+  --primary: #1448ff;
+  --secondary: #1371ff;
+  --light-bg: #eff5ff;
+  --body-text: #424861;
+  --title-color: #172653;
+  --white: #ffffff;
+  --sidebar-width: 220px;
+} */
+.app-container {
+  display: flex;
+  width: 800px;
+  height: 550px;
+  background-color: white;
+  overflow: hidden;
   font-family: 'Regola-Regular';
-  margin: 20px;
   font-size: 16px !important;
 }
 
+.main-content {
+  flex: 1;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* Sidebar styling (W3Schools style) */
+.sidebar {
+  width: 200px;
+  height: 100%;
+  background-color: var(--title-color);
+  display: flex;
+  flex-direction: column;
+  box-shadow: rgba(0, 0, 0, 0.08) 0 4px 12px 0;
+}
+
+.sidebar-header {
+  background-color: var(--title-color);
+  color: white;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-logo {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.sidebar-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Transform horizontal tabs to vertical in W3Schools style */
+.tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.tab-button {
+  width: 100%;
+  padding: 12px 16px;
+  text-align: left;
+  border: none;
+  outline: none;
+  background-color: inherit;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  color: var(--white);
+  font-size: 15px;
+  box-sizing: border-box;
+  font-family: 'Regola-Medium' !important;
+}
+
+.tab-button svg {
+  margin-right: 12px;
+  stroke: var(--white);
+  min-width: 18px;
+}
+
+.tab-button:hover {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.tab-button:hover svg {
+  stroke: var(--white);
+}
+
+.tab-button.active {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.tab-button.active svg {
+  stroke: white;
+}
+
+/* Header styling */
+.header {
+  margin-top: 30px;
+  border-top: 1px solid #e7e9f1;
+  padding-top: 20px;
+}
+
+/* Tab content styling */
+.tab-content {
+  display: none;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Page title styling */
+.page-title {
+  color: var(--title-color);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--background-color);
+}
+
+/* Loading indicator */
+#loading {
+  margin: 20px 0;
+  padding: 15px;
+  background-color: var(--background-color);
+  border-radius: 5px;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.titel {
+  margin: 0;
+  font-size: medium;
+  font-weight: 300;
+}
+/* 
+h1 {
+  font-size: 20px;
+  margin-bottom: 15px;
+} */
+
+h2 {
+  font-size: 16px;
+  margin-top: 30px;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Powered by section */
+.powered-by {
+  margin-top: auto;
+  background-color: var(--background-color);
+  padding: 10px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.powered-by p {
+  color: var(--title-color);
+  margin: 0 0 5px 0;
+  font-size: 12px;
+}
+
+.kreatix-logo {
+  max-width: 100px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/*end test*/
+
+/* 
 .header {
   display: flex;
   align-items: center;
@@ -73,7 +257,6 @@ h2 {
   display: none;
 }
 
-/* Tab Styling */
 .navbar {
   margin-right: 5px;
 }
@@ -125,7 +308,6 @@ h2 {
   display: block;
 }
 
-/* Content Styling */
 .summary {
   background-color: #f5f5f5;
   padding: 15px;
@@ -155,7 +337,7 @@ h2 {
   padding: 20px;
   font-style: italic;
 }
-
+ */
 .image-grid {
   display: grid;
   gap: 20px;
@@ -357,6 +539,10 @@ h2 {
   border-radius: 8px;
   margin-bottom: 20px;
   border: 1px solid #e7e9f1;
+}
+
+.structure-icon svg {
+  margin-right: 12px;
 }
 
 /* You can add additional custom styling here */
