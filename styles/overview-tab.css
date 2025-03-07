@@ -88,7 +88,7 @@
 .meta-content {
   padding: 12px 16px;
   color: var(--body);
-  font-size: 16px;
+  font-size: 16px !important;
   word-break: break-word;
 }
 
@@ -120,7 +120,7 @@
 .info-content {
   padding: 12px 16px;
   color: var(--body);
-  font-size: 14px;
+  font-size: 16px !important;
 }
 
 /* Add these styles to your CSS file */

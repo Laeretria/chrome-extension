@@ -69,7 +69,7 @@ export function updateHeadingsUI(response) {
         warningDiv.className = 'heading-warning multiple-h1-warning'
 
         warningDiv.innerHTML = `
-          <strong>Warning:</strong> Er zijn ${h1Count} H1-tags gevonden op deze pagina. 
+          <strong>Opgepast:</strong> Er zijn ${h1Count} H1-tags gevonden op deze pagina. 
           Voor optimale SEO is het aanbevolen om slechts één H1-tag per pagina te hebben.
         `
 

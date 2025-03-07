@@ -369,6 +369,7 @@ function createSocialPreviewUI(metadata) {
       text-align: left;
       background:rgb(255, 255, 255);
       padding: 1.5rem;
+      padding-bottom: 0px !important;
       border-radius: 6px;
     }
     
@@ -405,7 +406,7 @@ function createEmptyStateMessageHTML() {
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
     </div>
-    <h3 class="empty-state-title">Geen Social Media Metadata Gevonden</h3>
+    <h3 class="empty-state-title">Geen metadata van sociale media gevonden</h3>
     <p class="empty-state-description">
       Deze pagina mist metadata die de weergave zou verbeteren wanneer deze wordt gedeeld op sociale media.
       Zonder de juiste metadata zullen sociale platforms standaardwaarden gebruiken die je content mogelijk niet effectief weergeven.
