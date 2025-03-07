@@ -125,6 +125,7 @@ function createEmptySocialPreview() {
             <polyline points="21 15 16 10 5 21"></polyline>
           </svg>
           <span>Geen afbeeldingsmetadata gevonden</span>
+          <span>Meta zal automatisch de eerste beschikbare afbeelding tonen</span>
         </div>
         <div class="preview-text">
           <div class="preview-domain">${domain}</div>
@@ -290,7 +291,7 @@ function createSocialPreviewUI(metadata) {
       border: 1px dashed #dee2e6;
       padding: 6px 10px;
       color: #6c757d;
-      border-radius: 4px;
+      border-radius: 8px;
       font-style: italic;
     }
     
@@ -318,7 +319,7 @@ function createSocialPreviewUI(metadata) {
       border-left: 4px solid #ffc107;
       padding: 10px 15px;
       margin-bottom: 15px;
-      border-radius: 0 4px 4px 0;
+      border-radius: 8px;
     }
     
     .preview-notice-icon {
@@ -368,9 +369,8 @@ function createSocialPreviewUI(metadata) {
     .empty-state-recommendations {
       text-align: left;
       background:rgb(255, 255, 255);
-      padding: 1.5rem;
       padding-bottom: 0px !important;
-      border-radius: 6px;
+      border-radius: 8px;
     }
     
     .tag-recommendations {
@@ -384,9 +384,13 @@ function createSocialPreviewUI(metadata) {
     .empty-state-benefits {
       background: #d4edda;
       border-left: 4px solid #28a745;
-      padding: 0.75rem;
-      border-radius: 0 4px 4px 0;
+      padding: 16px;
+      border-radius: 8px;
       margin-top: 1rem;
+    }
+    .empty-state-benefits p{
+      padding: 0px !important;
+      margin: 0px !important;
     }
   `
   container.appendChild(style)
@@ -401,7 +405,7 @@ function createSocialPreviewUI(metadata) {
 function createEmptyStateMessageHTML() {
   return `
     <div class="empty-state-icon">
-      <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
       </svg>
