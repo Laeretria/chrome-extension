@@ -28,7 +28,8 @@
   border-bottom: 1px solid #e7e9f1;
   font-family: 'Regola-Bold';
   font-size: 18px;
-  border-radius: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .meta-header svg,
@@ -117,7 +118,8 @@
   border-bottom: 1px solid #e7e9f1;
   font-family: 'Regola-Bold';
   font-size: 18px;
-  border-radius: 8px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
 }
 
 .info-content {

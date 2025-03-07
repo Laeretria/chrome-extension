@@ -554,7 +554,6 @@ h2 {
   background: white;
   border-radius: 8px;
   margin-top: 15px;
-  padding: 16px;
   border: 1px solid #e7e9f1;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
 }
@@ -562,7 +561,7 @@ h2 {
 .heading-stats {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 16px;
+  padding: 16px;
 }
 
 .stats-group {
@@ -591,7 +590,7 @@ h2 {
 .footer-links {
   display: flex;
   gap: 16px;
-  padding-top: 16px;
+  padding: 16px;
   border-top: 1px solid #e7e9f1;
 }
 

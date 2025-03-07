@@ -29,7 +29,6 @@ export function updateSchemaUI(response) {
   buttonContainer.style.display = 'flex'
   buttonContainer.style.justifyContent = 'flex-end'
   buttonContainer.style.gap = '10px'
-  buttonContainer.style.marginBottom = '10px'
 
   // Add export text button
   const exportButton = document.createElement('button')
