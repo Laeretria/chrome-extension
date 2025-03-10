@@ -13,6 +13,10 @@
   margin: 0;
 }
 
+input {
+  font-family: 'Regola-Regular';
+}
+
 .info-schema {
   font-size: 14px;
   padding: 0 !important;
