@@ -328,7 +328,7 @@ button.custom-tooltip-icon {
 }
 
 .missingCanonical button.custom-tooltip-icon,
-externalCanonical button.custom-tooltip-icon,
+.externalCanonical button.custom-tooltip-icon,
 .non-indexable button.custom-tooltip-icon,
 .count-error button.custom-tooltip-icon {
   background-color: #cc7c83;

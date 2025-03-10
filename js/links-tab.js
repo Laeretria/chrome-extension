@@ -42,11 +42,12 @@ export function updateLinksUI(response) {
   setupExportButtons(metrics.uniqueLinks)
 }
 
-// New function to set up scrolling functionality
+// Modified function to scroll to H2 tags
 function setupMetricScrolling() {
   // Get individual metric elements by ID
   const internalLinksElement = document.getElementById('internalLinks')
   const externalLinksElement = document.getElementById('externalLinks')
+  const tooltipManager = getTooltipManager()
 
   // Make internal links metric clickable
   if (internalLinksElement) {
@@ -54,23 +55,33 @@ function setupMetricScrolling() {
 
     // Add click event listener
     internalLinksElement.addEventListener('click', () => {
-      // Try multiple possible selectors for internal links section
-      const internalSection =
-        document.getElementById('internalLinksList') ||
-        document.querySelector('.interne-links') ||
-        document.querySelector('.internal-links') ||
-        document.querySelector('[data-section="internal"]')
+      // Look for H2 heading for internal links section
+      const internalH2 = Array.from(document.querySelectorAll('h2')).find(
+        (h2) =>
+          h2.textContent.toLowerCase().includes('intern') ||
+          h2.id.toLowerCase().includes('intern')
+      )
 
-      if (internalSection) {
-        // Scroll to the section
-        internalSection.scrollIntoView({ behavior: 'smooth' })
+      if (internalH2) {
+        // Scroll to the H2 heading
+        internalH2.scrollIntoView({ behavior: 'smooth' })
       } else {
-        console.error('Could not find internal links section to scroll to')
+        // Fallback to the original approach if H2 not found
+        const internalSection =
+          document.getElementById('internalLinksList') ||
+          document.querySelector('.interne-links') ||
+          document.querySelector('.internal-links') ||
+          document.querySelector('[data-section="internal"]')
+
+        if (internalSection) {
+          internalSection.scrollIntoView({ behavior: 'smooth' })
+        } else {
+          console.error('Could not find internal links section to scroll to')
+        }
       }
     })
 
     // Add tooltip to indicate clickability
-    const tooltipManager = getTooltipManager()
     tooltipManager.attachToElement(
       internalLinksElement,
       'Klik om naar interne links te scrollen'
@@ -83,23 +94,33 @@ function setupMetricScrolling() {
 
     // Add click event listener
     externalLinksElement.addEventListener('click', () => {
-      // Try multiple possible selectors for external links section
-      const externalSection =
-        document.getElementById('externalLinksList') ||
-        document.querySelector('.externe-links') ||
-        document.querySelector('.external-links') ||
-        document.querySelector('[data-section="external"]')
+      // Look for H2 heading for external links section
+      const externalH2 = Array.from(document.querySelectorAll('h2')).find(
+        (h2) =>
+          h2.textContent.toLowerCase().includes('extern') ||
+          h2.id.toLowerCase().includes('extern')
+      )
 
-      if (externalSection) {
-        // Scroll to the section
-        externalSection.scrollIntoView({ behavior: 'smooth' })
+      if (externalH2) {
+        // Scroll to the H2 heading
+        externalH2.scrollIntoView({ behavior: 'smooth' })
       } else {
-        console.error('Could not find external links section to scroll to')
+        // Fallback to the original approach if H2 not found
+        const externalSection =
+          document.getElementById('externalLinksList') ||
+          document.querySelector('.externe-links') ||
+          document.querySelector('.external-links') ||
+          document.querySelector('[data-section="external"]')
+
+        if (externalSection) {
+          externalSection.scrollIntoView({ behavior: 'smooth' })
+        } else {
+          console.error('Could not find external links section to scroll to')
+        }
       }
     })
 
     // Add tooltip to indicate clickability
-    const tooltipManager = getTooltipManager()
     tooltipManager.attachToElement(
       externalLinksElement,
       'Klik om naar externe links te scrollen'

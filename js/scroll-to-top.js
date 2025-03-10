@@ -11,10 +11,10 @@ export function initScrollToTopButton() {
   // Style the button
   Object.assign(scrollToTopButton.style, {
     position: 'fixed',
-    bottom: '20px',
-    right: '20px',
-    width: '50px',
-    height: '50px',
+    bottom: '10px',
+    right: '27px',
+    width: '40px',
+    height: '40px',
     borderRadius: '50%',
     backgroundColor: '#1448ff', // Dark blue color matching the SEO tool theme
     color: 'white',

@@ -125,7 +125,6 @@ function createEmptySocialPreview() {
             <polyline points="21 15 16 10 5 21"></polyline>
           </svg>
           <span>Geen afbeeldingsmetadata gevonden</span>
-          <span>Meta zal automatisch de eerste beschikbare afbeelding tonen</span>
         </div>
         <div class="preview-text">
           <div class="preview-domain">${domain}</div>
@@ -252,7 +251,7 @@ function createSocialPreviewUI(metadata) {
       </svg>
     </div>
     <div class="preview-notice-text">
-      <strong>Dit is een voorbeeldsimulatie</strong> die laat zien hoe je link eruit zou zien op sociale media.
+      <strong>Dit is een voorbeeldsimulatie</strong> die laat zien hoe je link eruit zou zien op sociale media. Wanneer er geen afbeeldingsmetadata gevonden is, zal Meta automatisch de eerste beschikbare afbeelding tonen.
     </div>
   `
   previewContainer.appendChild(notice)
