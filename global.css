@@ -160,32 +160,6 @@ body {
   display: block;
 }
 
-/* Powered by section */
-.powered-by {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-  margin-top: auto;
-  background-color: var(--white);
-  padding: 10px;
-  text-align: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.powered-by p {
-  color: var(--title-color);
-  margin-right: 10px;
-  font-size: 10px;
-  font-family: 'Regola-Regular';
-}
-
-.kreatix-logo {
-  max-width: 100px;
-  height: auto;
-  margin: 0 auto;
-}
-
 /* Page title styling */
 .page-title {
   color: var(--title-color);
@@ -426,6 +400,20 @@ h2 {
   position: relative;
 }
 
+/* .export-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.export-buttons button {
+  width: 50%;
+  max-width: 200px;
+  text-align: center;
+} */
+
 .export-btn {
   transition: all 0.3s ease;
   position: relative;
@@ -608,4 +596,91 @@ h2 {
 
 .footer-link:hover {
   text-decoration: underline;
+}
+
+/* Powered by section */
+.powered-by {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  background-color: var(--white);
+  padding: 10px;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.powered-by p {
+  color: var(--title-color);
+  margin-right: 10px;
+  font-size: 10px;
+  font-family: 'Regola-Regular';
+}
+
+.kreatix-logo {
+  max-width: 100px;
+  height: auto;
+  margin: 0 auto;
+}
+
+/*Minimize*/
+
+/* Add these styles to your CSS */
+.minimize-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  margin: 10px;
+  width: 34px;
+  height: 34px;
+}
+
+.minimize-button svg {
+  background-color: var(--background-color, #eff5ff);
+  color: var(--primary-color, #1448ff);
+  border-radius: 8px;
+  padding: 8px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.minimize-button svg:hover {
+  background-color: var(--primary-color, #1448ff);
+  color: white;
+}
+
+.app-container.minimized {
+  width: 50px;
+  overflow: hidden;
+}
+
+.app-container.minimized .sidebar {
+  width: 50px;
+}
+
+.app-container.minimized .main-content {
+  margin-left: 50px;
+}
+
+.app-container.minimized .sidebar-title,
+.app-container.minimized .tabs span,
+.app-container.minimized .powered-by p,
+.app-container.minimized .powered-by a {
+  display: none;
+}
+
+.app-container.minimized .maximize-icon {
+  display: block !important;
+}
+
+.app-container.minimized .minimize-icon {
+  display: none;
+}
+
+/* Transition effects */
+.app-container,
+.sidebar,
+.main-content {
+  transition: all 0.3s ease;
 }

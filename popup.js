@@ -194,3 +194,28 @@ async function loadTabData(tabName) {
     console.error('Error loading tab data:', error)
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const minimizeButton = document.getElementById('minimizeButton')
+  const appContainer = document.querySelector('.app-container')
+  const minimizeIcon = document.querySelector('.minimize-icon')
+  const maximizeIcon = document.querySelector('.maximize-icon')
+
+  // Check if the app is minimized in localStorage
+  const isMinimized = localStorage.getItem('kreatixSEOToolMinimized') === 'true'
+  if (isMinimized) {
+    appContainer.classList.add('minimized')
+    minimizeIcon.style.display = 'none'
+    maximizeIcon.style.display = 'block'
+  }
+
+  minimizeButton.addEventListener('click', function () {
+    appContainer.classList.toggle('minimized')
+
+    // Toggle icon visibility
+    const currentlyMinimized = appContainer.classList.contains('minimized')
+
+    // Save state to localStorage
+    localStorage.setItem('kreatixSEOToolMinimized', currentlyMinimized)
+  })
+})
