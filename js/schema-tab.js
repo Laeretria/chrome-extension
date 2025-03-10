@@ -25,11 +25,104 @@ export function updateSchemaUI(response) {
   // Create a button container at the top-right
   const buttonContainer = document.createElement('div')
   buttonContainer.style.width = '100%'
-  buttonContainer.style.textAlign = 'right'
   buttonContainer.style.display = 'flex'
   buttonContainer.style.justifyContent = 'flex-end'
   buttonContainer.style.gap = '10px'
+  buttonContainer.style.marginBottom = '15px'
 
+  // Add search bar
+  const searchContainer = document.createElement('div')
+  searchContainer.style.display = 'flex'
+  searchContainer.style.width = '100%'
+  searchContainer.style.maxWidth = '300px'
+  searchContainer.style.position = 'relative'
+
+  const searchInput = document.createElement('input')
+  searchInput.type = 'text'
+  searchInput.placeholder = 'Zoek schemas...'
+  searchInput.style.width = '100%'
+  searchInput.style.padding = '8px 12px'
+  searchInput.style.paddingLeft = '32px' // Space for the icon
+  searchInput.style.borderRadius = '4px'
+  searchInput.style.border = '1px solid #e7e9f1'
+  searchInput.style.fontSize = '14px'
+
+  // Add search icon
+  const searchIcon = document.createElement('div')
+  searchIcon.innerHTML = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666;">
+      <circle cx="11" cy="11" r="8"></circle>
+      <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+    </svg>
+  `
+  searchContainer.appendChild(searchIcon)
+  searchContainer.appendChild(searchInput)
+  buttonContainer.appendChild(searchContainer)
+
+  // Clear search button (hidden initially)
+  const clearSearchButton = document.createElement('button')
+  clearSearchButton.innerHTML = '×'
+  clearSearchButton.style.position = 'absolute'
+  clearSearchButton.style.right = '8px'
+  clearSearchButton.style.top = '50%'
+  clearSearchButton.style.transform = 'translateY(-50%)'
+  clearSearchButton.style.background = 'transparent'
+  clearSearchButton.style.border = 'none'
+  clearSearchButton.style.fontSize = '18px'
+  clearSearchButton.style.cursor = 'pointer'
+  clearSearchButton.style.color = '#666'
+  clearSearchButton.style.display = 'none'
+  clearSearchButton.title = 'Zoekopdracht wissen'
+  searchContainer.appendChild(clearSearchButton)
+
+  // Add event listener for the clear button
+  clearSearchButton.addEventListener('click', () => {
+    // Clear search input
+    searchInput.value = ''
+    clearSearchButton.style.display = 'none'
+
+    // Get the container element
+    const container = document.getElementById('schema-container')
+
+    // Try to completely reset by rebuilding the UI
+    if (response && response.schemas) {
+      // First store the search UI
+      const searchUIElement = buttonContainer.cloneNode(true)
+
+      // Clear the container
+      container.innerHTML = ''
+
+      // Add back the search UI
+      container.appendChild(searchUIElement)
+
+      // Recreate the schema display from scratch
+      updateSchemaUI(response)
+
+      // Reattach event listeners for the new search UI elements
+      const newSearchInput = searchUIElement.querySelector('input[type="text"]')
+      const newClearButton = searchUIElement.querySelector('button')
+
+      if (newSearchInput) {
+        newSearchInput.addEventListener('input', function () {
+          const searchTerm = this.value.trim().toLowerCase()
+          newClearButton.style.display = searchTerm ? 'block' : 'none'
+          filterSchemaElements(searchTerm)
+        })
+      }
+
+      if (newClearButton) {
+        newClearButton.addEventListener('click', () => {
+          window.location.reload() // Last resort: just reload the page
+        })
+      }
+    } else {
+      // If we can't access the original response, reload the page
+      window.location.reload()
+    }
+  })
+
+  // Toggle commented export buttons
+  /* 
   // Add export text button
   const exportButton = document.createElement('button')
   exportButton.className = 'schema-export-btn'
@@ -117,11 +210,15 @@ export function updateSchemaUI(response) {
     exportSchemaDataAsJSON(response.schemas)
   })
   buttonContainer.appendChild(jsonExportButton)
+  */
 
   container.appendChild(buttonContainer)
 
   // Group identical schemas (especially for ratings)
   const groupedSchemas = groupSimilarSchemas(response.schemas)
+
+  // Store schema sections for search functionality
+  const schemaSections = []
 
   // Process and display each schema group
   groupedSchemas.forEach((schemaGroup, groupIndex) => {
@@ -132,7 +229,11 @@ export function updateSchemaUI(response) {
     schemaSection.style.marginBottom = '20px'
     schemaSection.style.backgroundColor = '#f5f9ff'
     schemaSection.style.borderRadius = '8px'
+    schemaSection.dataset.schemaIndex = groupIndex
     container.appendChild(schemaSection)
+
+    // Add to schema sections array for search functionality
+    schemaSections.push(schemaSection)
 
     // Add schema type header
     const schemaHeader = document.createElement('div')
@@ -142,6 +243,8 @@ export function updateSchemaUI(response) {
     schemaHeader.style.backgroundColor = '#1448ff'
     schemaHeader.style.color = 'white'
     schemaHeader.style.borderRadius = '6px 6px 0 0'
+
+    schemaHeader.setAttribute('data-schema-header', 'true')
 
     // Determine schema type and add a counter
     let schemaType = 'Unknown Schema'
@@ -268,6 +371,242 @@ export function updateSchemaUI(response) {
       })
     }
   })
+
+  // Add search functionality
+  searchInput.addEventListener('input', function () {
+    const searchTerm = this.value.trim().toLowerCase()
+
+    // Show/hide clear button based on search term
+    clearSearchButton.style.display = searchTerm ? 'block' : 'none'
+
+    // If search field is empty, reset to original state
+    if (!searchTerm) {
+      // Get the container element
+      const container = document.getElementById('schema-container')
+
+      // Try to completely reset by rebuilding the UI
+      if (response && response.schemas) {
+        // First store the search UI
+        const searchUIElement = buttonContainer.cloneNode(true)
+
+        // Clear the container
+        container.innerHTML = ''
+
+        // Add back the search UI
+        container.appendChild(searchUIElement)
+
+        // Recreate the schema display from scratch
+        updateSchemaUI(response)
+
+        // Reattach event listeners for the new search UI elements
+        const newSearchInput =
+          searchUIElement.querySelector('input[type="text"]')
+        const newClearButton = searchUIElement.querySelector('button')
+
+        if (newSearchInput) {
+          newSearchInput.addEventListener('input', function () {
+            const searchTerm = this.value.trim().toLowerCase()
+            newClearButton.style.display = searchTerm ? 'block' : 'none'
+            filterSchemaElements(searchTerm)
+          })
+        }
+
+        if (newClearButton) {
+          newClearButton.addEventListener('click', () => {
+            newSearchInput.value = ''
+            newClearButton.style.display = 'none'
+            window.location.reload() // Last resort: just reload the page
+          })
+        }
+      } else {
+        // If we can't access the original response, just filter with empty string
+        filterSchemaElements('')
+      }
+    } else {
+      // Normal search behavior for non-empty searches
+      filterSchemaElements(searchTerm)
+    }
+  })
+
+  // Search filter function
+  function filterSchemaElements(searchTerm) {
+    // Create a container for "no results" message if it doesn't exist
+    let noResultsElement = document.getElementById('no-search-results')
+    if (!noResultsElement) {
+      noResultsElement = document.createElement('div')
+      noResultsElement.id = 'no-search-results'
+      noResultsElement.style.padding = '20px'
+      noResultsElement.style.textAlign = 'center'
+      noResultsElement.style.color = '#666'
+      noResultsElement.style.fontStyle = 'italic'
+      noResultsElement.style.display = 'none'
+      noResultsElement.textContent = 'No schemas matching your search.'
+      container.appendChild(noResultsElement)
+    }
+
+    // If no search term, show all and return
+    if (!searchTerm) {
+      schemaSections.forEach((section) => {
+        section.style.display = 'block'
+
+        // Show all rows
+        const rows = section.querySelectorAll(
+          'div[style*="display: table-row"]'
+        )
+        rows.forEach((row) => {
+          row.style.display = 'table-row'
+        })
+
+        // Reset highlight
+        const cells = section.querySelectorAll(
+          'div[style*="display: table-cell"]'
+        )
+        cells.forEach((cell) => {
+          // First check if there's a link in the cell
+          const linkElement = cell.querySelector('a')
+          if (linkElement) {
+            const originalLinkText =
+              linkElement.getAttribute('data-original-text') ||
+              linkElement.textContent
+            linkElement.textContent = originalLinkText
+          } else {
+            // Otherwise, remove highlights from text content
+            const originalText =
+              cell.getAttribute('data-original-text') || cell.textContent
+            cell.textContent = originalText
+          }
+        })
+      })
+
+      noResultsElement.style.display = 'none'
+      return
+    }
+
+    let matchFound = false
+
+    // Loop through schema sections
+    schemaSections.forEach((section) => {
+      let sectionMatch = false
+
+      // Check schema header text
+      const header = section.querySelector(
+        'div[style*="background-color: #1448ff"]'
+      )
+      if (
+        header &&
+        String(header.textContent)
+          .toLowerCase()
+          .includes(String(searchTerm).toLowerCase())
+      ) {
+        sectionMatch = true
+      }
+
+      // Check rows in this section
+      const rows = section.querySelectorAll('div[style*="display: table-row"]')
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll('div[style*="display: table-cell"]')
+        let rowMatch = false
+
+        cells.forEach((cell) => {
+          // Store original text if not already stored
+          if (!cell.hasAttribute('data-original-text')) {
+            // Check if the cell contains a link
+            const linkElement = cell.querySelector('a')
+            if (linkElement) {
+              linkElement.setAttribute(
+                'data-original-text',
+                linkElement.textContent
+              )
+            } else {
+              cell.setAttribute('data-original-text', cell.textContent)
+            }
+          }
+
+          const cellText = String(cell.textContent).toLowerCase()
+          const searchTermLower = String(searchTerm).toLowerCase()
+
+          if (cellText.includes(searchTermLower.toLowerCase())) {
+            rowMatch = true
+            sectionMatch = true
+
+            // Highlight matching text
+            const linkElement = cell.querySelector('a')
+
+            if (linkElement) {
+              // Handle links separately to maintain href functionality
+              const originalText =
+                linkElement.getAttribute('data-original-text')
+              const regex = new RegExp(
+                `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+                'gi'
+              )
+              let result
+              let lastIndex = 0
+              let highlightedText = ''
+
+              while ((result = regex.exec(originalText)) !== null) {
+                highlightedText += originalText.substring(
+                  lastIndex,
+                  result.index
+                )
+                highlightedText += `<mark style="background-color: #37dbdb; padding: 0 2px;">${result[0]}</mark>`
+                lastIndex = regex.lastIndex
+              }
+
+              highlightedText += originalText.substring(lastIndex)
+              linkElement.innerHTML = highlightedText
+            } else {
+              // Handle regular text cells
+              const originalText = cell.getAttribute('data-original-text')
+              const regex = new RegExp(
+                `(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+                'gi'
+              )
+              let result
+              let lastIndex = 0
+              let highlightedText = ''
+
+              while ((result = regex.exec(originalText)) !== null) {
+                highlightedText += originalText.substring(
+                  lastIndex,
+                  result.index
+                )
+                highlightedText += `<mark style="background-color: #37dbdb; padding: 0 2px;">${result[0]}</mark>`
+                lastIndex = regex.lastIndex
+              }
+
+              highlightedText += originalText.substring(lastIndex)
+              cell.innerHTML = highlightedText
+            }
+          } else {
+            // Remove highlight if no match
+            const linkElement = cell.querySelector('a')
+            if (linkElement) {
+              linkElement.textContent =
+                linkElement.getAttribute('data-original-text') ||
+                linkElement.textContent
+            } else {
+              cell.textContent =
+                cell.getAttribute('data-original-text') || cell.textContent
+            }
+          }
+        })
+
+        // Show/hide row based on match
+        row.style.display = rowMatch ? 'table-row' : 'none'
+      })
+
+      // Show/hide section based on match
+      section.style.display = sectionMatch ? 'block' : 'none'
+
+      if (sectionMatch) {
+        matchFound = true
+      }
+    })
+
+    // Show/hide no results message
+    noResultsElement.style.display = matchFound ? 'none' : 'block'
+  }
 
   // Helper function to add a table row with consistent styling and display name
   function addTableRow(table, fullKey, value, index, displayKey) {
@@ -595,67 +934,6 @@ export function exportSchemaData(schemas) {
   const link = document.createElement('a')
   link.href = url
   link.download = `${currentWebsiteDomain}_schemas.txt`
-  link.click()
-
-  URL.revokeObjectURL(url)
-}
-
-export function exportSchemaDataAsJSON(schemas) {
-  // Process each schema to make it more readable
-  const processedSchemas = schemas.map((schema, index) => {
-    // Extract schema type
-    let schemaType = 'Unknown Schema'
-    if (schema.type) {
-      schemaType = schema.type
-    } else if (schema.content && schema.content['@type']) {
-      schemaType = schema.content['@type']
-    } else if (
-      schema.content &&
-      schema.content['@context'] &&
-      schema.content['@context'].includes('schema.org')
-    ) {
-      schemaType = 'Schema.org'
-    }
-
-    // Return schema with appropriate structure based on type
-    if (schema.content) {
-      return {
-        schemaType,
-        schemaIndex: index + 1,
-        data: schema.content,
-      }
-    } else if (schema.properties && Array.isArray(schema.properties)) {
-      // Convert properties array to object
-      const propsObject = {}
-      schema.properties.forEach((prop) => {
-        if (prop.key) {
-          propsObject[prop.key] = prop.value
-        }
-      })
-      return {
-        schemaType,
-        schemaIndex: index + 1,
-        data: propsObject,
-      }
-    }
-
-    return {
-      schemaType,
-      schemaIndex: index + 1,
-      data: {},
-    }
-  })
-
-  // Convert to JSON string with pretty formatting
-  const jsonString = JSON.stringify(processedSchemas, null, 2)
-
-  // Create and download file
-  const blob = new Blob([jsonString], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${currentWebsiteDomain}_schemas.json`
   link.click()
 
   URL.revokeObjectURL(url)
