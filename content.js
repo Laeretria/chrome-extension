@@ -1,98 +1,286 @@
 /**
- * Highlights only visible images on the current webpage that are missing alt text
+ * Highlights all images on the current webpage that are missing alt text and could potentially be visible
+ * Uses multiple detection strategies to ensure maximum coverage
  * @param {boolean} highlight - Whether to add or remove highlighting
  * @returns {Object} - Results containing count and image information
  */
 function highlightVisibleImagesWithNoAlt(highlight = true) {
-  // Remove any previous highlighting first
+  // First, remove any previous highlighting
   removeImageHighlighting()
 
+  // If we're not highlighting, just return
   if (!highlight) {
     return { success: true }
   }
+
+  // Add highlighting styles
+  addHighlightingStyle()
 
   const results = {
     missingAltCount: 0,
     imagesWithoutAlt: [],
   }
 
-  // Get all images from the DOM
-  const images = Array.from(document.getElementsByTagName('img'))
+  // PART 1: Find all images using multiple methods to ensure we don't miss any
+  // Method 1: Standard getElementsByTagName
+  const standardImages = Array.from(document.getElementsByTagName('img'))
 
-  // Filter for only visible images without alt text
-  const visibleImagesWithoutAlt = images.filter((img) => {
+  // Method 2: querySelectorAll for img tags (sometimes finds different results)
+  const queriedImages = Array.from(document.querySelectorAll('img'))
+
+  // Method 3: Find images in shadow DOM (for modern web components)
+  const shadowImages = findImagesInShadowDOM()
+
+  // Combine all images and remove duplicates
+  const allImages = [
+    ...new Set([...standardImages, ...queriedImages, ...shadowImages]),
+  ]
+
+  // PART 2: Filter images for those without alt text
+  const imagesWithoutAlt = allImages.filter((img) => {
     // Check if image has valid alt text
     const hasAlt =
       img.hasAttribute('alt') && img.getAttribute('alt').trim() !== ''
-
-    // If it has alt text, no need to check visibility
-    if (hasAlt) return false
-
-    // Otherwise, check if the image is visible
-    return isElementVisible(img)
+    return !hasAlt
   })
 
-  // Update results
-  results.missingAltCount = visibleImagesWithoutAlt.length
+  // PART 3: Only consider images that are potentially visible
+  // We'll use very loose criteria here to catch everything
+  const potentiallyVisibleImages = imagesWithoutAlt.filter((img) => {
+    // Use multiple visibility detection approaches
+    const approach1 = isElementRoughlyVisible(img)
+    const approach2 = isElementCompletelyVisible(img)
+    const approach3 = isElementPotentiallyVisible(img)
 
-  // Highlight the images and collect data
-  visibleImagesWithoutAlt.forEach((img) => {
-    // Add highlighting
+    // If ANY approach says it's visible, include it
+    return approach1 && approach2 && approach3
+  })
+
+  // PART 4: Highlight all potentially visible images without alt text
+  potentiallyVisibleImages.forEach((img) => {
     highlightImage(img)
 
     // Add to results
-    results.imagesWithoutAlt.push({
-      src: img.src,
-      alt: img.alt || '',
-      width: img.width || '',
-      height: img.height || '',
-    })
+    try {
+      results.imagesWithoutAlt.push({
+        src: img.src || '',
+        alt: '',
+        width: img.width || '',
+        height: img.height || '',
+        naturalWidth: img.naturalWidth || '',
+        naturalHeight: img.naturalHeight || '',
+      })
+    } catch (e) {
+      console.error('Error collecting image data:', e)
+    }
   })
+
+  // Update count
+  results.missingAltCount = potentiallyVisibleImages.length
 
   return results
 }
 
 /**
- * Checks if an element is actually visible on the page
- * @param {Element} element - The DOM element to check
- * @returns {boolean} - Whether the element is visible
+ * Finds images within Shadow DOM elements
+ * @returns {Array} - Array of image elements found in shadow DOM
  */
-function isElementVisible(element) {
-  // Check if element itself is hidden by inline CSS
-  if (
-    element.style.display === 'none' ||
-    element.style.visibility === 'hidden' ||
-    parseFloat(element.style.opacity) === 0
-  ) {
-    return false
+function findImagesInShadowDOM() {
+  const shadowImages = []
+
+  // Function to recursively search for shadow roots and images within them
+  function searchShadowDOM(root) {
+    // Get all elements in this root
+    const elements = root.querySelectorAll('*')
+
+    elements.forEach((element) => {
+      // Check if this element has a shadow root
+      if (element.shadowRoot) {
+        // Look for images in this shadow root
+        const shadowImgs = element.shadowRoot.querySelectorAll('img')
+        shadowImages.push(...shadowImgs)
+
+        // Recursively search this shadow root
+        searchShadowDOM(element.shadowRoot)
+      }
+    })
   }
 
-  // Check computed style
-  const style = window.getComputedStyle(element)
-  if (
-    style.display === 'none' ||
-    style.visibility === 'hidden' ||
-    parseFloat(style.opacity) === 0
-  ) {
-    return false
-  }
+  // Start the search from the document root
+  searchShadowDOM(document)
 
-  // Check if element has zero dimensions
-  if (element.offsetWidth <= 0 && element.offsetHeight <= 0) {
-    return false
-  }
+  return shadowImages
+}
 
-  // Check if any parent containers are hidden
-  let parent = element.parentElement
-  while (parent) {
-    const parentStyle = window.getComputedStyle(parent)
-    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden') {
+/**
+ * Approach 1: Basic visibility check looking at CSS properties
+ * @param {Element} element - The DOM element to check
+ * @returns {boolean} - Whether the element is roughly visible
+ */
+function isElementRoughlyVisible(element) {
+  if (!element) return false
+
+  try {
+    // 1. Check computed styles for the element
+    const style = window.getComputedStyle(element)
+
+    // If explicitly hidden, definitely not visible
+    if (
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      parseFloat(style.opacity) === 0
+    ) {
       return false
     }
-    parent = parent.parentElement
-  }
 
-  return true
+    // 2. Check if element has zero dimensions
+    // Only exclude if BOTH dimensions are zero
+    if (element.offsetWidth <= 0 && element.offsetHeight <= 0) {
+      return false
+    }
+
+    // 3. For images, check if they've loaded correctly
+    if (element.tagName === 'IMG') {
+      // If image is not complete, consider it visible (it's still loading)
+      if (!element.complete) {
+        return true
+      }
+
+      // If image has loaded but has zero natural dimensions, it failed to load
+      if (element.naturalWidth === 0 && element.naturalHeight === 0) {
+        return false
+      }
+    }
+
+    // 4. Consider images with very small dimensions to be visible
+    // (could be tracking pixels or small icons)
+    if (element.offsetWidth > 0 || element.offsetHeight > 0) {
+      return true
+    }
+
+    return true
+  } catch (e) {
+    console.error('Error in isElementRoughlyVisible:', e)
+    // Default to assuming it's visible if there's an error
+    return true
+  }
+}
+
+/**
+ * Approach 2: More thorough visibility check including parent containers
+ * @param {Element} element - The DOM element to check
+ * @returns {boolean} - Whether the element is completely visible
+ */
+function isElementCompletelyVisible(element) {
+  if (!element) return false
+
+  try {
+    // Check inline styles
+    if (
+      element.style.display === 'none' ||
+      element.style.visibility === 'hidden' ||
+      element.style.opacity === '0'
+    ) {
+      return false
+    }
+
+    // Check computed style
+    const style = window.getComputedStyle(element)
+    if (
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      parseFloat(style.opacity) === 0
+    ) {
+      return false
+    }
+
+    // Check if element has zero dimensions
+    if (element.offsetWidth <= 0 && element.offsetHeight <= 0) {
+      return false
+    }
+
+    // Check parent visibility (important for catching images in hidden containers)
+    let parent = element.parentElement
+    while (parent) {
+      const parentStyle = window.getComputedStyle(parent)
+      if (
+        parentStyle.display === 'none' ||
+        parentStyle.visibility === 'hidden'
+      ) {
+        return false
+      }
+      parent = parent.parentElement
+    }
+
+    return true
+  } catch (e) {
+    console.error('Error in isElementCompletelyVisible:', e)
+    return true
+  }
+}
+
+/**
+ * Approach 3: Loose visibility check that includes images that could potentially be visible
+ * @param {Element} element - The DOM element to check
+ * @returns {boolean} - Whether the element is potentially visible
+ */
+function isElementPotentiallyVisible(element) {
+  if (!element) return false
+
+  try {
+    // Check for images that are styled with display:none
+    if (element.style.display === 'none') {
+      return false
+    }
+
+    // Ignore images that failed to load
+    if (
+      element.tagName === 'IMG' &&
+      element.complete &&
+      element.naturalWidth === 0
+    ) {
+      return false
+    }
+
+    // Check for images that are positioned far offscreen
+    const rect = element.getBoundingClientRect()
+    const extremelyOffscreen =
+      rect.top < -10000 ||
+      rect.left < -10000 ||
+      rect.bottom > 20000 ||
+      rect.right > 20000
+
+    if (extremelyOffscreen) {
+      return false
+    }
+
+    // Consider everything else potentially visible
+    return true
+  } catch (e) {
+    console.error('Error in isElementPotentiallyVisible:', e)
+    return true
+  }
+}
+
+/**
+ * Adds the highlighting style definition to the document
+ */
+function addHighlightingStyle() {
+  // Only add the style if it doesn't already exist
+  if (!document.getElementById('seo-extension-highlight-style')) {
+    const style = document.createElement('style')
+    style.id = 'seo-extension-highlight-style'
+    style.textContent = `
+      .seo-extension-highlighted-img {
+        outline: 5px solid red !important;
+        outline-offset: -2px !important;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
+        position: relative !important;
+        z-index: 2147483647 !important;
+      }
+    `
+    document.head.appendChild(style)
+  }
 }
 
 /**
@@ -100,64 +288,44 @@ function isElementVisible(element) {
  * @param {HTMLImageElement} img - The image to highlight
  */
 function highlightImage(img) {
+  // Add highlighting class
   img.classList.add('seo-extension-highlighted-img')
+
+  // Also apply inline styles to ensure the highlighting works
+  img.style.outline = '5px solid red'
+  img.style.outlineOffset = '-2px'
+  img.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)'
+  img.style.position = 'relative'
+  img.style.zIndex = '2147483647' // Maximum z-index value
 }
 
 /**
  * Removes highlighting from all previously highlighted images
  */
 function removeImageHighlighting() {
-  // Remove highlighting class from all elements
+  // Remove highlighting class and inline styles from elements
   document.querySelectorAll('.seo-extension-highlighted-img').forEach((img) => {
     img.classList.remove('seo-extension-highlighted-img')
+    img.style.outline = ''
+    img.style.outlineOffset = ''
+    img.style.boxShadow = ''
+    img.style.position = ''
+    img.style.zIndex = ''
+  })
+
+  // Also remove any a11y-check-highlighted class (from your original code)
+  document.querySelectorAll('.a11y-check-highlighted').forEach((el) => {
+    el.classList.remove('a11y-check-highlighted')
+    el.style.outline = ''
+    el.style.outlineOffset = ''
   })
 
   // Remove the highlighting style if it exists
   const style = document.getElementById('seo-extension-highlight-style')
-  if (style) style.remove()
-}
-
-// Add the highlighting style to the document
-function addHighlightingStyle() {
-  // Create the style element if it doesn't exist
-  if (!document.getElementById('seo-extension-highlight-style')) {
-    const style = document.createElement('style')
-    style.id = 'seo-extension-highlight-style'
-    style.textContent = `
-      .seo-extension-highlighted-img {
-        outline: 5px solid red !important;
-        outline-offset: -2px;
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
-        position: relative !important;
-        z-index: 9999 !important;
-      }
-    `
-    document.head.appendChild(style)
+  if (style) {
+    style.remove()
   }
 }
-
-// Listen for messages from the popup/extension
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-  if (request.action === 'highlightImagesWithNoAlt') {
-    if (request.highlight) {
-      // Add the highlighting style
-      addHighlightingStyle()
-    }
-
-    // Run the highlighting function
-    const result = highlightVisibleImagesWithNoAlt(request.highlight)
-
-    // Send the results back
-    sendResponse({
-      success: true,
-      count: result.missingAltCount,
-      images: result.imagesWithoutAlt,
-    })
-  }
-
-  // Return true to indicate you might respond asynchronously
-  return true
-})
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // Keep all existing message handlers
@@ -557,7 +725,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     return true // Important: Return true to indicate async response
   } else if (request.action === 'getSchema') {
     sendResponse(getAllSchemas())
-    console.log('Processing getSchema request')
 
     function extractSchemaData() {
       const schemas = []
@@ -566,7 +733,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       const jsonLdScripts = document.querySelectorAll(
         'script[type="application/ld+json"]'
       )
-      console.log('Found', jsonLdScripts.length, 'JSON-LD scripts')
 
       jsonLdScripts.forEach((script, index) => {
         try {
@@ -619,7 +785,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
     try {
       const schemas = extractSchemaData()
-      console.log('Extracted schemas:', schemas)
 
       sendResponse({
         schemas: schemas,
@@ -640,21 +805,25 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       social: extractSocialMetadata(),
     })
   } else if (request.action === 'highlightImagesWithNoAlt') {
-    if (request.highlight) {
-      // Add the highlighting style
-      addHighlightingStyle()
+    if (request.action === 'highlightImagesWithNoAlt') {
+      try {
+        // Run the highlighting function
+        const result = highlightVisibleImagesWithNoAlt(request.highlight)
+
+        // Send the results back
+        sendResponse({
+          success: true,
+          count: result.missingAltCount,
+          images: result.imagesWithoutAlt,
+        })
+      } catch (error) {
+        console.error('Error during highlighting:', error)
+        sendResponse({
+          success: false,
+          error: error.message,
+        })
+      }
     }
-
-    // Run the highlighting function
-    const result = highlightVisibleImagesWithNoAlt(request.highlight)
-
-    // Send the results back
-    sendResponse({
-      success: true,
-      count: result.missingAltCount,
-      images: result.imagesWithoutAlt,
-    })
-    return true
   }
 
   // Helper function to get position of a node in the DOM

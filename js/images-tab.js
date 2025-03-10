@@ -3,7 +3,7 @@ import { getTooltipManager } from './tooltips-exports.js'
 
 export function updateImagesUI(response) {
   const { images, summary } = response
-  // Update metrics
+  // Update metrics - kept untouched as requested
   document.getElementById('totalImages').textContent = summary.total
   document.getElementById('missingAlt').textContent = summary.missingAlt
   document.getElementById('missingTitle').textContent = summary.missingTitle
@@ -55,30 +55,70 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
   // Add click event listener
   newHighlightBtn.addEventListener('click', () => {
     isHighlighted = !isHighlighted
+    console.log('Button clicked, highlight state:', isHighlighted)
+
+    // Update button text and style immediately for better user feedback
+    updateButtonState()
 
     // Send message to content script to toggle highlighting
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, {
-        action: 'highlightImagesWithNoAlt',
-        highlight: isHighlighted,
-      })
+      if (!tabs || tabs.length === 0) {
+        console.error('No active tab found')
+        return
+      }
+
+      console.log('Sending highlight message to tab:', tabs[0].id)
+
+      chrome.tabs.sendMessage(
+        tabs[0].id,
+        {
+          action: 'highlightImagesWithNoAlt',
+          highlight: isHighlighted,
+        },
+        function (response) {
+          if (chrome.runtime.lastError) {
+            console.error(
+              'Error messaging content script:',
+              chrome.runtime.lastError
+            )
+            // Reset button state if there was an error
+            isHighlighted = !isHighlighted
+            updateButtonState()
+            return
+          }
+
+          console.log('Got response from content script:', response)
+
+          // If we got a valid response with actual data
+          if (response && response.images) {
+            console.log('Displaying info for', response.images.length, 'images')
+            // Update the images info with the ones that were actually highlighted
+            if (isHighlighted) {
+              displayImagesInfo(imageInfoContainer, response.images)
+            } else {
+              // Hide image info when highlighting is turned off
+              imageInfoContainer.innerHTML = ''
+              imageInfoContainer.style.display = 'none'
+            }
+          }
+        }
+      )
     })
 
-    // Update button text based on state
-    newHighlightBtn.textContent = isHighlighted
-      ? 'Verwijder markering'
-      : 'Markeer afbeeldingen zonder alt-tags'
+    // Helper function to update button appearance
+    function updateButtonState() {
+      newHighlightBtn.textContent = isHighlighted
+        ? 'Verwijder markering'
+        : 'Markeer afbeeldingen zonder alt-tags'
 
-    // Optional: change button style when active
-    if (isHighlighted) {
-      newHighlightBtn.classList.add('active-highlight')
-      // Show images information when highlighted
-      displayImagesInfo(imageInfoContainer, imagesWithNoAlt)
-    } else {
-      newHighlightBtn.classList.remove('active-highlight')
-      // Hide images information when highlighting is removed
-      imageInfoContainer.innerHTML = ''
-      imageInfoContainer.style.display = 'none'
+      if (isHighlighted) {
+        newHighlightBtn.classList.add('active-highlight')
+      } else {
+        newHighlightBtn.classList.remove('active-highlight')
+        // Hide images information when highlighting is removed
+        imageInfoContainer.innerHTML = ''
+        imageInfoContainer.style.display = 'none'
+      }
     }
   })
 }
@@ -93,16 +133,13 @@ function createImageInfoContainer() {
   container.style.clear = 'both'
 
   // Find the proper parent where we should insert the container
-  // First, try to find the highlight button
   const highlightBtn = document.getElementById('highlightMissingAlt')
 
   if (highlightBtn) {
     // Find the parent container that should hold our image info
-    // This is likely the metrics container or a parent div that contains the button
     let parentContainer = highlightBtn.parentNode
 
-    // If the parent is just a div that holds the button, get its parent
-    // Often buttons are in a button container, and we want to add after that container
+    // Navigate up to find appropriate container
     while (
       parentContainer &&
       parentContainer.tagName === 'DIV' &&
@@ -137,15 +174,20 @@ function createImageInfoContainer() {
 }
 
 // Display information about images with no alt text in a grid layout
-function displayImagesInfo(container, imagesWithNoAlt) {
-  if (!container || !imagesWithNoAlt || imagesWithNoAlt.length === 0) return
+function displayImagesInfo(container, imagesWithoutAlt) {
+  if (!container || !imagesWithoutAlt || imagesWithoutAlt.length === 0) return
 
   container.innerHTML = ''
   container.style.display = 'block'
 
+  // Filter to show only visible images
+  const visibleImagesWithoutAlt = imagesWithoutAlt.filter(
+    (img) => img.isVisible !== false
+  )
+
   // Create heading
   const heading = document.createElement('h3')
-  heading.textContent = 'Afbeeldingen zonder alt-tekst'
+  heading.textContent = `Afbeeldingen zonder alt-tekst (${visibleImagesWithoutAlt.length} zichtbare van ${imagesWithoutAlt.length} totaal)`
   heading.style.fontSize = '16px'
   heading.style.marginBottom = '20px'
   heading.style.marginTop = '20px'
@@ -161,8 +203,8 @@ function displayImagesInfo(container, imagesWithNoAlt) {
   grid.style.marginTop = '10px'
   grid.style.margin = '16px'
 
-  // Add each image to the grid
-  imagesWithNoAlt.forEach((img) => {
+  // Add only visible images to the grid
+  visibleImagesWithoutAlt.forEach((img) => {
     const imgContainer = document.createElement('div')
     imgContainer.className = 'image-container'
     imgContainer.style.border = '1px solid #ddd'
@@ -219,6 +261,25 @@ function displayImagesInfo(container, imagesWithNoAlt) {
     sourceInfo.style.fontSize = '12px'
     sourceInfo.style.lineHeight = '1.6'
 
+    // Create dimensions info if available
+    if (img.width || img.height) {
+      const dimensionsInfo = document.createElement('div')
+      dimensionsInfo.className = 'image-dimensions'
+      dimensionsInfo.style.marginBottom = '8px'
+
+      const dimensionsLabel = document.createElement('strong')
+      dimensionsLabel.textContent = 'Afmetingen: '
+
+      const dimensionsValue = document.createElement('span')
+      dimensionsValue.textContent = `${img.width || '?'}×${
+        img.height || '?'
+      } px`
+
+      dimensionsInfo.appendChild(dimensionsLabel)
+      dimensionsInfo.appendChild(dimensionsValue)
+      sourceInfo.appendChild(dimensionsInfo)
+    }
+
     // Create URL info
     const urlLabel = document.createElement('strong')
     urlLabel.textContent = 'Volledige URL: '
@@ -246,6 +307,7 @@ function displayImagesInfo(container, imagesWithNoAlt) {
   container.appendChild(grid)
 }
 
+// Keep the original export functions exactly as they were
 export function setupImageExportButtons(images) {
   // Get tooltip manager instance
   const tooltipManager = getTooltipManager()
