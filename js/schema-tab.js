@@ -39,7 +39,7 @@ export function updateSchemaUI(response) {
 
   const searchInput = document.createElement('input')
   searchInput.type = 'text'
-  searchInput.placeholder = 'Zoek schemas...'
+  searchInput.placeholder = 'Zoeken...'
   searchInput.style.width = '100%'
   searchInput.style.padding = '8px 12px'
   searchInput.style.paddingLeft = '32px' // Space for the icon
@@ -549,7 +549,7 @@ export function updateSchemaUI(response) {
                   lastIndex,
                   result.index
                 )
-                highlightedText += `<mark style="background-color: #37dbdb; padding: 0 2px;">${result[0]}</mark>`
+                highlightedText += `<mark style="background-color: #1448ff; padding: 0 2px; color: white;">${result[0]}</mark>`
                 lastIndex = regex.lastIndex
               }
 
@@ -571,7 +571,7 @@ export function updateSchemaUI(response) {
                   lastIndex,
                   result.index
                 )
-                highlightedText += `<mark style="background-color: #37dbdb; padding: 0 2px;">${result[0]}</mark>`
+                highlightedText += `<mark style="background-color: #1448ff; padding: 0 2px; color: white;">${result[0]}</mark>`
                 lastIndex = regex.lastIndex
               }
 

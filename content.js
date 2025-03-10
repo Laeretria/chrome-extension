@@ -1,3 +1,164 @@
+/**
+ * Highlights only visible images on the current webpage that are missing alt text
+ * @param {boolean} highlight - Whether to add or remove highlighting
+ * @returns {Object} - Results containing count and image information
+ */
+function highlightVisibleImagesWithNoAlt(highlight = true) {
+  // Remove any previous highlighting first
+  removeImageHighlighting()
+
+  if (!highlight) {
+    return { success: true }
+  }
+
+  const results = {
+    missingAltCount: 0,
+    imagesWithoutAlt: [],
+  }
+
+  // Get all images from the DOM
+  const images = Array.from(document.getElementsByTagName('img'))
+
+  // Filter for only visible images without alt text
+  const visibleImagesWithoutAlt = images.filter((img) => {
+    // Check if image has valid alt text
+    const hasAlt =
+      img.hasAttribute('alt') && img.getAttribute('alt').trim() !== ''
+
+    // If it has alt text, no need to check visibility
+    if (hasAlt) return false
+
+    // Otherwise, check if the image is visible
+    return isElementVisible(img)
+  })
+
+  // Update results
+  results.missingAltCount = visibleImagesWithoutAlt.length
+
+  // Highlight the images and collect data
+  visibleImagesWithoutAlt.forEach((img) => {
+    // Add highlighting
+    highlightImage(img)
+
+    // Add to results
+    results.imagesWithoutAlt.push({
+      src: img.src,
+      alt: img.alt || '',
+      width: img.width || '',
+      height: img.height || '',
+    })
+  })
+
+  return results
+}
+
+/**
+ * Checks if an element is actually visible on the page
+ * @param {Element} element - The DOM element to check
+ * @returns {boolean} - Whether the element is visible
+ */
+function isElementVisible(element) {
+  // Check if element itself is hidden by inline CSS
+  if (
+    element.style.display === 'none' ||
+    element.style.visibility === 'hidden' ||
+    parseFloat(element.style.opacity) === 0
+  ) {
+    return false
+  }
+
+  // Check computed style
+  const style = window.getComputedStyle(element)
+  if (
+    style.display === 'none' ||
+    style.visibility === 'hidden' ||
+    parseFloat(style.opacity) === 0
+  ) {
+    return false
+  }
+
+  // Check if element has zero dimensions
+  if (element.offsetWidth <= 0 && element.offsetHeight <= 0) {
+    return false
+  }
+
+  // Check if any parent containers are hidden
+  let parent = element.parentElement
+  while (parent) {
+    const parentStyle = window.getComputedStyle(parent)
+    if (parentStyle.display === 'none' || parentStyle.visibility === 'hidden') {
+      return false
+    }
+    parent = parent.parentElement
+  }
+
+  return true
+}
+
+/**
+ * Highlights an image with a visible border
+ * @param {HTMLImageElement} img - The image to highlight
+ */
+function highlightImage(img) {
+  img.classList.add('seo-extension-highlighted-img')
+}
+
+/**
+ * Removes highlighting from all previously highlighted images
+ */
+function removeImageHighlighting() {
+  // Remove highlighting class from all elements
+  document.querySelectorAll('.seo-extension-highlighted-img').forEach((img) => {
+    img.classList.remove('seo-extension-highlighted-img')
+  })
+
+  // Remove the highlighting style if it exists
+  const style = document.getElementById('seo-extension-highlight-style')
+  if (style) style.remove()
+}
+
+// Add the highlighting style to the document
+function addHighlightingStyle() {
+  // Create the style element if it doesn't exist
+  if (!document.getElementById('seo-extension-highlight-style')) {
+    const style = document.createElement('style')
+    style.id = 'seo-extension-highlight-style'
+    style.textContent = `
+      .seo-extension-highlighted-img {
+        outline: 5px solid red !important;
+        outline-offset: -2px;
+        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
+        position: relative !important;
+        z-index: 9999 !important;
+      }
+    `
+    document.head.appendChild(style)
+  }
+}
+
+// Listen for messages from the popup/extension
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === 'highlightImagesWithNoAlt') {
+    if (request.highlight) {
+      // Add the highlighting style
+      addHighlightingStyle()
+    }
+
+    // Run the highlighting function
+    const result = highlightVisibleImagesWithNoAlt(request.highlight)
+
+    // Send the results back
+    sendResponse({
+      success: true,
+      count: result.missingAltCount,
+      images: result.imagesWithoutAlt,
+    })
+  }
+
+  // Return true to indicate you might respond asynchronously
+  return true
+})
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // Keep all existing message handlers
   if (request.action === 'getOverview') {
@@ -479,46 +640,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       social: extractSocialMetadata(),
     })
   } else if (request.action === 'highlightImagesWithNoAlt') {
-    // Either apply or remove the highlighting
     if (request.highlight) {
-      // Add style for highlighted images
-      const style = document.createElement('style')
-      style.id = 'seo-extension-highlight-style'
-      style.textContent = `
-        .seo-extension-highlighted-img {
-          outline: 5px solid red !important;
-          box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
-          position: relative !important;
-          z-index: 9999 !important;
-        }
-      `
-      document.head.appendChild(style)
-
-      // Find all images without alt
-      const imagesWithoutAlt = Array.from(
-        document.getElementsByTagName('img')
-      ).filter((img) => !img.alt || img.alt.trim() === '')
-
-      // Add highlighting class only
-      imagesWithoutAlt.forEach((img) => {
-        img.classList.add('seo-extension-highlighted-img')
-      })
-
-      sendResponse({ success: true, count: imagesWithoutAlt.length })
-    } else {
-      // Remove highlighting
-      document
-        .querySelectorAll('.seo-extension-highlighted-img')
-        .forEach((img) => {
-          img.classList.remove('seo-extension-highlighted-img')
-        })
-
-      // Remove the style
-      const style = document.getElementById('seo-extension-highlight-style')
-      if (style) style.remove()
-
-      sendResponse({ success: true })
+      // Add the highlighting style
+      addHighlightingStyle()
     }
+
+    // Run the highlighting function
+    const result = highlightVisibleImagesWithNoAlt(request.highlight)
+
+    // Send the results back
+    sendResponse({
+      success: true,
+      count: result.missingAltCount,
+      images: result.imagesWithoutAlt,
+    })
     return true
   }
 

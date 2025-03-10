@@ -175,6 +175,7 @@ function displayImagesInfo(container, imagesWithNoAlt) {
     const imgHeader = document.createElement('div')
     imgHeader.style.marginBottom = '12px'
     imgHeader.style.paddingBottom = '8px'
+    imgHeader.style.fontSize = '14px'
 
     // Extract just the filename from the path
     const urlParts = img.src.split('/')

@@ -390,7 +390,7 @@ h2 {
 }
 
 /* Export Buttons Links and Images */
-.export-buttons {
+/* .export-buttons {
   text-align: center;
   display: flex;
   justify-content: flex-start;
@@ -398,25 +398,28 @@ h2 {
   gap: 15px;
   margin-top: 20px;
   position: relative;
-}
+} */
 
-/* .export-buttons {
+.export-buttons {
   display: flex;
-  justify-content: center;
+  justify-content: center; /* Centers buttons inside container */
   align-items: center;
-  gap: 20px;
+  gap: 15px; /* Space between buttons */
   margin-top: 20px;
+  width: 100%; /* Ensure the container takes full width */
 }
 
 .export-buttons button {
-  width: 50%;
-  max-width: 200px;
+  flex: 1; /* Makes buttons take equal width */
   text-align: center;
-} */
+  padding: 10px; /* Adjust padding as needed */
+  max-width: 100%;
+}
 
 .export-btn {
   transition: all 0.3s ease;
   position: relative;
+  max-width: 100%;
 }
 
 .complete-btn {
@@ -428,10 +431,10 @@ h2 {
   cursor: pointer;
   border: 1px solid #e7e9f1;
   font-family: 'Regola-Medium';
-  font-size: 14px;
   color: var(--body);
   background-color: #bceabd;
   transition: background-color 0.3s;
+  width: 100%;
 }
 
 .complete-btn:not(.disabled):hover {
@@ -447,10 +450,10 @@ h2 {
   cursor: pointer;
   border: 1px solid #e7e9f1;
   font-family: 'Regola-Medium';
-  font-size: 14px;
   color: var(--body);
   background-color: #eca9a9;
   transition: background-color 0.3s;
+  width: 100%;
 }
 
 .incomplete-btn:not(.disabled):hover {
