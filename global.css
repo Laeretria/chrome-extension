@@ -70,6 +70,13 @@ body {
   flex-direction: column;
 }
 
+/* Create a container for bottom elements */
+.sidebar-bottom {
+  margin-top: auto; /* Push to bottom */
+  display: flex;
+  flex-direction: column;
+}
+
 .sidebar-header {
   background-color: var(--title-color);
   color: white;
@@ -611,7 +618,6 @@ h2 {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin-top: auto;
   background-color: var(--white);
   padding: 10px;
   text-align: center;
@@ -636,25 +642,31 @@ h2 {
 /* Add these styles to your CSS */
 .minimize-button {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start; /* Changed from center to flex-start */
   align-items: center;
   cursor: pointer;
-  margin: 10px;
-  width: 34px;
-  height: 34px;
+  width: 20px;
+  height: 20px;
+  padding: 12px 16px;
 }
 
 .minimize-button svg {
-  background-color: var(--background-color, #eff5ff);
-  color: var(--primary-color, #1448ff);
-  border-radius: 8px;
-  padding: 8px;
+  color: white;
   transition: color 0.3s ease, background-color 0.3s ease;
+  width: 20px; /* Set explicit width */
+  height: 20px; /* Set explicit height */
 }
 
 .minimize-button svg:hover {
-  background-color: var(--primary-color, #1448ff);
+  background-color: transparent;
   color: white;
+}
+
+/* Add this to ensure both icons have the same styling */
+.minimize-icon,
+.maximize-icon {
+  width: 20px;
+  height: 20px;
 }
 
 .app-container.minimized {
@@ -664,10 +676,40 @@ h2 {
 
 .app-container.minimized .sidebar {
   width: 50px;
+  height: auto; /* Allow height to collapse to content */
+  min-height: unset; /* Remove any minimum height */
+}
+
+/* Adjust the tabs section to take only needed space */
+.app-container.minimized .tabs {
+  margin-bottom: 0; /* Remove any bottom margin */
+  order: 0;
 }
 
 .app-container.minimized .main-content {
   margin-left: 50px;
+}
+
+.app-container.minimized .sidebar-header {
+  order: -1; /* Ensure header is at the top */
+}
+
+/* Hide the sidebar-bottom in minimized state */
+.app-container.minimized .sidebar-bottom {
+  margin-top: 0; /* No longer push to bottom */
+  position: static; /* Reset any positioning */
+  order: 1; /* Put it after the tabs */
+}
+
+/* Hide powered-by section when minimized */
+.app-container.minimized .powered-by {
+  display: none; /* Completely hide the powered-by section */
+}
+
+/* Position the minimize button immediately after tabs */
+.app-container.minimized .minimize-button {
+  margin: 10px auto; /* Center it horizontally with auto margins */
+  order: 2; /* Position after the sidebar-bottom */
 }
 
 .app-container.minimized .sidebar-title,
@@ -682,12 +724,15 @@ h2 {
 }
 
 .app-container.minimized .minimize-icon {
-  display: none;
+  justify-content: center;
 }
 
 /* Transition effects */
 .app-container,
 .sidebar,
-.main-content {
+.sidebar-bottom,
+.minimize-button,
+.powered-by,
+.tabs .main-content {
   transition: all 0.3s ease;
 }

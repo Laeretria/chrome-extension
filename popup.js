@@ -42,8 +42,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 // Setup tab navigation
 function setupTabNavigation() {
   const tabs = document.querySelectorAll('.tab-button')
+  const appContainer = document.querySelector('.app-container')
+
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
+      // First, maximize the sidebar if it's minimized
+      if (appContainer.classList.contains('minimized')) {
+        appContainer.classList.remove('minimized')
+
+        // Update localStorage to reflect the maximized state
+        localStorage.setItem('kreatixSEOToolMinimized', 'false')
+
+        // Update icon visibility
+        const minimizeIcon = document.querySelector('.minimize-icon')
+        const maximizeIcon = document.querySelector('.maximize-icon')
+        if (minimizeIcon && maximizeIcon) {
+          minimizeIcon.style.display = 'block'
+          maximizeIcon.style.display = 'none'
+        }
+      }
+
+      // Then continue with regular tab switching logic
       tabs.forEach((t) => t.classList.remove('active'))
       tab.classList.add('active')
 
@@ -195,27 +214,101 @@ async function loadTabData(tabName) {
   }
 }
 
+// Add this to your JS file
 document.addEventListener('DOMContentLoaded', function () {
   const minimizeButton = document.getElementById('minimizeButton')
   const appContainer = document.querySelector('.app-container')
-  const minimizeIcon = document.querySelector('.minimize-icon')
-  const maximizeIcon = document.querySelector('.maximize-icon')
+  const sidebar = document.querySelector('.sidebar')
 
-  // Check if the app is minimized in localStorage
+  // Function to adjust sidebar height
+  function adjustSidebarHeight() {
+    if (appContainer.classList.contains('minimized')) {
+      // Get just the tabs and header elements
+      const header = sidebar.querySelector('.sidebar-header')
+      const tabs = sidebar.querySelector('.tabs')
+      const minButton = sidebar.querySelector('.minimize-button')
+
+      // Calculate exact height needed (sum of visible elements + small padding)
+      let totalHeight =
+        (header ? header.offsetHeight : 0) +
+        (tabs ? tabs.offsetHeight : 0) +
+        (minButton ? minButton.offsetHeight : 0) +
+        20 // Extra padding
+
+      // Set the exact height
+      sidebar.style.height = totalHeight + 'px'
+
+      // Make sure the minimize button is visible
+      if (minButton) {
+        minButton.style.display = 'flex'
+        const maximizeIcon = minButton.querySelector('.maximize-icon')
+        if (maximizeIcon) {
+          maximizeIcon.style.display = 'block'
+        }
+      }
+
+      // Hide the powered-by section
+      const poweredBy = sidebar.querySelector('.powered-by')
+      if (poweredBy) {
+        poweredBy.style.display = 'none'
+      }
+    } else {
+      // Reset height when maximized
+      sidebar.style.height = '100%'
+
+      // Show the powered-by section
+      const poweredBy = sidebar.querySelector('.powered-by')
+      if (poweredBy) {
+        poweredBy.style.display = 'flex'
+      }
+    }
+  }
+
+  // Call when clicking the minimize button
+  minimizeButton.addEventListener('click', function () {
+    // Toggle the minimized class
+    appContainer.classList.toggle('minimized')
+
+    // Update localStorage
+    const currentlyMinimized = appContainer.classList.contains('minimized')
+    localStorage.setItem('kreatixSEOToolMinimized', currentlyMinimized)
+
+    // Toggle icon visibility
+    const minimizeIcon = document.querySelector('.minimize-icon')
+    const maximizeIcon = document.querySelector('.maximize-icon')
+    if (minimizeIcon && maximizeIcon) {
+      if (currentlyMinimized) {
+        minimizeIcon.style.display = 'none'
+        maximizeIcon.style.display = 'block'
+      } else {
+        minimizeIcon.style.display = 'block'
+        maximizeIcon.style.display = 'none'
+      }
+    }
+
+    // Wait a moment for DOM updates, then adjust height
+    setTimeout(adjustSidebarHeight, 50)
+  })
+
+  // Also apply on initial load
   const isMinimized = localStorage.getItem('kreatixSEOToolMinimized') === 'true'
   if (isMinimized) {
     appContainer.classList.add('minimized')
-    minimizeIcon.style.display = 'none'
-    maximizeIcon.style.display = 'block'
+    const minimizeIcon = document.querySelector('.minimize-icon')
+    const maximizeIcon = document.querySelector('.maximize-icon')
+    if (minimizeIcon && maximizeIcon) {
+      minimizeIcon.style.display = 'none'
+      maximizeIcon.style.display = 'block'
+    }
+
+    // Adjust height after a short delay to ensure DOM is ready
+    setTimeout(adjustSidebarHeight, 100)
   }
 
-  minimizeButton.addEventListener('click', function () {
-    appContainer.classList.toggle('minimized')
-
-    // Toggle icon visibility
-    const currentlyMinimized = appContainer.classList.contains('minimized')
-
-    // Save state to localStorage
-    localStorage.setItem('kreatixSEOToolMinimized', currentlyMinimized)
+  // Also adjust on window resize
+  window.addEventListener('resize', function () {
+    if (appContainer.classList.contains('minimized')) {
+      adjustSidebarHeight()
+    }
   })
 })

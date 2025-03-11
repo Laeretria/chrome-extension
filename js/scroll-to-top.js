@@ -23,8 +23,9 @@ export function initScrollToTopButton() {
     display: 'none', // Hidden by default
     zIndex: '1000',
     boxShadow: '0 2px 5px rgba(0, 0, 0, 0.3)',
-    transition: 'opacity 0.3s, transform 0.3s',
+    transition: 'opacity 0.2s ease, transform 0.5s ease, visibility 0.2s ease',
     opacity: '0',
+    visibility: 'hidden',
   })
 
   // Add hover effect
@@ -73,6 +74,12 @@ export function initScrollToTopButton() {
     // Fallback to window scroll event
     window.addEventListener('scroll', toggleScrollToTopButton)
   }
+
+  // Add event listener for window resize
+  window.addEventListener('resize', handleWindowResize)
+
+  // Initial check for window size
+  handleWindowResize()
 }
 
 function toggleScrollToTopButton() {
@@ -83,23 +90,60 @@ function toggleScrollToTopButton() {
   const mainContent = document.querySelector('.main-content')
   const scrollY = mainContent ? mainContent.scrollTop : window.scrollY
 
-  // Show button when user scrolls down 300px from the top
-  if (scrollY > 300) {
+  // Show button when user scrolls down 300px from the top and window width is adequate
+  if (scrollY > 300 && window.innerWidth > 768) {
+    // 768px is a common breakpoint for mobile devices
+    // First make it visible but transparent
     scrollToTopButton.style.display = 'block'
+    scrollToTopButton.style.visibility = 'visible'
+
+    // Trigger reflow to ensure smooth transition
+    scrollToTopButton.offsetHeight
+
     // Fade in animation
-    setTimeout(() => {
-      scrollToTopButton.style.opacity = '1'
-    }, 10)
+    scrollToTopButton.style.opacity = '1'
   } else {
     // Fade out animation
     scrollToTopButton.style.opacity = '0'
+    scrollToTopButton.style.visibility = 'hidden'
+
     // Hide after fade out animation completes
     setTimeout(() => {
-      if (scrollY <= 300) {
-        // Check again in case user scrolled back down
+      if (scrollY <= 300 || window.innerWidth <= 768) {
+        // Check again in case user scrolled back down or resized
         scrollToTopButton.style.display = 'none'
       }
-    }, 300)
+    }, 500) // Match this with the transition duration
+  }
+}
+
+function handleWindowResize() {
+  const scrollToTopButton = document.getElementById('scrollToTopBtn')
+  if (!scrollToTopButton) return
+
+  // Hide button when window width is below threshold (mobile/minimized view)
+  if (window.innerWidth <= 768) {
+    scrollToTopButton.style.opacity = '0'
+    scrollToTopButton.style.visibility = 'hidden'
+
+    setTimeout(() => {
+      scrollToTopButton.style.display = 'none'
+    }, 500) // Match this with the transition duration
+  } else {
+    // Check scroll position to determine if button should be visible
+    const mainContent = document.querySelector('.main-content')
+    const scrollY = mainContent ? mainContent.scrollTop : window.scrollY
+
+    if (scrollY > 300) {
+      // First make it visible but transparent
+      scrollToTopButton.style.display = 'block'
+
+      // Trigger reflow to ensure smooth transition
+      scrollToTopButton.offsetHeight
+
+      scrollToTopButton.style.visibility = 'visible'
+      scrollToTopButton.style.opacity = '1'
+    }
   }
 }
 
