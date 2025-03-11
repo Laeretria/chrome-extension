@@ -669,8 +669,22 @@ h2 {
   height: 20px;
 }
 
+/* Add the favicon to the header when minimized */
+.minimized-favicon {
+  display: none;
+  width: 24px;
+  height: auto;
+  margin: auto;
+  padding: 0px;
+}
+
+.app-container.minimized .minimized-favicon {
+  display: block;
+}
+
 .app-container.minimized {
   width: 50px;
+  height: 335px;
   overflow: hidden;
 }
 
@@ -733,6 +747,7 @@ h2 {
 .sidebar-bottom,
 .minimize-button,
 .powered-by,
-.tabs .main-content {
+.tabs .main-content,
+.minimized-favicon {
   transition: all 0.3s ease;
 }

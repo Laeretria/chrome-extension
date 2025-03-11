@@ -220,6 +220,37 @@ document.addEventListener('DOMContentLoaded', function () {
   const appContainer = document.querySelector('.app-container')
   const sidebar = document.querySelector('.sidebar')
 
+  // Function to add favicon
+  function addFaviconToHeader() {
+    const header = sidebar.querySelector('.sidebar-header')
+    if (header) {
+      // Check if favicon already exists
+      let favicon = header.querySelector('.minimized-favicon')
+
+      if (!favicon) {
+        // Create favicon element if it doesn't exist
+        favicon = document.createElement('img')
+        favicon.src = 'assets/logo/kreatix-favicon.jpg'
+        favicon.alt = 'Kreatix'
+        favicon.className = 'minimized-favicon'
+        header.appendChild(favicon)
+      }
+
+      // Toggle visibility based on minimized state
+      favicon.style.display = appContainer.classList.contains('minimized')
+        ? 'block'
+        : 'none'
+
+      // Hide title when minimized
+      const title = header.querySelector('.sidebar-title')
+      if (title) {
+        title.style.display = appContainer.classList.contains('minimized')
+          ? 'none'
+          : 'block'
+      }
+    }
+  }
+
   // Function to adjust sidebar height
   function adjustSidebarHeight() {
     if (appContainer.classList.contains('minimized')) {
@@ -287,6 +318,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Wait a moment for DOM updates, then adjust height
+
+    // Add favicon to header when minimized
+    addFaviconToHeader()
     setTimeout(adjustSidebarHeight, 50)
   })
 
