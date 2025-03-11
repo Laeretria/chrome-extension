@@ -214,7 +214,7 @@ async function loadTabData(tabName) {
   }
 }
 
-// Add this to your JS file
+// Modified version to fix persistence issues with minimized state
 document.addEventListener('DOMContentLoaded', function () {
   const minimizeButton = document.getElementById('minimizeButton')
   const appContainer = document.querySelector('.app-container')
@@ -254,22 +254,12 @@ document.addEventListener('DOMContentLoaded', function () {
   // Function to adjust sidebar height
   function adjustSidebarHeight() {
     if (appContainer.classList.contains('minimized')) {
-      // Get just the tabs and header elements
-      const header = sidebar.querySelector('.sidebar-header')
-      const tabs = sidebar.querySelector('.tabs')
-      const minButton = sidebar.querySelector('.minimize-button')
-
-      // Calculate exact height needed (sum of visible elements + small padding)
-      let totalHeight =
-        (header ? header.offsetHeight : 0) +
-        (tabs ? tabs.offsetHeight : 0) +
-        (minButton ? minButton.offsetHeight : 0) +
-        20 // Extra padding
-
-      // Set the exact height
-      sidebar.style.height = totalHeight + 'px'
+      // Force the sidebar height to match your hardcoded CSS value
+      appContainer.style.height = '335px'
+      sidebar.style.width = '50px'
 
       // Make sure the minimize button is visible
+      const minButton = sidebar.querySelector('.minimize-button')
       if (minButton) {
         minButton.style.display = 'flex'
         const maximizeIcon = minButton.querySelector('.maximize-icon')
@@ -283,60 +273,79 @@ document.addEventListener('DOMContentLoaded', function () {
       if (poweredBy) {
         poweredBy.style.display = 'none'
       }
+
+      // Ensure tab text is hidden
+      const tabLabels = sidebar.querySelectorAll('.tab-button span')
+      tabLabels.forEach((span) => {
+        span.style.display = 'none'
+      })
     } else {
-      // Reset height when maximized
+      // Reset styles when maximized
+      appContainer.style.height = '550px'
       sidebar.style.height = '100%'
+      sidebar.style.width = '200px'
 
       // Show the powered-by section
       const poweredBy = sidebar.querySelector('.powered-by')
       if (poweredBy) {
         poweredBy.style.display = 'flex'
       }
+
+      // Show tab text
+      const tabLabels = sidebar.querySelectorAll('.tab-button span')
+      tabLabels.forEach((span) => {
+        span.style.display = 'block'
+      })
     }
   }
 
-  // Call when clicking the minimize button
-  minimizeButton.addEventListener('click', function () {
-    // Toggle the minimized class
-    appContainer.classList.toggle('minimized')
-
-    // Update localStorage
-    const currentlyMinimized = appContainer.classList.contains('minimized')
-    localStorage.setItem('kreatixSEOToolMinimized', currentlyMinimized)
+  // Apply minimized state or maximized state
+  function applyMinimizedState(isMinimized) {
+    // Toggle minimized class
+    if (isMinimized) {
+      appContainer.classList.add('minimized')
+    } else {
+      appContainer.classList.remove('minimized')
+    }
 
     // Toggle icon visibility
     const minimizeIcon = document.querySelector('.minimize-icon')
     const maximizeIcon = document.querySelector('.maximize-icon')
     if (minimizeIcon && maximizeIcon) {
-      if (currentlyMinimized) {
-        minimizeIcon.style.display = 'none'
-        maximizeIcon.style.display = 'block'
-      } else {
-        minimizeIcon.style.display = 'block'
-        maximizeIcon.style.display = 'none'
-      }
+      minimizeIcon.style.display = isMinimized ? 'none' : 'block'
+      maximizeIcon.style.display = isMinimized ? 'block' : 'none'
     }
 
-    // Wait a moment for DOM updates, then adjust height
-
-    // Add favicon to header when minimized
+    // Add favicon
     addFaviconToHeader()
-    setTimeout(adjustSidebarHeight, 50)
+
+    // Apply correct height
+    adjustSidebarHeight()
+  }
+
+  // Call when clicking the minimize button
+  minimizeButton.addEventListener('click', function () {
+    // Toggle the minimized state
+    const newMinimizedState = !appContainer.classList.contains('minimized')
+
+    // Update localStorage
+    localStorage.setItem('kreatixSEOToolMinimized', newMinimizedState)
+
+    // Apply the state
+    applyMinimizedState(newMinimizedState)
   })
 
-  // Also apply on initial load
+  // Initialize state on page load
+  // This needs to happen before any other initialization
   const isMinimized = localStorage.getItem('kreatixSEOToolMinimized') === 'true'
   if (isMinimized) {
-    appContainer.classList.add('minimized')
-    const minimizeIcon = document.querySelector('.minimize-icon')
-    const maximizeIcon = document.querySelector('.maximize-icon')
-    if (minimizeIcon && maximizeIcon) {
-      minimizeIcon.style.display = 'none'
-      maximizeIcon.style.display = 'block'
-    }
+    // Apply minimized state immediately
+    applyMinimizedState(true)
 
-    // Adjust height after a short delay to ensure DOM is ready
-    setTimeout(adjustSidebarHeight, 100)
+    // Also apply after a short delay to ensure everything is applied correctly
+    setTimeout(() => {
+      applyMinimizedState(true)
+    }, 100)
   }
 
   // Also adjust on window resize
