@@ -2,8 +2,107 @@
 import { setupFooterLinks } from './footer-utils.js'
 import { currentWebsiteDomain } from './domain-utils.js'
 
+// This function filters the heading data to exclude navigation headings
+function filterNavigationHeadings(response) {
+  // If no response or no structure, return the original response
+  if (!response || !response.structure) {
+    return response
+  }
+
+  // Clone the response to avoid modifying the original
+  const filteredResponse = JSON.parse(JSON.stringify(response))
+  const originalStructure = filteredResponse.structure
+
+  // Initialize filtered structure and counts
+  const filteredStructure = []
+  const filteredCounts = { h1: 0, h2: 0, h3: 0, h4: 0, h5: 0, h6: 0 }
+
+  // Process each heading for patterns that suggest navigation items
+  const headingTexts = {}
+  const repeatedHeadings = new Set()
+
+  // First pass: identify repeated heading patterns (likely navigation items)
+  originalStructure.forEach((heading) => {
+    const key = `${heading.level}-${heading.text.trim()}`
+    headingTexts[key] = (headingTexts[key] || 0) + 1
+
+    // If this heading appears multiple times, mark it for exclusion (likely a menu item)
+    if (headingTexts[key] > 1) {
+      repeatedHeadings.add(key)
+    }
+  })
+
+  // Second pass: filter out navigation headings
+  originalStructure.forEach((heading) => {
+    const key = `${heading.level}-${heading.text.trim()}`
+
+    // Check if this is a repeated heading (likely navigation)
+    if (repeatedHeadings.has(key)) {
+      return // Skip this heading
+    }
+
+    // Check if this heading has navigation-related text
+    const lowerText = heading.text.toLowerCase().trim()
+    const navigationTerms = [
+      'menu',
+      'navigation',
+      'home',
+      'contact',
+      'about',
+      'login',
+      'sign in',
+      'register',
+    ]
+
+    if (
+      navigationTerms.some(
+        (term) => lowerText === term || lowerText.startsWith(term + ' ')
+      )
+    ) {
+      // If the heading directly matches a navigation term, skip it
+      return
+    }
+
+    // Check for patterns common in menu headings:
+    // 1. Very short headings that are likely menu items
+    if (heading.text.trim().length < 3 && heading.level > 3) {
+      return
+    }
+
+    // 2. Headings that appear at the top of the document and are common menu items
+    if (
+      heading.level > 3 &&
+      (lowerText === 'articles' ||
+        lowerText === 'blog' ||
+        lowerText === 'artikels' ||
+        lowerText === 'podcasts' ||
+        lowerText === 'freebies' ||
+        lowerText === 'meer')
+    ) {
+      return
+    }
+
+    // Add to filtered structure
+    filteredStructure.push(heading)
+
+    // Update counts
+    filteredCounts[`h${heading.level}`] =
+      (filteredCounts[`h${heading.level}`] || 0) + 1
+  })
+
+  // Update the response with filtered data
+  filteredResponse.structure = filteredStructure
+  filteredResponse.counts = filteredCounts
+
+  return filteredResponse
+}
+
+// Main function to analyze and update headings UI
 export function updateHeadingsUI(response) {
-  const { counts, structure, summary } = response
+  // Apply filtering to exclude navigation headings
+  const filteredResponse = filterNavigationHeadings(response)
+
+  const { counts, structure, summary } = filteredResponse
 
   // Update heading count statistics
   for (let i = 1; i <= 6; i++) {
