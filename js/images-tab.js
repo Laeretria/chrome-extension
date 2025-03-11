@@ -219,7 +219,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
       text-align: left;
       background: white;
       padding: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       margin: 0px;
       border: 1px solid #eee;
     }
@@ -230,7 +230,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
       background-color: #fff8e6;
       border-left: 4px solid #ffc107;
       padding: 10px 15px;
-      border-radius: 8px;
+      border-radius: 6px;
       text-align: left;
     }
     
@@ -351,7 +351,7 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     const imgContainer = document.createElement('div')
     imgContainer.className = 'image-container'
     imgContainer.style.border = '1px solid #ddd'
-    imgContainer.style.borderRadius = '8px'
+    imgContainer.style.borderRadius = '6px'
     imgContainer.style.padding = '16px'
     imgContainer.style.backgroundColor = '#f9f9f9'
 
@@ -365,7 +365,7 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     thumbnailContainer.style.justifyContent = 'center'
     thumbnailContainer.style.marginBottom = '12px'
     thumbnailContainer.style.border = '1px solid #eee'
-    thumbnailContainer.style.borderRadius = '4px'
+    thumbnailContainer.style.borderRadius = '6px'
     thumbnailContainer.style.padding = '10px'
 
     // Create thumbnail
@@ -388,21 +388,19 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     const urlParts = img.src.split('/')
     const filename = urlParts[urlParts.length - 1]
 
-    // Create URL info
+    // Create URL info as a single element
+    const urlElement = document.createElement('div')
+    urlElement.style.fontSize = '10px'
+    urlElement.style.color = '#424861'
+    urlElement.style.wordBreak = 'break-word'
+
     const urlLabel = document.createElement('strong')
-    urlLabel.textContent = 'Volledige URL: '
+    urlLabel.textContent = 'URL: '
+    urlLabel.style.color = '#424861'
+    urlLabel.style.fontSize = '12px'
 
-    const urlValue = document.createElement('span')
-    urlValue.textContent = img.src
-    urlValue.style.color = '#424861'
-    urlValue.style.fontSize = '10px'
-    urlValue.style.wordBreak = 'break-all'
-    urlValue.style.display = 'block'
-    urlValue.style.marginTop = '4px'
-
-    const urlContainer = document.createElement('div')
-    urlContainer.appendChild(urlLabel)
-    urlContainer.appendChild(urlValue)
+    urlElement.appendChild(urlLabel)
+    urlElement.appendChild(document.createTextNode(img.src))
 
     // Create filename info as a single element
     const filenameElement = document.createElement('div')
@@ -420,7 +418,7 @@ function displayImagesInfo(container, imagesWithoutAlt) {
 
     // Add elements to source info
     sourceInfo.appendChild(filenameElement)
-    sourceInfo.appendChild(urlContainer)
+    sourceInfo.appendChild(urlElement)
 
     // Add elements to container
     imgContainer.appendChild(thumbnailContainer)

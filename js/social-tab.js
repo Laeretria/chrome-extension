@@ -290,7 +290,7 @@ function createSocialPreviewUI(metadata) {
       border: 1px dashed #dee2e6;
       padding: 6px 10px;
       color: #6c757d;
-      border-radius: 8px;
+      border-radius: 6px;
       font-style: italic;
     }
     
@@ -318,7 +318,7 @@ function createSocialPreviewUI(metadata) {
       border-left: 4px solid #ffc107;
       padding: 10px 15px;
       margin-bottom: 15px;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     
     .preview-notice-icon {
@@ -328,7 +328,7 @@ function createSocialPreviewUI(metadata) {
     
     .preview-empty-card {
       border: 1px solid #e9ecef;
-      border-radius: 8px;
+      border-radius: 6px;
       overflow: hidden;
     }
     
@@ -336,7 +336,7 @@ function createSocialPreviewUI(metadata) {
       text-align: center;
       background: white;
       padding: 15px;
-      border-radius: 8px;
+      border-radius: 6px;
       margin-top: 20px;
       margin: 1.5rem 0;
       border: 1px solid #eee;
@@ -348,7 +348,7 @@ function createSocialPreviewUI(metadata) {
       justify-content: center;
       background-color: var(--background-color);
       color: var(--primary-color);
-      border-radius: 8px;
+      border-radius: 6px;
       padding: 8px;
     }
     
@@ -370,7 +370,7 @@ function createSocialPreviewUI(metadata) {
       text-align: left;
       background:rgb(255, 255, 255);
       padding-bottom: 0px !important;
-      border-radius: 8px;
+      border-radius: 6px;
     }
     
     .tag-recommendations {
@@ -385,7 +385,7 @@ function createSocialPreviewUI(metadata) {
       background: #d4edda;
       border-left: 4px solid #28a745;
       padding: 16px;
-      border-radius: 8px;
+      border-radius: 6px;
       margin-top: 1rem;
     }
     .empty-state-benefits p{

@@ -214,11 +214,12 @@ async function loadTabData(tabName) {
   }
 }
 
-// Modified version to fix persistence issues with minimized state
+// Modified version that preserves icon visibility
 document.addEventListener('DOMContentLoaded', function () {
   const minimizeButton = document.getElementById('minimizeButton')
   const appContainer = document.querySelector('.app-container')
   const sidebar = document.querySelector('.sidebar')
+  const tabButtons = document.querySelectorAll('.tab-button')
 
   // Function to add favicon
   function addFaviconToHeader() {
@@ -251,33 +252,40 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Function to adjust sidebar height
+  // Update the adjustSidebarHeight function to use opacity and visibility instead of display
+  // for elements you want to transition smoothly
+
   function adjustSidebarHeight() {
     if (appContainer.classList.contains('minimized')) {
       // Force the sidebar height to match your hardcoded CSS value
       appContainer.style.height = '335px'
       sidebar.style.width = '50px'
 
-      // Make sure the minimize button is visible
-      const minButton = sidebar.querySelector('.minimize-button')
-      if (minButton) {
-        minButton.style.display = 'flex'
-        const maximizeIcon = minButton.querySelector('.maximize-icon')
-        if (maximizeIcon) {
-          maximizeIcon.style.display = 'block'
-        }
+      // Hide "Minimaliseer" text with opacity
+      const minimizeText = minimizeButton.querySelector('.minimize-text')
+      if (minimizeText) {
+        minimizeText.style.opacity = '0'
+        minimizeText.style.visibility = 'hidden'
       }
 
-      // Hide the powered-by section
+      // Hide the powered-by section with opacity
       const poweredBy = sidebar.querySelector('.powered-by')
       if (poweredBy) {
-        poweredBy.style.display = 'none'
+        poweredBy.style.opacity = '0'
+        poweredBy.style.visibility = 'hidden'
+        // After transition completes, set display none
+        setTimeout(() => {
+          if (appContainer.classList.contains('minimized')) {
+            poweredBy.style.display = 'none'
+          }
+        }, 300)
       }
 
-      // Ensure tab text is hidden
+      // Ensure tab text is hidden with opacity
       const tabLabels = sidebar.querySelectorAll('.tab-button span')
       tabLabels.forEach((span) => {
-        span.style.display = 'none'
+        span.style.opacity = '0'
+        span.style.visibility = 'hidden'
       })
     } else {
       // Reset styles when maximized
@@ -289,13 +297,26 @@ document.addEventListener('DOMContentLoaded', function () {
       const poweredBy = sidebar.querySelector('.powered-by')
       if (poweredBy) {
         poweredBy.style.display = 'flex'
+        // Small delay to allow display:flex to take effect before transition
+        setTimeout(() => {
+          poweredBy.style.visibility = 'visible'
+          poweredBy.style.opacity = '1'
+        }, 10)
       }
 
-      // Show tab text
+      // Show tab text and minimize text with opacity
       const tabLabels = sidebar.querySelectorAll('.tab-button span')
       tabLabels.forEach((span) => {
-        span.style.display = 'block'
+        span.style.visibility = 'visible'
+        span.style.opacity = '1'
       })
+
+      // Show "Minimaliseer" text with opacity
+      const minimizeText = minimizeButton.querySelector('.minimize-text')
+      if (minimizeText) {
+        minimizeText.style.visibility = 'visible'
+        minimizeText.style.opacity = '1'
+      }
     }
   }
 
@@ -308,13 +329,8 @@ document.addEventListener('DOMContentLoaded', function () {
       appContainer.classList.remove('minimized')
     }
 
-    // Toggle icon visibility
-    const minimizeIcon = document.querySelector('.minimize-icon')
-    const maximizeIcon = document.querySelector('.maximize-icon')
-    if (minimizeIcon && maximizeIcon) {
-      minimizeIcon.style.display = isMinimized ? 'none' : 'block'
-      maximizeIcon.style.display = isMinimized ? 'block' : 'none'
-    }
+    // DO NOT modify the display of minimize-icon and maximize-icon here
+    // Let your original CSS handle that
 
     // Add favicon
     addFaviconToHeader()
@@ -333,6 +349,43 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Apply the state
     applyMinimizedState(newMinimizedState)
+
+    // Toggle icon visibility manually
+    const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
+    const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+
+    if (minimizeIcon && maximizeIcon) {
+      if (newMinimizedState) {
+        minimizeIcon.style.display = 'none'
+        maximizeIcon.style.display = 'block'
+      } else {
+        minimizeIcon.style.display = 'block'
+        maximizeIcon.style.display = 'none'
+      }
+    }
+  })
+
+  // Add click events to all tab buttons to maximize when minimized
+  tabButtons.forEach((tabButton) => {
+    tabButton.addEventListener('click', function (e) {
+      // If sidebar is minimized, expand it when clicking any tab
+      if (appContainer.classList.contains('minimized')) {
+        // Update localStorage
+        localStorage.setItem('kreatixSEOToolMinimized', false)
+
+        // Apply maximized state
+        applyMinimizedState(false)
+
+        // Toggle icon visibility manually
+        const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
+        const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+
+        if (minimizeIcon && maximizeIcon) {
+          minimizeIcon.style.display = 'block'
+          maximizeIcon.style.display = 'none'
+        }
+      }
+    })
   })
 
   // Initialize state on page load
@@ -341,6 +394,15 @@ document.addEventListener('DOMContentLoaded', function () {
   if (isMinimized) {
     // Apply minimized state immediately
     applyMinimizedState(true)
+
+    // Toggle icon visibility manually
+    const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
+    const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+
+    if (minimizeIcon && maximizeIcon) {
+      minimizeIcon.style.display = 'none'
+      maximizeIcon.style.display = 'block'
+    }
 
     // Also apply after a short delay to ensure everything is applied correctly
     setTimeout(() => {

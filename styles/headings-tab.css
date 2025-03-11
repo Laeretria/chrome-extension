@@ -1,7 +1,7 @@
 /* Headings Tab Styles */
 .headings-structure {
   background: white;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 1px solid #e7e9f1;
 }
 
@@ -29,7 +29,7 @@
   padding: 8px 16px;
   background-color: var(--primary-color);
   border: none;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 13px;
   color: white;
   cursor: pointer;
@@ -84,7 +84,7 @@
 .heading-tag {
   display: inline-block;
   padding: 3px 6px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   color: var(--body);
   min-width: 35px;
@@ -116,7 +116,7 @@
   margin-bottom: 15px;
   background-color: #ffcdcdad;
   border: 1px solid #ffbaba;
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--body);
   font-size: 14px;
 }
@@ -137,13 +137,12 @@
 .action-button {
   display: flex;
   align-items: center;
-  border-radius: 4px;
+  border-radius: 6px;
   background-color: var(--primary-color);
   font-size: 13px;
   transition: background-color 0.2s;
 
   padding: 8px 16px;
-  border-radius: 4px;
   color: white;
   border: none;
   cursor: pointer;
@@ -168,7 +167,7 @@
   color: #666;
   font-size: 16px;
   background-color: #f9f9f9;
-  border-radius: 4px;
+  border-radius: 6px;
   margin: 20px 0;
 }
 

@@ -43,7 +43,7 @@ export function updateSchemaUI(response) {
   searchInput.style.width = '100%'
   searchInput.style.padding = '8px 12px'
   searchInput.style.paddingLeft = '32px' // Space for the icon
-  searchInput.style.borderRadius = '4px'
+  searchInput.style.borderRadius = '6px'
   searchInput.style.border = '1px solid #e7e9f1'
   searchInput.style.fontSize = '14px'
 
@@ -227,7 +227,7 @@ export function updateSchemaUI(response) {
     // Create a schema section
     const schemaSection = document.createElement('div')
     schemaSection.style.backgroundColor = '#f5f9ff'
-    schemaSection.style.borderRadius = '8px'
+    schemaSection.style.borderRadius = '6px'
     schemaSection.dataset.schemaIndex = groupIndex
     container.appendChild(schemaSection)
 

@@ -14,7 +14,7 @@
 .meta-item {
   background: var(--white);
   border: 1px solid #e7e9f1;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
 }
@@ -39,7 +39,7 @@
 .info-header svg {
   background-color: var(--background-color);
   color: var(--primary-color);
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 8px;
 }
 
@@ -52,20 +52,12 @@
   margin-left: auto;
 }
 
-.character-count {
-  background-color: #e9ecef;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  color: var(--body);
-}
-
 .self-referencing,
 .indexable {
   background-color: #d4edda;
   color: #155724;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
 }
 
@@ -74,7 +66,7 @@
   background-color: #f8d7da;
   color: #721c24;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   border: 1px solid #f5c6cb;
   display: flex;
@@ -84,7 +76,7 @@
   background-color: #f8d7da;
   color: #721c24;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 12px;
   border: 1px solid #f5c6cb;
 }
@@ -106,7 +98,7 @@
 .info-item {
   background: var(--white);
   border: 1px solid #e7e9f1;
-  border-radius: 8px;
+  border-radius: 6px;
   overflow: hidden;
   /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
 }
@@ -122,8 +114,8 @@
 .character-count {
   font-size: 12px;
   margin-left: 5px;
-  padding: 2px 6px;
-  border-radius: 3px;
+  padding: 4px 8px;
+  border-radius: 6px;
   font-weight: normal;
 }
 
@@ -256,7 +248,7 @@
   width: 280px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 12px;
   font-size: 14px;
   line-height: 1.4;
@@ -381,7 +373,7 @@ button.custom-tooltip-icon:focus {
   position: relative;
   max-width: 250px;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-size: 12px;
   line-height: 1.4;
@@ -420,7 +412,7 @@ button.custom-tooltip-icon:focus {
   width: 280px;
   background-color: #fff;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  border-radius: 8px;
+  border-radius: 6px;
   padding: 12px;
   font-size: 14px;
   line-height: 1.4;
