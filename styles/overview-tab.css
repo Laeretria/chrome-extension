@@ -29,8 +29,8 @@
   border-bottom: 1px solid #e7e9f1;
   font-family: 'Regola-Bold';
   font-size: 18px;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
   color: var(--title-color);
 }
 

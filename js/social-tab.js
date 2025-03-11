@@ -271,18 +271,24 @@ function createSocialPreviewUI(metadata) {
   const style = document.createElement('style')
   style.textContent = `
     .social-preview-compact .preview-image-compact {
-      max-height: 180px;
+      max-height: 400px;
       overflow: hidden;
     }
     
     .social-preview-compact .preview-image-compact img {
-      max-height: 180px;
-      object-fit: cover;
+      max-height: 400px;
+      object-fit: contain;
+      width: 100%;
+      background-color: #f8f9fa;
     }
     
     .social-preview-compact .preview-placeholder-image {
-      max-height: 180px;
+      max-height: 400px;
       padding: 10px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .preview-placeholder {
