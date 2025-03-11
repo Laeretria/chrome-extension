@@ -155,8 +155,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
   // Create title element (outside the notice box)
   const title = document.createElement('h3')
   title.className = 'empty-state-title'
-  title.textContent = 'Markeer afbeeldingen zonder alt-tags'
-  title.style.textAlign = 'center'
+  title.textContent = 'Markeer afbeeldingen zonder alt-tag'
   title.style.marginBottom = '15px'
 
   // Add the title to the container
@@ -175,7 +174,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
     </div>
     <div class="preview-notice-text">
       <p class="empty-state-description">
-        Klik op de knop om afbeeldingen zonder alt-tags te markeren die zichtbaar zijn op de pagina.
+        Klik op Markeer afbeeldingen om zichtbare afbeeldingen zonder alt-tag op deze pagina te markeren.
       </p>
     </div>
   `
@@ -208,7 +207,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
 
       // Style the cloned button
       buttonClone.style.display = 'block'
-      buttonClone.style.margin = '15px auto'
+      buttonClone.style.margin = '15px 0'
       buttonClone.id = 'highlightMissingAltClone'
     }
   }
@@ -217,7 +216,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
   const style = document.createElement('style')
   style.textContent = `
     .empty-state-container {
-      text-align: center;
+      text-align: left;
       background: white;
       padding: 16px;
       border-radius: 8px;
@@ -249,6 +248,7 @@ function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
       margin-top: 0px !important;
       padding: 0px !important;
       color: var(--title-color);
+      text-align: left;
     }
     
     .empty-state-description {
@@ -354,27 +354,6 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     imgContainer.style.borderRadius = '8px'
     imgContainer.style.padding = '16px'
     imgContainer.style.backgroundColor = '#f9f9f9'
-    imgContainer.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)'
-
-    // Image container header - for filename
-    const imgHeader = document.createElement('div')
-    imgHeader.style.marginBottom = '12px'
-    imgHeader.style.paddingBottom = '8px'
-    imgHeader.style.fontSize = '14px'
-
-    // Extract just the filename from the path
-    const urlParts = img.src.split('/')
-    const filename = urlParts[urlParts.length - 1]
-
-    const filenameEl = document.createElement('strong')
-    filenameEl.textContent = 'Bestand: '
-
-    const filenameValue = document.createElement('span')
-    filenameValue.textContent = filename
-    filenameValue.style.wordBreak = 'break-all'
-
-    imgHeader.appendChild(filenameEl)
-    imgHeader.appendChild(filenameValue)
 
     // Create thumbnail container - to center the image
     const thumbnailContainer = document.createElement('div')
@@ -387,13 +366,14 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     thumbnailContainer.style.marginBottom = '12px'
     thumbnailContainer.style.border = '1px solid #eee'
     thumbnailContainer.style.borderRadius = '4px'
+    thumbnailContainer.style.padding = '10px'
 
     // Create thumbnail
     const thumbnail = document.createElement('img')
     thumbnail.src = img.src
     thumbnail.alt = 'Afbeelding zonder alt-tekst'
-    thumbnail.style.maxWidth = '90%'
-    thumbnail.style.maxHeight = '80px'
+    thumbnail.style.maxWidth = '100%'
+    thumbnail.style.maxHeight = '60px'
     thumbnail.style.objectFit = 'contain'
 
     thumbnailContainer.appendChild(thumbnail)
@@ -404,24 +384,9 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     sourceInfo.style.fontSize = '12px'
     sourceInfo.style.lineHeight = '1.6'
 
-    // Create dimensions info if available
-    if (img.width || img.height) {
-      const dimensionsInfo = document.createElement('div')
-      dimensionsInfo.className = 'image-dimensions'
-      dimensionsInfo.style.marginBottom = '8px'
-
-      const dimensionsLabel = document.createElement('strong')
-      dimensionsLabel.textContent = 'Afmetingen: '
-
-      const dimensionsValue = document.createElement('span')
-      dimensionsValue.textContent = `${img.width || '?'}×${
-        img.height || '?'
-      } px`
-
-      dimensionsInfo.appendChild(dimensionsLabel)
-      dimensionsInfo.appendChild(dimensionsValue)
-      sourceInfo.appendChild(dimensionsInfo)
-    }
+    // Extract just the filename from the path
+    const urlParts = img.src.split('/')
+    const filename = urlParts[urlParts.length - 1]
 
     // Create URL info
     const urlLabel = document.createElement('strong')
@@ -429,7 +394,7 @@ function displayImagesInfo(container, imagesWithoutAlt) {
 
     const urlValue = document.createElement('span')
     urlValue.textContent = img.src
-    urlValue.style.color = '#666'
+    urlValue.style.color = '#424861'
     urlValue.style.fontSize = '10px'
     urlValue.style.wordBreak = 'break-all'
     urlValue.style.display = 'block'
@@ -438,10 +403,26 @@ function displayImagesInfo(container, imagesWithoutAlt) {
     const urlContainer = document.createElement('div')
     urlContainer.appendChild(urlLabel)
     urlContainer.appendChild(urlValue)
+
+    // Create filename info as a single element
+    const filenameElement = document.createElement('div')
+    filenameElement.style.fontSize = '10px'
+    filenameElement.style.color = '#424861'
+    filenameElement.style.wordBreak = 'break-word'
+
+    const filenameLabel = document.createElement('strong')
+    filenameLabel.textContent = 'Bestand: '
+    filenameLabel.style.color = '#424861'
+    filenameLabel.style.fontSize = '12px'
+
+    filenameElement.appendChild(filenameLabel)
+    filenameElement.appendChild(document.createTextNode(filename))
+
+    // Add elements to source info
+    sourceInfo.appendChild(filenameElement)
     sourceInfo.appendChild(urlContainer)
 
     // Add elements to container
-    imgContainer.appendChild(imgHeader)
     imgContainer.appendChild(thumbnailContainer)
     imgContainer.appendChild(sourceInfo)
     grid.appendChild(imgContainer)
