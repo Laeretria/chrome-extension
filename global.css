@@ -429,16 +429,18 @@ h2 {
   padding: 10px;
   border-radius: 4px;
   cursor: pointer;
-  border: 1px solid #e7e9f1;
+  border: none;
   font-family: 'Regola-Medium';
-  color: var(--body);
-  background-color: #bceabd;
+  color: #025313;
+  background-color: #69b578;
   transition: background-color 0.3s;
   width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 .complete-btn:not(.disabled):hover {
-  background-color: #9fe6a1;
+  opacity: 0.9;
 }
 
 .incomplete-btn {
@@ -448,16 +450,18 @@ h2 {
   padding: 10px;
   border-radius: 4px;
   cursor: pointer;
-  border: 1px solid #e7e9f1;
+  border: none;
   font-family: 'Regola-Medium';
-  color: var(--body);
-  background-color: #eca9a9;
+  color: #490c0b;
+  background-color: #ff5e5b;
   transition: background-color 0.3s;
   width: 100%;
+  text-align: center;
+  justify-content: center;
 }
 
 .incomplete-btn:not(.disabled):hover {
-  background-color: #e89292;
+  opacity: 0.9;
 }
 
 .export-btn.disabled {

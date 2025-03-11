@@ -226,11 +226,15 @@ export function updateSchemaUI(response) {
 
     // Create a schema section
     const schemaSection = document.createElement('div')
-    schemaSection.style.marginBottom = '20px'
     schemaSection.style.backgroundColor = '#f5f9ff'
     schemaSection.style.borderRadius = '8px'
     schemaSection.dataset.schemaIndex = groupIndex
     container.appendChild(schemaSection)
+
+    // Add this line to select all children except the last one
+    container.querySelectorAll('div:not(:last-child)').forEach((div) => {
+      div.style.marginBottom = '15px'
+    })
 
     // Add to schema sections array for search functionality
     schemaSections.push(schemaSection)
