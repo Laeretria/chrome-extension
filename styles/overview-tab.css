@@ -16,7 +16,6 @@
   border: 1px solid #e7e9f1;
   border-radius: 6px;
   overflow: hidden;
-  /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
 }
 
 .meta-header,
@@ -100,7 +99,6 @@
   border: 1px solid #e7e9f1;
   border-radius: 6px;
   overflow: hidden;
-  /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
 }
 
 .info-content {
@@ -108,8 +106,6 @@
   color: var(--body);
   font-size: 16px !important;
 }
-
-/* Add these styles to your CSS file */
 
 .character-count {
   font-size: 12px;
@@ -234,7 +230,6 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
-  /* Create a hover target area that's slightly larger than the visible tooltip */
   padding: 15px;
   margin: -15px;
 }
@@ -257,6 +252,7 @@
   font-weight: normal;
   border: 1px solid #e0e0e0;
   position: relative;
+  font-family: 'Regola-Regular';
 }
 
 /* Default arrow position (pointing left) */
@@ -378,6 +374,7 @@ button.custom-tooltip-icon:focus {
   font-size: 12px;
   line-height: 1.4;
   border: 1px solid;
+  font-family: 'Regola-Regular';
 }
 
 /* For standard tooltips - arrow pointing left */

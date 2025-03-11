@@ -390,9 +390,10 @@ function createSocialPreviewUI(metadata) {
     .empty-state-benefits {
       background: #d4edda;
       border-left: 4px solid #28a745;
-      padding: 16px;
+      padding: 10px 15px;
       border-radius: 6px;
       margin-top: 1rem;
+      font-size: 14px;
     }
     .empty-state-benefits p{
       padding: 0px !important;

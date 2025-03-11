@@ -1,14 +1,4 @@
-// custom-tooltips.js - Modified version without inline styles
-// This can be saved as a separate file
-
 export function createCustomTooltip(element, tooltipInfo, tooltipType) {
-  console.log(
-    'Creating custom tooltip:',
-    tooltipType,
-    'for element:',
-    element.textContent.trim()
-  )
-
   // Create the tooltip icon
   const tooltipIcon = document.createElement('button')
   tooltipIcon.type = 'button'

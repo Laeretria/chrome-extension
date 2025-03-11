@@ -243,8 +243,6 @@ export function addTooltipToElement(element, tooltipInfo) {
 
 // Updated setupTooltips function to clean up previous tooltips properly
 export function setupTooltips() {
-  console.log('Setting up tooltips...')
-
   // Remove any existing tooltips to prevent duplicates
   document.querySelectorAll('.tooltip-icon').forEach((icon) => {
     const tooltipId = icon.getAttribute('data-tooltip-id')
@@ -265,7 +263,6 @@ export function setupTooltips() {
     if (!titleElement) return
 
     const titleText = titleElement.textContent.trim().toLowerCase()
-    console.log('Found meta header:', titleText)
 
     // Map titleText to tooltipData key
     let tooltipKey
@@ -285,7 +282,6 @@ export function setupTooltips() {
     if (!titleElement) return
 
     const titleText = titleElement.textContent.trim().toLowerCase()
-    console.log('Found info header:', titleText)
 
     // Map titleText to tooltipData key
     let tooltipKey
@@ -298,6 +294,4 @@ export function setupTooltips() {
       addTooltipToElement(titleElement, tooltipData[tooltipKey])
     }
   })
-
-  console.log('Tooltip setup complete')
 }

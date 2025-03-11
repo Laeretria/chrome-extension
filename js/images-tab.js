@@ -69,7 +69,6 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
   // Add click event listener
   newHighlightBtn.addEventListener('click', () => {
     isHighlighted = !isHighlighted
-    console.log('Button clicked, highlight state:', isHighlighted)
 
     // Update button text and style immediately for better user feedback
     updateButtonState()
@@ -80,8 +79,6 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
         console.error('No active tab found')
         return
       }
-
-      console.log('Sending highlight message to tab:', tabs[0].id)
 
       chrome.tabs.sendMessage(
         tabs[0].id,
@@ -101,11 +98,8 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
             return
           }
 
-          console.log('Got response from content script:', response)
-
           // If we got a valid response with actual data
           if (response && response.images) {
-            console.log('Displaying info for', response.images.length, 'images')
             // Update the images info with the ones that were actually highlighted
             if (isHighlighted) {
               displayImagesInfo(imageInfoContainer, response.images)

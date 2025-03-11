@@ -13,7 +13,6 @@ export async function getSitemapFromRobots(domain) {
 
     // Check if response is successful
     if (!response.ok) {
-      console.log(`No robots.txt found at ${fullDomain}/robots.txt`)
       return []
     }
 
@@ -179,8 +178,6 @@ const setupCompletedLinks = new Set()
 
 // Setup footer links function with support for different tab IDs
 export async function setupFooterLinks(currentDomain) {
-  console.log('Setting up footer links for domain:', currentDomain)
-
   // If no domain provided, try to get it from the active tab
   if (!currentDomain) {
     currentDomain = await getCurrentDomain()
@@ -195,8 +192,6 @@ export async function setupFooterLinks(currentDomain) {
     ? currentDomain
     : `https://${currentDomain}`
 
-  console.log('Using domain:', fullDomain)
-
   // Check for elements with different possible ID prefixes
   const possiblePrefixes = ['', 'headings-', 'overview-']
 
@@ -210,20 +205,14 @@ export async function setupFooterLinks(currentDomain) {
       setupCompletedLinks.has(robotsLinkId) ||
       setupCompletedLinks.has(sitemapLinkId)
     ) {
-      console.log(`Links with prefix '${prefix}' already set up, skipping`)
       continue
     }
-
-    console.log(`Looking for robotsLink with ID: ${robotsLinkId}`)
-    console.log(`Looking for sitemapLink with ID: ${sitemapLinkId}`)
 
     const robotsLink = document.getElementById(robotsLinkId)
     const sitemapLink = document.getElementById(sitemapLinkId)
     const sitemapLoader = document.getElementById(sitemapLoaderId)
 
     if (robotsLink) {
-      console.log(`Found robotsLink with ID: ${robotsLinkId}`)
-
       // Mark this link as set up to avoid duplicates
       setupCompletedLinks.add(robotsLinkId)
 
@@ -240,7 +229,6 @@ export async function setupFooterLinks(currentDomain) {
       // Add click event listener
       newRobotsLink.addEventListener('click', (e) => {
         e.preventDefault()
-        console.log(`Opening robots.txt: ${robotsTxtUrl}`)
 
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
           if (chrome.runtime.lastError) {
@@ -265,8 +253,6 @@ export async function setupFooterLinks(currentDomain) {
     }
 
     if (sitemapLink) {
-      console.log(`Found sitemapLink with ID: ${sitemapLinkId}`)
-
       // Mark this link as set up to avoid duplicates
       setupCompletedLinks.add(sitemapLinkId)
 
@@ -277,8 +263,6 @@ export async function setupFooterLinks(currentDomain) {
       // Find the sitemap URL and set up the link
       findSitemapUrl(fullDomain)
         .then((sitemapUrl) => {
-          console.log(`Found sitemap URL for ${prefix}:`, sitemapUrl)
-
           // Clear any existing event listeners by replacing with a clone
           const newSitemapLink = sitemapLink.cloneNode(true)
           if (sitemapLink.parentNode) {
@@ -292,7 +276,6 @@ export async function setupFooterLinks(currentDomain) {
           // Add click event listener
           newSitemapLink.addEventListener('click', (e) => {
             e.preventDefault()
-            console.log(`Opening sitemap: ${sitemapUrl}`)
 
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
               if (chrome.runtime.lastError) {

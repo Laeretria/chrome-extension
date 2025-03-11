@@ -25,7 +25,6 @@ export async function initCurrentDomain() {
     if (tabs && tabs[0] && tabs[0].url) {
       const url = tabs[0].url
       currentWebsiteDomain = getCleanDomainName(url)
-      console.log('Current website domain:', currentWebsiteDomain)
     }
   } catch (error) {
     console.error('Error getting current domain:', error)
