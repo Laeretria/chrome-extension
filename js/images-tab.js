@@ -30,9 +30,23 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
     return
   }
 
-  // Remove any existing event listeners
-  const newHighlightBtn = highlightBtn.cloneNode(true)
-  highlightBtn.parentNode.replaceChild(newHighlightBtn, highlightBtn)
+  // Create empty state container
+  createEmptyStateContainer(hasMissingAlt, highlightBtn)
+
+  // Check if we're using the cloned button in the empty state container
+  const highlightBtnClone = document.getElementById('highlightMissingAltClone')
+
+  // Use the clone if it exists, otherwise use the original
+  const btnToUse = highlightBtnClone || highlightBtn
+
+  // Remove any existing event listeners by cloning
+  const newHighlightBtn = btnToUse.cloneNode(true)
+  btnToUse.parentNode.replaceChild(newHighlightBtn, btnToUse)
+
+  // If we're working with the clone, make sure it maintains the clone ID
+  if (highlightBtnClone) {
+    newHighlightBtn.id = 'highlightMissingAltClone'
+  }
 
   // Get tooltip manager instance
   const tooltipManager = getTooltipManager()
@@ -109,7 +123,7 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
     function updateButtonState() {
       newHighlightBtn.textContent = isHighlighted
         ? 'Verwijder markering'
-        : 'Markeer afbeeldingen zonder alt-tags'
+        : 'Markeer afbeeldingen'
 
       if (isHighlighted) {
         newHighlightBtn.classList.add('active-highlight')
@@ -123,12 +137,141 @@ function setupHighlightButton(hasMissingAlt, imagesWithNoAlt) {
   })
 }
 
+// Create empty state container with specified styling and content
+function createEmptyStateContainer(hasMissingAlt, highlightBtn) {
+  // Remove existing empty state container if it exists
+  const existingContainer = document.getElementById(
+    'images-empty-state-container'
+  )
+  if (existingContainer) {
+    existingContainer.remove()
+  }
+
+  // Create the empty state container
+  const emptyStateContainer = document.createElement('div')
+  emptyStateContainer.id = 'images-empty-state-container'
+  emptyStateContainer.className = 'empty-state-container'
+
+  // Create title element (outside the notice box)
+  const title = document.createElement('h3')
+  title.className = 'empty-state-title'
+  title.textContent = 'Markeer afbeeldingen zonder alt-tags'
+  title.style.textAlign = 'center'
+  title.style.marginBottom = '15px'
+
+  // Add the title to the container
+  emptyStateContainer.appendChild(title)
+
+  // Create notice content (styled like preview-notice from social.js)
+  const noticeContent = document.createElement('div')
+  noticeContent.className = 'preview-notice'
+  noticeContent.innerHTML = `
+    <div class="preview-notice-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+    </div>
+    <div class="preview-notice-text">
+      <p class="empty-state-description">
+        Klik op de knop om afbeeldingen zonder alt-tags te markeren die zichtbaar zijn op de pagina.
+      </p>
+    </div>
+  `
+
+  emptyStateContainer.appendChild(noticeContent)
+
+  // Find the best location to insert the empty state container
+  const imagesTab = document.getElementById('images-tab')
+
+  if (imagesTab) {
+    // Try to find the structure list container
+    const structureList =
+      imagesTab.querySelector('.structure-list') ||
+      imagesTab.querySelector('.tab-content') ||
+      imagesTab
+
+    // Append the empty state container to the structure list
+    structureList.appendChild(emptyStateContainer)
+
+    // If the highlight button exists
+    if (highlightBtn) {
+      // Clone the button to avoid any existing event handlers
+      const buttonClone = highlightBtn.cloneNode(true)
+
+      // Add the cloned button to the empty state container
+      emptyStateContainer.appendChild(buttonClone)
+
+      // Hide the original button (we'll keep it in the DOM to avoid other JS errors)
+      highlightBtn.style.display = 'none'
+
+      // Style the cloned button
+      buttonClone.style.display = 'block'
+      buttonClone.style.margin = '15px auto'
+      buttonClone.id = 'highlightMissingAltClone'
+    }
+  }
+
+  // Add necessary CSS for the empty state
+  const style = document.createElement('style')
+  style.textContent = `
+    .empty-state-container {
+      text-align: center;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 0px;
+      border: 1px solid #eee;
+    }
+    
+    .preview-notice {
+      display: flex;
+      align-items: center;
+      background-color: #fff8e6;
+      border-left: 4px solid #ffc107;
+      padding: 10px 15px;
+      border-radius: 8px;
+      text-align: left;
+    }
+    
+    .preview-notice-icon {
+      margin-right: 10px;
+      color: #ffc107;
+      display: flex;
+      align-items: center;
+    }
+    
+    .empty-state-title {
+      margin-bottom: 0.5rem;
+      color: black;
+      font-size: 16px;
+      margin-top: 0px !important;
+      padding: 0px !important;
+      color: var(--title-color);
+    }
+    
+    .empty-state-description {
+      margin-bottom: 0;
+      margin-top: 0 !important;
+      color: #495057;
+      line-height: 1.5;
+      font-size: 14px;
+      padding: 0 !important;
+      font-family: 'Regola-Regular';
+    }
+  `
+
+  document.head.appendChild(style)
+
+  return emptyStateContainer
+}
+
 // Create a container for displaying image information
 function createImageInfoContainer() {
   const container = document.createElement('div')
   container.id = 'imageInfoContainer'
   container.style.display = 'none'
-  container.style.marginTop = '20px'
   container.style.width = '100%'
   container.style.clear = 'both'
 
@@ -187,12 +330,12 @@ function displayImagesInfo(container, imagesWithoutAlt) {
 
   // Create heading
   const heading = document.createElement('h3')
-  heading.textContent = `Afbeeldingen zonder alt-tekst (${visibleImagesWithoutAlt.length} zichtbare van ${imagesWithoutAlt.length} totaal)`
+  heading.textContent = `Afbeeldingen zichtbaar  (${visibleImagesWithoutAlt.length})`
   heading.style.fontSize = '16px'
-  heading.style.marginBottom = '20px'
-  heading.style.marginTop = '20px'
   heading.style.paddingLeft = '16px'
   container.appendChild(heading)
+
+  heading.classList.add('custom-heading')
 
   // Create grid container
   const grid = document.createElement('div')

@@ -20,8 +20,14 @@
   border: 1px solid #e7e9f1;
   font-family: 'Regola-Medium';
   transition: background-color 0.3s;
+  margin-bottom: 0px !important;
 }
 
 .highlight-button:hover {
   background-color: var(--secondary-color);
+}
+
+h3.custom-heading {
+  margin-top: 0 !important;
+  margin-bottom: 16x;
 }

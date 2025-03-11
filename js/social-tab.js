@@ -357,6 +357,7 @@ function createSocialPreviewUI(metadata) {
       color: black;
       margin-top: 0px !important;
       padding: 0px !important;
+      color: var(--title-color);
     }
     
     .empty-state-description {
