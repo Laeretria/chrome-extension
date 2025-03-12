@@ -127,7 +127,6 @@ async function ensureContentScriptInjected(tabId) {
 // Main function to load tab data
 async function loadTabData(tabName) {
   try {
-    console.log(`Loading data for tab: ${tabName}`)
     const tabs = await chrome.tabs.query({ active: true, currentWindow: true })
     const currentTab = tabs[0]
 
@@ -170,7 +169,6 @@ async function loadTabData(tabName) {
           console.error('Error in sendMessage:', chrome.runtime.lastError)
           reject(chrome.runtime.lastError)
         } else {
-          console.log(`Received response for ${action}:`, response)
           resolve(response)
         }
       })

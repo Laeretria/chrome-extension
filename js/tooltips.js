@@ -71,8 +71,6 @@ export const tooltipData = {
 
 // Improved helper function with better hover behavior
 export function addTooltipToElement(element, tooltipInfo) {
-  console.log('Adding tooltip to element:', element.textContent.trim())
-
   // First, check if tooltip already exists
   let nextSibling = element.nextSibling
   while (nextSibling) {
