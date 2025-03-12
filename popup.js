@@ -220,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const tabButtons = document.querySelectorAll('.tab-button')
 
   // Function to add favicon
+  // Modify the addFaviconToHeader function
   function addFaviconToHeader() {
     const header = sidebar.querySelector('.sidebar-header')
     if (header) {
@@ -235,18 +236,30 @@ document.addEventListener('DOMContentLoaded', function () {
         header.appendChild(favicon)
       }
 
-      // Toggle visibility based on minimized state
+      // Handle title transitions before adding/removing minimized class
+      const title = header.querySelector('.sidebar-title')
+      if (title) {
+        if (appContainer.classList.contains('minimized')) {
+          // When minimized, fade out title immediately
+          title.style.opacity = '0'
+          // Use setTimeout to ensure it's fully invisible before DOM changes
+          setTimeout(() => {
+            title.style.display = 'none'
+          }, 150)
+        } else {
+          // When maximized, hide first then fade in
+          title.style.display = 'block'
+          // Use setTimeout to ensure display change is applied before opacity
+          setTimeout(() => {
+            title.style.opacity = '1'
+          }, 10)
+        }
+      }
+
+      // Handle favicon display
       favicon.style.display = appContainer.classList.contains('minimized')
         ? 'block'
         : 'none'
-
-      // Hide title when minimized
-      const title = header.querySelector('.sidebar-title')
-      if (title) {
-        title.style.display = appContainer.classList.contains('minimized')
-          ? 'none'
-          : 'block'
-      }
     }
   }
 
@@ -339,27 +352,65 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Call when clicking the minimize button
   minimizeButton.addEventListener('click', function () {
-    // Toggle the minimized state
-    const newMinimizedState = !appContainer.classList.contains('minimized')
+    // Get current state
+    const willMinimize = !appContainer.classList.contains('minimized')
 
-    // Update localStorage
-    localStorage.setItem('kreatixSEOToolMinimized', newMinimizedState)
+    // Handle title transitions before class changes
+    const title = sidebar.querySelector('.sidebar-title')
+    if (title) {
+      if (willMinimize) {
+        // Hide title immediately when minimizing
+        title.style.opacity = '0'
 
-    // Apply the state
-    applyMinimizedState(newMinimizedState)
+        // Wait for title fade-out before starting container transition
+        setTimeout(() => {
+          // Toggle the minimized state
+          appContainer.classList.add('minimized')
 
-    // Toggle icon visibility manually
-    const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
-    const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+          // Update localStorage
+          localStorage.setItem('kreatixSEOToolMinimized', 'true')
 
-    if (minimizeIcon && maximizeIcon) {
-      if (newMinimizedState) {
-        minimizeIcon.style.display = 'none'
-        maximizeIcon.style.display = 'block'
+          // Apply the state
+          applyMinimizedState(true)
+
+          // Toggle icon visibility
+          const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
+          const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+
+          if (minimizeIcon && maximizeIcon) {
+            minimizeIcon.style.display = 'none'
+            maximizeIcon.style.display = 'block'
+          }
+        }, 150)
       } else {
-        minimizeIcon.style.display = 'block'
-        maximizeIcon.style.display = 'none'
+        // When maximizing, change class first
+        appContainer.classList.remove('minimized')
+
+        // Update localStorage
+        localStorage.setItem('kreatixSEOToolMinimized', 'false')
+
+        // Apply the state
+        applyMinimizedState(false)
+
+        // Toggle icon visibility
+        const minimizeIcon = minimizeButton.querySelector('.minimize-icon')
+        const maximizeIcon = minimizeButton.querySelector('.maximize-icon')
+
+        if (minimizeIcon && maximizeIcon) {
+          minimizeIcon.style.display = 'block'
+          maximizeIcon.style.display = 'none'
+        }
+
+        // Show title with delay
+        setTimeout(() => {
+          title.style.display = 'block'
+          // Additional small delay for smoother transition
+          setTimeout(() => {
+            title.style.opacity = '1'
+          }, 10)
+        }, 50)
       }
+      return
     }
   })
 

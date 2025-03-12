@@ -86,6 +86,8 @@ body {
   font-weight: bold;
   text-align: left;
   color: white;
+  transition: opacity 0.25s ease-in-out;
+  white-space: nowrap;
 }
 
 /* Transform horizontal tabs to vertical in W3Schools style */
@@ -264,17 +266,6 @@ h2 {
   color: #721c24;
 }
 
-/* Export Buttons Links and Images */
-/* .export-buttons {
-  text-align: center;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-  position: relative;
-} */
-
 .export-buttons {
   display: flex;
   justify-content: center; /* Centers buttons inside container */
@@ -431,7 +422,6 @@ h2 {
   border-radius: 6px;
   margin-top: 15px;
   border: 1px solid #e7e9f1;
-  /* box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px; */
 }
 
 .heading-stats {
@@ -557,13 +547,12 @@ h2 {
 
 /* Add the favicon to the header when minimized */
 .minimized-favicon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
+  display: none;
+  width: 24px;
   height: auto;
-  margin: auto;
-  padding: 0px;
+  margin: 0 auto;
+  padding: 10px 0;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .app-container.minimized .minimized-favicon {
@@ -578,13 +567,13 @@ h2 {
 
 .app-container.minimized .sidebar {
   width: 50px;
-  height: auto; /* Allow height to collapse to content */
-  min-height: unset; /* Remove any minimum height */
+  height: auto;
+  min-height: unset;
 }
 
 /* Adjust the tabs section to take only needed space */
 .app-container.minimized .tabs {
-  margin-bottom: 0; /* Remove any bottom margin */
+  margin-bottom: 0;
   order: 0;
 }
 
@@ -593,32 +582,42 @@ h2 {
 }
 
 .app-container.minimized .sidebar-header {
-  order: -1; /* Ensure header is at the top */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin: 0px !important;
+  padding: 0px !important;
 }
 
 /* Hide the sidebar-bottom in minimized state */
 .app-container.minimized .sidebar-bottom {
-  margin-top: 0; /* No longer push to bottom */
-  position: static; /* Reset any positioning */
-  order: 1; /* Put it after the tabs */
+  margin-top: 0;
+  position: static;
+  order: 1;
 }
 
 /* Hide powered-by section when minimized */
 .app-container.minimized .powered-by {
-  display: none; /* Completely hide the powered-by section */
+  display: none;
 }
 
 /* Position the minimize button immediately after tabs */
 .app-container.minimized .minimize-button {
-  margin: 10px auto; /* Center it horizontally with auto margins */
-  order: 2; /* Position after the sidebar-bottom */
+  margin: 10px auto;
+  order: 2;
 }
 
-.app-container.minimized .sidebar-title,
 .app-container.minimized .tabs span,
 .app-container.minimized .powered-by p,
 .app-container.minimized .powered-by a {
   display: none;
+}
+
+.app-container.minimized .sidebar-title {
+  opacity: 0;
+  visibility: hidden;
+  position: absolute; /* Remove from flow instead of display:none */
 }
 
 .app-container.minimized .maximize-icon {
@@ -628,17 +627,6 @@ h2 {
 .app-container.minimized .minimize-icon {
   justify-content: center;
 }
-
-/* .app-container,
-.sidebar,
-.sidebar-bottom,
-.minimize-button,
-.powered-by,
-.tabs .main-content,
-.minimized-favicon,
-.maximize-icon {
-  transition: all 0.3s ease;
-} */
 
 /* Enhanced transition effects */
 .app-container {
