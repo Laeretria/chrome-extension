@@ -8,6 +8,12 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "icons": {
+    "16": "assets/logo/icon16.png",
+    "32": "assets/logo/icon32.png",
+    "48": "assets/logo/icon48.png",
+    "128": "assets/logo/icon128.png"
+  },
   "web_accessible_resources": [
     {
       "resources": ["js/*.js"],

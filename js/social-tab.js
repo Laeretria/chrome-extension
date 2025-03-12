@@ -339,19 +339,23 @@ function createSocialPreviewUI(metadata) {
     }
     
     .empty-state-container {
-      text-align: center;
+      display: flex;
+      flex-direction: column;
+      text-align: left;
       background: white;
       padding: 15px;
       border-radius: 6px;
       margin-top: 20px;
-      margin: 1.5rem 0;
+      margin-bottom: 0px;
       border: 1px solid #eee;
+    }
+
+    .empty-state-icon {
+      margin-right: 12px;
     }
     
     .empty-state-icon svg {
-      margin: 0 auto 1rem;
-      display: flex;
-      justify-content: center;
+      display: block;
       background-color: var(--background-color);
       color: var(--primary-color);
       border-radius: 6px;
@@ -359,17 +363,24 @@ function createSocialPreviewUI(metadata) {
     }
     
     .empty-state-title {
-      margin-bottom: 1rem;
       color: black;
       margin-top: 0px !important;
       padding: 0px !important;
       color: var(--title-color);
+      text-align: left;
+      margin-bottom: 0px !important;
     }
     
     .empty-state-description {
       margin-bottom: 1.5rem;
       color: #495057;
       line-height: 1.5;
+      text-align: left;
+    }
+
+    .empty-state-header {
+      display: flex;
+      align-items: center;
     }
     
     .empty-state-recommendations {
@@ -381,10 +392,12 @@ function createSocialPreviewUI(metadata) {
     
     .tag-recommendations {
       margin-bottom: 1rem;
+      text-align: left;
     }
     
     .tag-recommendations li {
       margin-bottom: 0.5rem;
+      text-align: left;
     }
     
     .empty-state-benefits {
@@ -411,13 +424,15 @@ function createSocialPreviewUI(metadata) {
  */
 function createEmptyStateMessageHTML() {
   return `
-    <div class="empty-state-icon">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-      </svg>
+    <div class="empty-state-header">
+      <div class="empty-state-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+        </svg>
+      </div>
+      <h3 class="empty-state-title">Geen metadata van sociale media gevonden</h3>
     </div>
-    <h3 class="empty-state-title">Geen metadata van sociale media gevonden</h3>
     <p class="empty-state-description">
       Deze pagina mist metadata die de weergave zou verbeteren wanneer deze wordt gedeeld op sociale media.
       Zonder de juiste metadata zullen sociale platforms standaardwaarden gebruiken die je content mogelijk niet effectief weergeven.

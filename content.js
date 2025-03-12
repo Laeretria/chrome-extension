@@ -274,7 +274,6 @@ function addHighlightingStyle() {
       .seo-extension-highlighted-img {
         outline: 5px solid red !important;
         outline-offset: -2px !important;
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.7) !important;
         position: relative !important;
         z-index: 2147483647 !important;
       }
@@ -294,7 +293,6 @@ function highlightImage(img) {
   // Also apply inline styles to ensure the highlighting works
   img.style.outline = '5px solid red'
   img.style.outlineOffset = '-2px'
-  img.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.7)'
   img.style.position = 'relative'
   img.style.zIndex = '2147483647' // Maximum z-index value
 }

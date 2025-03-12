@@ -136,12 +136,12 @@ export function createLinkElement(link) {
   if (link.href === 'Undefined (No href attribute)') {
     div.innerHTML = `
         <div class="undefined-link">Undefined (No href attribute)</div>
-        <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+        <div class="link-anchor">Anker: ${link.text || 'No text'}</div>
       `
   } else {
     div.innerHTML = `
         <a href="${link.href}" class="link-url" target="_blank">${link.href}</a>
-        <div class="link-anchor">Anchor: ${link.text || 'No text'}</div>
+        <div class="link-anchor">Anker: ${link.text || 'No text'}</div>
       `
   }
 

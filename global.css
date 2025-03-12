@@ -557,8 +557,10 @@ h2 {
 
 /* Add the favicon to the header when minimized */
 .minimized-favicon {
-  display: none;
-  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
   height: auto;
   margin: auto;
   padding: 0px;
