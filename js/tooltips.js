@@ -1,55 +1,47 @@
 export const tooltipData = {
   title: {
     text: 'Dit is de tekst die wordt weergegeven in het browsertabblad en vaak in de koppen van zoekresultaten (soms herschrijft Google ze). De huidige maximale lengte die volledig wordt weergegeven in zoekresultaten is ongeveer 65 tekens of 568 pixels.',
-    link: 'https://kreatix.be/blog/meta-title-seo',
+    // link: 'https://kreatix.be/blog/meta-title-seo',
   },
   description: {
     text: 'Een korte tekst die een pagina samenvat. Hoewel niet cruciaal, is een ideale lengte tussen de 70 en 155 tekens.',
-    link: 'https://kreatix.be/blog/meta-description-seo',
+    // link: 'https://kreatix.be/blog/meta-description-seo',
   },
   url: {
     text: 'De URL van de pagina waarop je je momenteel bevindt. URL staat voor Uniform Resource Locator.',
-    link: 'https://kreatix.be/blog/url-structure-seo',
+    // link: 'https://kreatix.be/blog/url-structure-seo',
   },
   canonical: {
     text: "Een canonical tag vertelt zoekmachines zoals Google wat de 'voorkeurs-' of 'hoofd-' URL van een pagina moet zijn.",
-    link: 'https://kreatix.be/blog/canonical-tags-seo',
+    // link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
   robotsTag: {
     text: "De robots-meta tag vertelt zoekmachines of ze je pagina moeten indexeren en de links moeten volgen. Veelvoorkomende waarden zijn 'index,follow', 'noindex,follow' en 'noindex,nofollow'.",
-    link: 'https://kreatix.be/blog/robots-meta-tags',
+    // link: 'https://kreatix.be/blog/robots-meta-tags',
   },
   xRobotsTag: {
     text: "De X-Robots-Tag is een HTTP-header die dezelfde richtlijnen biedt als de robots-meta tag, maar kan worden toegepast op niet-HTML-documenten zoals PDF's.",
-    link: 'https://kreatix.be/blog/x-robots-tag',
+    // link: 'https://kreatix.be/blog/x-robots-tag',
   },
-  /*   wordCount: {
-    text: 'Het totale aantal woorden op je pagina. Hoewel er geen perfect aantal woorden is, presteert uitgebreide content vaak beter in zoekresultaten voor informatieve zoekopdrachten.',
-    link: 'https://kreatix.be/blog/content-length-seo',
-  },
-  language: {
-    text: 'De opgegeven taal van de pagina.',
-    link: 'https://kreatix.be/blog/language-settings-seo',
-  }, */
   indexable: {
     text: 'Deze pagina kan worden geïndexeerd door zoekmachines zoals Google, wat betekent dat deze kan verschijnen in zoekresultaten.',
-    link: 'https://kreatix.be/blog/indexing-seo',
+    // link: 'https://kreatix.be/blog/indexing-seo',
   },
   nonIndexable: {
     text: 'Deze pagina kan niet worden geïndexeerd door zoekmachines en zal niet verschijnen in zoekresultaten.',
-    link: 'https://kreatix.be/blog/noindex-seo',
+    // link: 'https://kreatix.be/blog/noindex-seo',
   },
   selfReferencing: {
     text: 'De canonical URL verwijst naar dezelfde pagina, wat aangeeft dat dit de oorspronkelijke/hoofdversie van de content is.',
-    link: 'https://kreatix.be/blog/canonical-tags-seo',
+    // link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
   external: {
     text: 'De canonical URL verwijst naar een andere pagina, wat aangeeft dat dit niet de oorspronkelijke/hoofdversie van de content is.',
-    link: 'https://kreatix.be/blog/canonical-tags-seo',
+    // link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
   missingCanonical: {
     text: 'Er is geen canonical tag gevonden op deze pagina. Het toevoegen van een canonical tag helpt zoekmachines begrijpen welke URL de geprefereerde versie van deze pagina is.',
-    link: 'https://kreatix.be/blog/canonical-tags-seo',
+    // link: 'https://kreatix.be/blog/canonical-tags-seo',
   },
   titleTooShort: {
     text: 'De titel is te kort. Titels korter dan 30 tekens benutten de zichtbare ruimte in zoekresultaten niet optimaal en kunnen minder relevant lijken voor zoekmachines.',

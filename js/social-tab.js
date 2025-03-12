@@ -15,24 +15,70 @@ function formatDate(dateString) {
 }
 
 /**
- * Helper function to extract domain from URL
+ * Updated helper function to extract domain from URL
  * @param {string} url - URL to extract domain from
  * @returns {string} - Extracted domain
  */
 function extractDomain(url) {
   try {
-    const domain = new URL(url).hostname
+    // First try to get canonical URL
+    let sourceUrl = url
+    try {
+      const canonicalLink = document.querySelector('link[rel="canonical"]')
+      if (canonicalLink && canonicalLink.href) {
+        sourceUrl = canonicalLink.href
+      }
+    } catch (domError) {
+      // Silently continue with original URL if DOM access fails
+    }
 
-    // Check if the domain looks like a real domain or an internal identifier
-    // Real domains typically have a TLD (.com, .nl, etc.) and don't consist only of random characters
-    if (!domain.includes('.') || /^[a-z0-9]{30,}$/i.test(domain)) {
-      return 'voorbeeld-domein.be' // This is likely an internal identifier, use a placeholder
+    const domain = new URL(sourceUrl).hostname
+
+    // Significantly improved domain validation
+    // Only invalidate domains in very specific cases:
+    // 1. No dots at all (every valid domain has at least one dot)
+    // 2. Extremely long string of only alphanumeric chars (likely an ID, not a domain)
+    if (
+      !domain.includes('.') ||
+      (/^[a-z0-9]{30,}$/i.test(domain) && !domain.includes('.'))
+    ) {
+      return 'voorbeeld-domein.be'
+    }
+
+    // For IP addresses and localhost, you might want to use a placeholder
+    if (/^(\d{1,3}\.){3}\d{1,3}$/.test(domain) || domain === 'localhost') {
+      return 'voorbeeld-domein.be'
     }
 
     return domain
   } catch (e) {
     return 'voorbeeld-domein.be'
   }
+}
+
+/**
+ * Function to extract and display site name from various sources
+ * @param {Object} metadata - The metadata object
+ * @param {string} url - Current page URL
+ * @returns {string} - Site name to display
+ */
+function getSiteName(metadata, url) {
+  const og = metadata.og || {}
+
+  // Priority order for site name:
+  // 1. og:site_name from metadata (most reliable when available)
+  // 2. Domain name extracted from canonical URL or current URL
+  // 3. Fallback to example domain
+
+  if (og.site_name && og.site_name.trim().length > 0) {
+    return og.site_name
+  }
+
+  // Get domain, preferring canonical URL
+  const domain = extractDomain(url)
+
+  // Format domain for display - remove www. prefix
+  return domain.replace(/^www\./, '')
 }
 
 /**
@@ -52,8 +98,13 @@ function createSocialPreview(metadata) {
   const description =
     og.description || twitter.description || 'Geen beschrijving'
   const image = og.image || twitter.image || ''
-  const siteName = og.site_name || extractDomain(window.location.href)
   const url = og.url || window.location.href
+
+  // Use getSiteName function for more reliable site name
+  const siteName = getSiteName(metadata, url)
+
+  // Display the domain (without www.)
+  const displayDomain = extractDomain(url).replace(/^www\./, '')
 
   let html = `
       <div class="preview-header">
@@ -81,7 +132,7 @@ function createSocialPreview(metadata) {
 
   html += `
         <div class="preview-text">
-          <div class="preview-domain">${extractDomain(url)}</div>
+          <div class="preview-domain">${displayDomain}</div>
           <div class="preview-title">${title}</div>
           <div class="preview-description">${description}</div>
         </div>
@@ -106,7 +157,9 @@ function createEmptySocialPreview() {
   container.className =
     'social-preview social-preview-empty social-preview-compact'
 
-  const domain = extractDomain(window.location.href)
+  // Use the improved domain extraction
+  const url = window.location.href
+  const domain = extractDomain(url).replace(/^www\./, '')
 
   container.innerHTML = `
     <div class="preview-header">
