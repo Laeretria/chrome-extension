@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "SEO Checker Tool",
+  "name": "SEO Checker Tool - Gratis SEO-analyse van elke website",
   "version": "1.0.0",
-  "description": "Een uitgebreide SEO analyse tool voor uw webpagina's",
+  "description": "Analyseer gratis de SEO van alle websites. Inclusief alt-tags, meta-beschrijvingen en meer",
   "permissions": ["activeTab", "scripting", "tabs"],
   "host_permissions": ["<all_urls>"],
   "action": {
